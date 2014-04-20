@@ -64,5 +64,5 @@ Oculus Rift DK1
 ### Credits
 
 * Oculus VR, for being awesome and making a C API for their SDK.
-* The authors of ctypesgen (https://code.google.com/p/ctypesgen/) for their outstanding ctypes wrapper.
+* The authors of ctypesgen (https://code.google.com/p/ctypesgen/) for their outstanding ctypes wrapper generator.
 
