@@ -612,11 +612,11 @@ _libs["libovr.dll"] = load_library(ovrpath)
 
 # No modules
 
-uintptr_t = c_uint # c:\\mingw\\include\\stdint.h: 87
+uintptr_t = c_uint # stdint.h: 87
 
-ovrBool = c_char # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 31
+ovrBool = c_char # OVR_CAPI.h: 31
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 51
+# OVR_CAPI.h: 51
 class struct_ovrVector2i_(Structure):
     pass
 
@@ -629,9 +629,9 @@ struct_ovrVector2i_._fields_ = [
     ('y', c_int),
 ]
 
-ovrVector2i = struct_ovrVector2i_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 51
+ovrVector2i = struct_ovrVector2i_ # OVR_CAPI.h: 51
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 55
+# OVR_CAPI.h: 55
 class struct_ovrSizei_(Structure):
     pass
 
@@ -644,9 +644,9 @@ struct_ovrSizei_._fields_ = [
     ('h', c_int),
 ]
 
-ovrSizei = struct_ovrSizei_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 55
+ovrSizei = struct_ovrSizei_ # OVR_CAPI.h: 55
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 60
+# OVR_CAPI.h: 60
 class struct_ovrRecti_(Structure):
     pass
 
@@ -659,9 +659,9 @@ struct_ovrRecti_._fields_ = [
     ('Size', ovrSizei),
 ]
 
-ovrRecti = struct_ovrRecti_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 60
+ovrRecti = struct_ovrRecti_ # OVR_CAPI.h: 60
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 66
+# OVR_CAPI.h: 66
 class struct_ovrQuatf_(Structure):
     pass
 
@@ -678,9 +678,9 @@ struct_ovrQuatf_._fields_ = [
     ('w', c_float),
 ]
 
-ovrQuatf = struct_ovrQuatf_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 66
+ovrQuatf = struct_ovrQuatf_ # OVR_CAPI.h: 66
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 70
+# OVR_CAPI.h: 70
 class struct_ovrVector2f_(Structure):
     pass
 
@@ -693,9 +693,9 @@ struct_ovrVector2f_._fields_ = [
     ('y', c_float),
 ]
 
-ovrVector2f = struct_ovrVector2f_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 70
+ovrVector2f = struct_ovrVector2f_ # OVR_CAPI.h: 70
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 74
+# OVR_CAPI.h: 74
 class struct_ovrVector3f_(Structure):
     pass
 
@@ -710,9 +710,9 @@ struct_ovrVector3f_._fields_ = [
     ('z', c_float),
 ]
 
-ovrVector3f = struct_ovrVector3f_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 74
+ovrVector3f = struct_ovrVector3f_ # OVR_CAPI.h: 74
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 78
+# OVR_CAPI.h: 78
 class struct_ovrMatrix4f_(Structure):
     pass
 
@@ -723,9 +723,9 @@ struct_ovrMatrix4f_._fields_ = [
     ('M', (c_float * 4) * 4),
 ]
 
-ovrMatrix4f = struct_ovrMatrix4f_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 78
+ovrMatrix4f = struct_ovrMatrix4f_ # OVR_CAPI.h: 78
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 84
+# OVR_CAPI.h: 84
 class struct_ovrPosef_(Structure):
     pass
 
@@ -738,9 +738,9 @@ struct_ovrPosef_._fields_ = [
     ('Position', ovrVector3f),
 ]
 
-ovrPosef = struct_ovrPosef_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 84
+ovrPosef = struct_ovrPosef_ # OVR_CAPI.h: 84
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 95
+# OVR_CAPI.h: 95
 class struct_ovrPoseStatef_(Structure):
     pass
 
@@ -761,9 +761,9 @@ struct_ovrPoseStatef_._fields_ = [
     ('TimeInSeconds', c_double),
 ]
 
-ovrPoseStatef = struct_ovrPoseStatef_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 95
+ovrPoseStatef = struct_ovrPoseStatef_ # OVR_CAPI.h: 95
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 106
+# OVR_CAPI.h: 106
 class struct_ovrFovPort_(Structure):
     pass
 
@@ -780,73 +780,73 @@ struct_ovrFovPort_._fields_ = [
     ('RightTan', c_float),
 ]
 
-ovrFovPort = struct_ovrFovPort_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 106
+ovrFovPort = struct_ovrFovPort_ # OVR_CAPI.h: 106
 
-enum_anon_1 = c_int # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 121
+enum_anon_1 = c_int # OVR_CAPI.h: 121
 
-ovrHmd_None = 0 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 121
+ovrHmd_None = 0 # OVR_CAPI.h: 121
 
-ovrHmd_DK1 = 3 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 121
+ovrHmd_DK1 = 3 # OVR_CAPI.h: 121
 
-ovrHmd_DKHD = 4 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 121
+ovrHmd_DKHD = 4 # OVR_CAPI.h: 121
 
-ovrHmd_CrystalCoveProto = 5 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 121
+ovrHmd_CrystalCoveProto = 5 # OVR_CAPI.h: 121
 
-ovrHmd_DK2 = 6 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 121
+ovrHmd_DK2 = 6 # OVR_CAPI.h: 121
 
-ovrHmd_Other = (ovrHmd_DK2 + 1) # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 121
+ovrHmd_Other = (ovrHmd_DK2 + 1) # OVR_CAPI.h: 121
 
-ovrHmdType = enum_anon_1 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 121
+ovrHmdType = enum_anon_1 # OVR_CAPI.h: 121
 
-enum_anon_2 = c_int # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 138
+enum_anon_2 = c_int # OVR_CAPI.h: 138
 
-ovrHmdCap_Present = 1 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 138
+ovrHmdCap_Present = 1 # OVR_CAPI.h: 138
 
-ovrHmdCap_Available = 2 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 138
+ovrHmdCap_Available = 2 # OVR_CAPI.h: 138
 
-ovrHmdCap_Orientation = 16 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 138
+ovrHmdCap_Orientation = 16 # OVR_CAPI.h: 138
 
-ovrHmdCap_YawCorrection = 32 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 138
+ovrHmdCap_YawCorrection = 32 # OVR_CAPI.h: 138
 
-ovrHmdCap_Position = 64 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 138
+ovrHmdCap_Position = 64 # OVR_CAPI.h: 138
 
-ovrHmdCap_LowPersistence = 128 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 138
+ovrHmdCap_LowPersistence = 128 # OVR_CAPI.h: 138
 
-ovrHmdCap_LatencyTest = 256 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 138
+ovrHmdCap_LatencyTest = 256 # OVR_CAPI.h: 138
 
-ovrHmdCap_DynamicPrediction = 512 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 138
+ovrHmdCap_DynamicPrediction = 512 # OVR_CAPI.h: 138
 
-ovrHmdCap_NoVSync = 4096 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 138
+ovrHmdCap_NoVSync = 4096 # OVR_CAPI.h: 138
 
-ovrHmdCapBits = enum_anon_2 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 138
+ovrHmdCapBits = enum_anon_2 # OVR_CAPI.h: 138
 
-enum_anon_3 = c_int # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 147
+enum_anon_3 = c_int # OVR_CAPI.h: 147
 
-ovrDistortion_Chromatic = 1 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 147
+ovrDistortion_Chromatic = 1 # OVR_CAPI.h: 147
 
-ovrDistortion_TimeWarp = 2 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 147
+ovrDistortion_TimeWarp = 2 # OVR_CAPI.h: 147
 
-ovrDistortion_Vignette = 8 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 147
+ovrDistortion_Vignette = 8 # OVR_CAPI.h: 147
 
-ovrDistortionCaps = enum_anon_3 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 147
+ovrDistortionCaps = enum_anon_3 # OVR_CAPI.h: 147
 
-enum_anon_4 = c_int # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 158
+enum_anon_4 = c_int # OVR_CAPI.h: 158
 
-ovrEye_Left = 0 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 158
+ovrEye_Left = 0 # OVR_CAPI.h: 158
 
-ovrEye_Right = 1 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 158
+ovrEye_Right = 1 # OVR_CAPI.h: 158
 
-ovrEye_Count = 2 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 158
+ovrEye_Count = 2 # OVR_CAPI.h: 158
 
-ovrEyeType = enum_anon_4 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 158
+ovrEyeType = enum_anon_4 # OVR_CAPI.h: 158
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 162
+# OVR_CAPI.h: 162
 class struct_ovrHmdStruct(Structure):
     pass
 
-ovrHmd = POINTER(struct_ovrHmdStruct) # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 162
+ovrHmd = POINTER(struct_ovrHmdStruct) # OVR_CAPI.h: 162
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 201
+# OVR_CAPI.h: 201
 class struct_ovrHmdDesc_(Structure):
     pass
 
@@ -881,21 +881,21 @@ struct_ovrHmdDesc_._fields_ = [
     ('DisplayId', c_long),
 ]
 
-ovrHmdDesc = struct_ovrHmdDesc_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 201
+ovrHmdDesc = struct_ovrHmdDesc_ # OVR_CAPI.h: 201
 
-enum_anon_5 = c_int # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 221
+enum_anon_5 = c_int # OVR_CAPI.h: 221
 
-ovrStatus_OrientationTracked = 1 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 221
+ovrStatus_OrientationTracked = 1 # OVR_CAPI.h: 221
 
-ovrStatus_PositionTracked = 2 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 221
+ovrStatus_PositionTracked = 2 # OVR_CAPI.h: 221
 
-ovrStatus_PositionConnected = 32 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 221
+ovrStatus_PositionConnected = 32 # OVR_CAPI.h: 221
 
-ovrStatus_HmdConnected = 128 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 221
+ovrStatus_HmdConnected = 128 # OVR_CAPI.h: 221
 
-ovrStatusBits = enum_anon_5 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 221
+ovrStatusBits = enum_anon_5 # OVR_CAPI.h: 221
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 239
+# OVR_CAPI.h: 239
 class struct_ovrSensorState_(Structure):
     pass
 
@@ -912,9 +912,9 @@ struct_ovrSensorState_._fields_ = [
     ('StatusFlags', c_uint),
 ]
 
-ovrSensorState = struct_ovrSensorState_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 239
+ovrSensorState = struct_ovrSensorState_ # OVR_CAPI.h: 239
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 250
+# OVR_CAPI.h: 250
 class struct_ovrSensorDesc_(Structure):
     pass
 
@@ -929,9 +929,9 @@ struct_ovrSensorDesc_._fields_ = [
     ('SerialNumber', c_char * 24),
 ]
 
-ovrSensorDesc = struct_ovrSensorDesc_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 250
+ovrSensorDesc = struct_ovrSensorDesc_ # OVR_CAPI.h: 250
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 282
+# OVR_CAPI.h: 282
 class struct_ovrFrameTiming_(Structure):
     pass
 
@@ -952,9 +952,9 @@ struct_ovrFrameTiming_._fields_ = [
     ('EyeScanoutSeconds', c_double * 2),
 ]
 
-ovrFrameTiming = struct_ovrFrameTiming_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 282
+ovrFrameTiming = struct_ovrFrameTiming_ # OVR_CAPI.h: 282
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 301
+# OVR_CAPI.h: 301
 class struct_ovrEyeDesc_(Structure):
     pass
 
@@ -971,9 +971,9 @@ struct_ovrEyeDesc_._fields_ = [
     ('Fov', ovrFovPort),
 ]
 
-ovrEyeDesc = struct_ovrEyeDesc_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 301
+ovrEyeDesc = struct_ovrEyeDesc_ # OVR_CAPI.h: 301
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 310
+# OVR_CAPI.h: 310
 class struct_ovrEyeRenderDesc_(Structure):
     pass
 
@@ -990,27 +990,27 @@ struct_ovrEyeRenderDesc_._fields_ = [
     ('ViewAdjust', ovrVector3f),
 ]
 
-ovrEyeRenderDesc = struct_ovrEyeRenderDesc_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 310
+ovrEyeRenderDesc = struct_ovrEyeRenderDesc_ # OVR_CAPI.h: 310
 
-enum_anon_6 = c_int # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 334
+enum_anon_6 = c_int # OVR_CAPI.h: 334
 
-ovrRenderAPI_None = 0 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 334
+ovrRenderAPI_None = 0 # OVR_CAPI.h: 334
 
-ovrRenderAPI_OpenGL = (ovrRenderAPI_None + 1) # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 334
+ovrRenderAPI_OpenGL = (ovrRenderAPI_None + 1) # OVR_CAPI.h: 334
 
-ovrRenderAPI_Android_GLES = (ovrRenderAPI_OpenGL + 1) # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 334
+ovrRenderAPI_Android_GLES = (ovrRenderAPI_OpenGL + 1) # OVR_CAPI.h: 334
 
-ovrRenderAPI_D3D9 = (ovrRenderAPI_Android_GLES + 1) # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 334
+ovrRenderAPI_D3D9 = (ovrRenderAPI_Android_GLES + 1) # OVR_CAPI.h: 334
 
-ovrRenderAPI_D3D10 = (ovrRenderAPI_D3D9 + 1) # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 334
+ovrRenderAPI_D3D10 = (ovrRenderAPI_D3D9 + 1) # OVR_CAPI.h: 334
 
-ovrRenderAPI_D3D11 = (ovrRenderAPI_D3D10 + 1) # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 334
+ovrRenderAPI_D3D11 = (ovrRenderAPI_D3D10 + 1) # OVR_CAPI.h: 334
 
-ovrRenderAPI_Count = (ovrRenderAPI_D3D11 + 1) # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 334
+ovrRenderAPI_Count = (ovrRenderAPI_D3D11 + 1) # OVR_CAPI.h: 334
 
-ovrRenderAPIType = enum_anon_6 # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 334
+ovrRenderAPIType = enum_anon_6 # OVR_CAPI.h: 334
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 343
+# OVR_CAPI.h: 343
 class struct_ovrRenderAPIConfigHeader_(Structure):
     pass
 
@@ -1025,9 +1025,9 @@ struct_ovrRenderAPIConfigHeader_._fields_ = [
     ('Multisample', c_int),
 ]
 
-ovrRenderAPIConfigHeader = struct_ovrRenderAPIConfigHeader_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 343
+ovrRenderAPIConfigHeader = struct_ovrRenderAPIConfigHeader_ # OVR_CAPI.h: 343
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 349
+# OVR_CAPI.h: 349
 class struct_ovrRenderAPIConfig_(Structure):
     pass
 
@@ -1040,9 +1040,9 @@ struct_ovrRenderAPIConfig_._fields_ = [
     ('PlatformData', uintptr_t * 8),
 ]
 
-ovrRenderAPIConfig = struct_ovrRenderAPIConfig_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 349
+ovrRenderAPIConfig = struct_ovrRenderAPIConfig_ # OVR_CAPI.h: 349
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 359
+# OVR_CAPI.h: 359
 class struct_ovrTextureHeader_(Structure):
     pass
 
@@ -1057,9 +1057,9 @@ struct_ovrTextureHeader_._fields_ = [
     ('RenderViewport', ovrRecti),
 ]
 
-ovrTextureHeader = struct_ovrTextureHeader_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 359
+ovrTextureHeader = struct_ovrTextureHeader_ # OVR_CAPI.h: 359
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 365
+# OVR_CAPI.h: 365
 class struct_ovrTexture_(Structure):
     pass
 
@@ -1072,45 +1072,45 @@ struct_ovrTexture_._fields_ = [
     ('PlatformData', uintptr_t * 8),
 ]
 
-ovrTexture = struct_ovrTexture_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 365
+ovrTexture = struct_ovrTexture_ # OVR_CAPI.h: 365
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 401
+# OVR_CAPI.h: 401
 if hasattr(_libs['libovr.dll'], 'ovr_Initialize'):
     ovr_Initialize = _libs['libovr.dll'].ovr_Initialize
     ovr_Initialize.argtypes = []
     ovr_Initialize.restype = ovrBool
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 402
+# OVR_CAPI.h: 402
 if hasattr(_libs['libovr.dll'], 'ovr_Shutdown'):
     ovr_Shutdown = _libs['libovr.dll'].ovr_Shutdown
     ovr_Shutdown.argtypes = []
     ovr_Shutdown.restype = None
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 407
+# OVR_CAPI.h: 407
 if hasattr(_libs['libovr.dll'], 'ovrHmd_Detect'):
     ovrHmd_Detect = _libs['libovr.dll'].ovrHmd_Detect
     ovrHmd_Detect.argtypes = []
     ovrHmd_Detect.restype = c_int
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 413
+# OVR_CAPI.h: 413
 if hasattr(_libs['libovr.dll'], 'ovrHmd_Create'):
     ovrHmd_Create = _libs['libovr.dll'].ovrHmd_Create
     ovrHmd_Create.argtypes = [c_int]
     ovrHmd_Create.restype = ovrHmd
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 414
+# OVR_CAPI.h: 414
 if hasattr(_libs['libovr.dll'], 'ovrHmd_Destroy'):
     ovrHmd_Destroy = _libs['libovr.dll'].ovrHmd_Destroy
     ovrHmd_Destroy.argtypes = [ovrHmd]
     ovrHmd_Destroy.restype = None
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 418
+# OVR_CAPI.h: 418
 if hasattr(_libs['libovr.dll'], 'ovrHmd_CreateDebug'):
     ovrHmd_CreateDebug = _libs['libovr.dll'].ovrHmd_CreateDebug
     ovrHmd_CreateDebug.argtypes = [ovrHmdType]
     ovrHmd_CreateDebug.restype = ovrHmd
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 424
+# OVR_CAPI.h: 424
 if hasattr(_libs['libovr.dll'], 'ovrHmd_GetLastError'):
     ovrHmd_GetLastError = _libs['libovr.dll'].ovrHmd_GetLastError
     ovrHmd_GetLastError.argtypes = [ovrHmd]
@@ -1120,85 +1120,85 @@ if hasattr(_libs['libovr.dll'], 'ovrHmd_GetLastError'):
         ovrHmd_GetLastError.restype = String
         ovrHmd_GetLastError.errcheck = ReturnString
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 440
+# OVR_CAPI.h: 440
 if hasattr(_libs['libovr.dll'], 'ovrHmd_StartSensor'):
     ovrHmd_StartSensor = _libs['libovr.dll'].ovrHmd_StartSensor
     ovrHmd_StartSensor.argtypes = [ovrHmd, c_uint, c_uint]
     ovrHmd_StartSensor.restype = ovrBool
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 443
+# OVR_CAPI.h: 443
 if hasattr(_libs['libovr.dll'], 'ovrHmd_StopSensor'):
     ovrHmd_StopSensor = _libs['libovr.dll'].ovrHmd_StopSensor
     ovrHmd_StopSensor.argtypes = [ovrHmd]
     ovrHmd_StopSensor.restype = None
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 445
+# OVR_CAPI.h: 445
 if hasattr(_libs['libovr.dll'], 'ovrHmd_ResetSensor'):
     ovrHmd_ResetSensor = _libs['libovr.dll'].ovrHmd_ResetSensor
     ovrHmd_ResetSensor.argtypes = [ovrHmd]
     ovrHmd_ResetSensor.restype = None
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 452
+# OVR_CAPI.h: 452
 if hasattr(_libs['libovr.dll'], 'ovrHmd_GetSensorState'):
     ovrHmd_GetSensorState = _libs['libovr.dll'].ovrHmd_GetSensorState
     ovrHmd_GetSensorState.argtypes = [ovrHmd, c_double]
     ovrHmd_GetSensorState.restype = ovrSensorState
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 456
+# OVR_CAPI.h: 456
 if hasattr(_libs['libovr.dll'], 'ovrHmd_GetSensorDesc'):
     ovrHmd_GetSensorDesc = _libs['libovr.dll'].ovrHmd_GetSensorDesc
     ovrHmd_GetSensorDesc.argtypes = [ovrHmd, POINTER(ovrSensorDesc)]
     ovrHmd_GetSensorDesc.restype = ovrBool
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 463
+# OVR_CAPI.h: 463
 if hasattr(_libs['libovr.dll'], 'ovrHmd_GetDesc'):
     ovrHmd_GetDesc = _libs['libovr.dll'].ovrHmd_GetDesc
     ovrHmd_GetDesc.argtypes = [ovrHmd, POINTER(ovrHmdDesc)]
     ovrHmd_GetDesc.restype = None
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 470
+# OVR_CAPI.h: 470
 if hasattr(_libs['libovr.dll'], 'ovrHmd_GetFovTextureSize'):
     ovrHmd_GetFovTextureSize = _libs['libovr.dll'].ovrHmd_GetFovTextureSize
     ovrHmd_GetFovTextureSize.argtypes = [ovrHmd, ovrEyeType, ovrFovPort, c_float]
     ovrHmd_GetFovTextureSize.restype = ovrSizei
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 512
+# OVR_CAPI.h: 512
 if hasattr(_libs['libovr.dll'], 'ovrHmd_ConfigureRendering'):
     ovrHmd_ConfigureRendering = _libs['libovr.dll'].ovrHmd_ConfigureRendering
     ovrHmd_ConfigureRendering.argtypes = [ovrHmd, POINTER(ovrRenderAPIConfig), c_uint, c_uint, ovrEyeDesc * 2, ovrEyeRenderDesc * 2]
     ovrHmd_ConfigureRendering.restype = ovrBool
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 524
+# OVR_CAPI.h: 524
 if hasattr(_libs['libovr.dll'], 'ovrHmd_BeginFrame'):
     ovrHmd_BeginFrame = _libs['libovr.dll'].ovrHmd_BeginFrame
     ovrHmd_BeginFrame.argtypes = [ovrHmd, c_uint]
     ovrHmd_BeginFrame.restype = ovrFrameTiming
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 530
+# OVR_CAPI.h: 530
 if hasattr(_libs['libovr.dll'], 'ovrHmd_EndFrame'):
     ovrHmd_EndFrame = _libs['libovr.dll'].ovrHmd_EndFrame
     ovrHmd_EndFrame.argtypes = [ovrHmd]
     ovrHmd_EndFrame.restype = None
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 540
+# OVR_CAPI.h: 540
 if hasattr(_libs['libovr.dll'], 'ovrHmd_BeginEyeRender'):
     ovrHmd_BeginEyeRender = _libs['libovr.dll'].ovrHmd_BeginEyeRender
     ovrHmd_BeginEyeRender.argtypes = [ovrHmd, ovrEyeType]
     ovrHmd_BeginEyeRender.restype = ovrPosef
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 548
+# OVR_CAPI.h: 548
 if hasattr(_libs['libovr.dll'], 'ovrHmd_EndEyeRender'):
     ovrHmd_EndEyeRender = _libs['libovr.dll'].ovrHmd_EndEyeRender
     ovrHmd_EndEyeRender.argtypes = [ovrHmd, ovrEyeType, ovrPosef, POINTER(ovrTexture)]
     ovrHmd_EndEyeRender.restype = None
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 575
+# OVR_CAPI.h: 575
 if hasattr(_libs['libovr.dll'], 'ovrHmd_GetRenderDesc'):
     ovrHmd_GetRenderDesc = _libs['libovr.dll'].ovrHmd_GetRenderDesc
     ovrHmd_GetRenderDesc.argtypes = [ovrHmd, ovrEyeDesc]
     ovrHmd_GetRenderDesc.restype = ovrEyeRenderDesc
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 590
+# OVR_CAPI.h: 590
 class struct_ovrDistortionVertex_(Structure):
     pass
 
@@ -1219,9 +1219,9 @@ struct_ovrDistortionVertex_._fields_ = [
     ('TexB', ovrVector2f),
 ]
 
-ovrDistortionVertex = struct_ovrDistortionVertex_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 590
+ovrDistortionVertex = struct_ovrDistortionVertex_ # OVR_CAPI.h: 590
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 600
+# OVR_CAPI.h: 600
 class struct_ovrDistortionMesh_(Structure):
     pass
 
@@ -1238,81 +1238,81 @@ struct_ovrDistortionMesh_._fields_ = [
     ('IndexCount', c_uint),
 ]
 
-ovrDistortionMesh = struct_ovrDistortionMesh_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 600
+ovrDistortionMesh = struct_ovrDistortionMesh_ # OVR_CAPI.h: 600
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 610
+# OVR_CAPI.h: 610
 if hasattr(_libs['libovr.dll'], 'ovrHmd_CreateDistortionMesh'):
     ovrHmd_CreateDistortionMesh = _libs['libovr.dll'].ovrHmd_CreateDistortionMesh
     ovrHmd_CreateDistortionMesh.argtypes = [ovrHmd, ovrEyeDesc, c_uint, ovrVector2f * 2, POINTER(ovrDistortionMesh)]
     ovrHmd_CreateDistortionMesh.restype = ovrBool
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 617
+# OVR_CAPI.h: 617
 if hasattr(_libs['libovr.dll'], 'ovrHmd_DestroyDistortionMesh'):
     ovrHmd_DestroyDistortionMesh = _libs['libovr.dll'].ovrHmd_DestroyDistortionMesh
     ovrHmd_DestroyDistortionMesh.argtypes = [POINTER(ovrDistortionMesh)]
     ovrHmd_DestroyDistortionMesh.restype = None
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 621
+# OVR_CAPI.h: 621
 if hasattr(_libs['libovr.dll'], 'ovrHmd_GetRenderScaleAndOffset'):
     ovrHmd_GetRenderScaleAndOffset = _libs['libovr.dll'].ovrHmd_GetRenderScaleAndOffset
     ovrHmd_GetRenderScaleAndOffset.argtypes = [ovrHmd, ovrEyeDesc, c_uint, ovrVector2f * 2]
     ovrHmd_GetRenderScaleAndOffset.restype = None
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 628
+# OVR_CAPI.h: 628
 if hasattr(_libs['libovr.dll'], 'ovrHmd_GetFrameTiming'):
     ovrHmd_GetFrameTiming = _libs['libovr.dll'].ovrHmd_GetFrameTiming
     ovrHmd_GetFrameTiming.argtypes = [ovrHmd, c_uint]
     ovrHmd_GetFrameTiming.restype = ovrFrameTiming
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 633
+# OVR_CAPI.h: 633
 if hasattr(_libs['libovr.dll'], 'ovrHmd_BeginFrameTiming'):
     ovrHmd_BeginFrameTiming = _libs['libovr.dll'].ovrHmd_BeginFrameTiming
     ovrHmd_BeginFrameTiming.argtypes = [ovrHmd, c_uint]
     ovrHmd_BeginFrameTiming.restype = ovrFrameTiming
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 638
+# OVR_CAPI.h: 638
 if hasattr(_libs['libovr.dll'], 'ovrHmd_EndFrameTiming'):
     ovrHmd_EndFrameTiming = _libs['libovr.dll'].ovrHmd_EndFrameTiming
     ovrHmd_EndFrameTiming.argtypes = [ovrHmd]
     ovrHmd_EndFrameTiming.restype = None
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 648
+# OVR_CAPI.h: 648
 if hasattr(_libs['libovr.dll'], 'ovrHmd_GetEyePose'):
     ovrHmd_GetEyePose = _libs['libovr.dll'].ovrHmd_GetEyePose
     ovrHmd_GetEyePose.argtypes = [ovrHmd, ovrEyeType]
     ovrHmd_GetEyePose.restype = ovrPosef
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 655
+# OVR_CAPI.h: 655
 if hasattr(_libs['libovr.dll'], 'ovrHmd_GetEyeTimewarpMatrices'):
     ovrHmd_GetEyeTimewarpMatrices = _libs['libovr.dll'].ovrHmd_GetEyeTimewarpMatrices
     ovrHmd_GetEyeTimewarpMatrices.argtypes = [ovrHmd, ovrEyeType, ovrPosef, ovrMatrix4f * 2]
     ovrHmd_GetEyeTimewarpMatrices.restype = None
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 664
+# OVR_CAPI.h: 664
 if hasattr(_libs['libovr.dll'], 'ovrMatrix4f_Projection'):
     ovrMatrix4f_Projection = _libs['libovr.dll'].ovrMatrix4f_Projection
     ovrMatrix4f_Projection.argtypes = [ovrFovPort, c_float, c_float, ovrBool]
     ovrMatrix4f_Projection.restype = ovrMatrix4f
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 670
+# OVR_CAPI.h: 670
 if hasattr(_libs['libovr.dll'], 'ovrMatrix4f_OrthoSubProjection'):
     ovrMatrix4f_OrthoSubProjection = _libs['libovr.dll'].ovrMatrix4f_OrthoSubProjection
     ovrMatrix4f_OrthoSubProjection.argtypes = [ovrMatrix4f, ovrVector2f, c_float, c_float]
     ovrMatrix4f_OrthoSubProjection.restype = ovrMatrix4f
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 675
+# OVR_CAPI.h: 675
 if hasattr(_libs['libovr.dll'], 'ovr_GetTimeInSeconds'):
     ovr_GetTimeInSeconds = _libs['libovr.dll'].ovr_GetTimeInSeconds
     ovr_GetTimeInSeconds.argtypes = []
     ovr_GetTimeInSeconds.restype = c_double
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 678
+# OVR_CAPI.h: 678
 if hasattr(_libs['libovr.dll'], 'ovr_WaitTillTime'):
     ovr_WaitTillTime = _libs['libovr.dll'].ovr_WaitTillTime
     ovr_WaitTillTime.argtypes = [c_double]
     ovr_WaitTillTime.restype = c_double
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 687
+# OVR_CAPI.h: 687
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_ProcessLatencyTest'):
         continue
@@ -1321,7 +1321,7 @@ for _lib in _libs.itervalues():
     ovrHmd_ProcessLatencyTest.restype = ovrBool
     break
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 691
+# OVR_CAPI.h: 691
 if hasattr(_libs['libovr.dll'], 'ovrHmd_GetLatencyTestResult'):
     ovrHmd_GetLatencyTestResult = _libs['libovr.dll'].ovrHmd_GetLatencyTestResult
     ovrHmd_GetLatencyTestResult.argtypes = [ovrHmd]
@@ -1331,37 +1331,37 @@ if hasattr(_libs['libovr.dll'], 'ovrHmd_GetLatencyTestResult'):
         ovrHmd_GetLatencyTestResult.restype = String
         ovrHmd_GetLatencyTestResult.errcheck = ReturnString
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 695
+# OVR_CAPI.h: 695
 if hasattr(_libs['libovr.dll'], 'ovrHmd_GetMeasuredLatencyTest2'):
     ovrHmd_GetMeasuredLatencyTest2 = _libs['libovr.dll'].ovrHmd_GetMeasuredLatencyTest2
     ovrHmd_GetMeasuredLatencyTest2.argtypes = [ovrHmd]
     ovrHmd_GetMeasuredLatencyTest2.restype = c_double
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 731
+# OVR_CAPI.h: 731
 if hasattr(_libs['libovr.dll'], 'ovrHmd_GetFloat'):
     ovrHmd_GetFloat = _libs['libovr.dll'].ovrHmd_GetFloat
     ovrHmd_GetFloat.argtypes = [ovrHmd, String, c_float]
     ovrHmd_GetFloat.restype = c_float
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 734
+# OVR_CAPI.h: 734
 if hasattr(_libs['libovr.dll'], 'ovrHmd_SetFloat'):
     ovrHmd_SetFloat = _libs['libovr.dll'].ovrHmd_SetFloat
     ovrHmd_SetFloat.argtypes = [ovrHmd, String, c_float]
     ovrHmd_SetFloat.restype = ovrBool
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 739
+# OVR_CAPI.h: 739
 if hasattr(_libs['libovr.dll'], 'ovrHmd_GetFloatArray'):
     ovrHmd_GetFloatArray = _libs['libovr.dll'].ovrHmd_GetFloatArray
     ovrHmd_GetFloatArray.argtypes = [ovrHmd, String, POINTER(c_float), c_uint]
     ovrHmd_GetFloatArray.restype = c_uint
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 743
+# OVR_CAPI.h: 743
 if hasattr(_libs['libovr.dll'], 'ovrHmd_SetFloatArray'):
     ovrHmd_SetFloatArray = _libs['libovr.dll'].ovrHmd_SetFloatArray
     ovrHmd_SetFloatArray.argtypes = [ovrHmd, String, POINTER(c_float), c_uint]
     ovrHmd_SetFloatArray.restype = ovrBool
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 749
+# OVR_CAPI.h: 749
 if hasattr(_libs['libovr.dll'], 'ovrHmd_GetString'):
     ovrHmd_GetString = _libs['libovr.dll'].ovrHmd_GetString
     ovrHmd_GetString.argtypes = [ovrHmd, String, String]
@@ -1371,141 +1371,141 @@ if hasattr(_libs['libovr.dll'], 'ovrHmd_GetString'):
         ovrHmd_GetString.restype = String
         ovrHmd_GetString.errcheck = ReturnString
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 754
+# OVR_CAPI.h: 754
 if hasattr(_libs['libovr.dll'], 'ovrHmd_GetArraySize'):
     ovrHmd_GetArraySize = _libs['libovr.dll'].ovrHmd_GetArraySize
     ovrHmd_GetArraySize.argtypes = [ovrHmd, String]
     ovrHmd_GetArraySize.restype = c_uint
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 711
+# OVR_CAPI.h: 711
 try:
     OVR_KEY_USER = 'User'
 except:
     pass
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 712
+# OVR_CAPI.h: 712
 try:
     OVR_KEY_NAME = 'Name'
 except:
     pass
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 713
+# OVR_CAPI.h: 713
 try:
     OVR_KEY_GENDER = 'Gender'
 except:
     pass
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 714
+# OVR_CAPI.h: 714
 try:
     OVR_KEY_PLAYER_HEIGHT = 'PlayerHeight'
 except:
     pass
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 715
+# OVR_CAPI.h: 715
 try:
     OVR_KEY_EYE_HEIGHT = 'EyeHeight'
 except:
     pass
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 716
+# OVR_CAPI.h: 716
 try:
     OVR_KEY_IPD = 'IPD'
 except:
     pass
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 717
+# OVR_CAPI.h: 717
 try:
     OVR_KEY_NECK_TO_EYE_HORIZONTAL = 'NeckEyeHori'
 except:
     pass
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 718
+# OVR_CAPI.h: 718
 try:
     OVR_KEY_NECK_TO_EYE_VERTICAL = 'NeckEyeVert'
 except:
     pass
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 720
+# OVR_CAPI.h: 720
 try:
     OVR_DEFAULT_GENDER = 'Male'
 except:
     pass
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 721
+# OVR_CAPI.h: 721
 try:
     OVR_DEFAULT_PLAYER_HEIGHT = 1.778
 except:
     pass
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 722
+# OVR_CAPI.h: 722
 try:
     OVR_DEFAULT_EYE_HEIGHT = 1.675
 except:
     pass
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 723
+# OVR_CAPI.h: 723
 try:
     OVR_DEFAULT_IPD = 0.064
 except:
     pass
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 724
+# OVR_CAPI.h: 724
 try:
     OVR_DEFAULT_NECK_TO_EYE_HORIZONTAL = 0.12
 except:
     pass
 
-# C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 725
+# OVR_CAPI.h: 725
 try:
     OVR_DEFAULT_NECK_TO_EYE_VERTICAL = 0.12
 except:
     pass
 
-ovrVector2i_ = struct_ovrVector2i_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 51
+ovrVector2i_ = struct_ovrVector2i_ # OVR_CAPI.h: 51
 
-ovrSizei_ = struct_ovrSizei_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 55
+ovrSizei_ = struct_ovrSizei_ # OVR_CAPI.h: 55
 
-ovrRecti_ = struct_ovrRecti_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 60
+ovrRecti_ = struct_ovrRecti_ # OVR_CAPI.h: 60
 
-ovrQuatf_ = struct_ovrQuatf_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 66
+ovrQuatf_ = struct_ovrQuatf_ # OVR_CAPI.h: 66
 
-ovrVector2f_ = struct_ovrVector2f_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 70
+ovrVector2f_ = struct_ovrVector2f_ # OVR_CAPI.h: 70
 
-ovrVector3f_ = struct_ovrVector3f_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 74
+ovrVector3f_ = struct_ovrVector3f_ # OVR_CAPI.h: 74
 
-ovrMatrix4f_ = struct_ovrMatrix4f_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 78
+ovrMatrix4f_ = struct_ovrMatrix4f_ # OVR_CAPI.h: 78
 
-ovrPosef_ = struct_ovrPosef_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 84
+ovrPosef_ = struct_ovrPosef_ # OVR_CAPI.h: 84
 
-ovrPoseStatef_ = struct_ovrPoseStatef_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 95
+ovrPoseStatef_ = struct_ovrPoseStatef_ # OVR_CAPI.h: 95
 
-ovrFovPort_ = struct_ovrFovPort_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 106
+ovrFovPort_ = struct_ovrFovPort_ # OVR_CAPI.h: 106
 
-ovrHmdStruct = struct_ovrHmdStruct # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 162
+ovrHmdStruct = struct_ovrHmdStruct # OVR_CAPI.h: 162
 
-ovrHmdDesc_ = struct_ovrHmdDesc_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 201
+ovrHmdDesc_ = struct_ovrHmdDesc_ # OVR_CAPI.h: 201
 
-ovrSensorState_ = struct_ovrSensorState_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 239
+ovrSensorState_ = struct_ovrSensorState_ # OVR_CAPI.h: 239
 
-ovrSensorDesc_ = struct_ovrSensorDesc_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 250
+ovrSensorDesc_ = struct_ovrSensorDesc_ # OVR_CAPI.h: 250
 
-ovrFrameTiming_ = struct_ovrFrameTiming_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 282
+ovrFrameTiming_ = struct_ovrFrameTiming_ # OVR_CAPI.h: 282
 
-ovrEyeDesc_ = struct_ovrEyeDesc_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 301
+ovrEyeDesc_ = struct_ovrEyeDesc_ # OVR_CAPI.h: 301
 
-ovrEyeRenderDesc_ = struct_ovrEyeRenderDesc_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 310
+ovrEyeRenderDesc_ = struct_ovrEyeRenderDesc_ # OVR_CAPI.h: 310
 
-ovrRenderAPIConfigHeader_ = struct_ovrRenderAPIConfigHeader_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 343
+ovrRenderAPIConfigHeader_ = struct_ovrRenderAPIConfigHeader_ # OVR_CAPI.h: 343
 
-ovrRenderAPIConfig_ = struct_ovrRenderAPIConfig_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 349
+ovrRenderAPIConfig_ = struct_ovrRenderAPIConfig_ # OVR_CAPI.h: 349
 
-ovrTextureHeader_ = struct_ovrTextureHeader_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 359
+ovrTextureHeader_ = struct_ovrTextureHeader_ # OVR_CAPI.h: 359
 
-ovrTexture_ = struct_ovrTexture_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 365
+ovrTexture_ = struct_ovrTexture_ # OVR_CAPI.h: 365
 
-ovrDistortionVertex_ = struct_ovrDistortionVertex_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 590
+ovrDistortionVertex_ = struct_ovrDistortionVertex_ # OVR_CAPI.h: 590
 
-ovrDistortionMesh_ = struct_ovrDistortionMesh_ # C:\\msys\\1.0\\home\\rye\\src\\python-ovrsdk\\windows\\OVR_CAPI.h: 600
+ovrDistortionMesh_ = struct_ovrDistortionMesh_ # OVR_CAPI.h: 600
 
 # No inserted files
 
