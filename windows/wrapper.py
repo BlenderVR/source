@@ -1,10 +1,3 @@
-'''Wrapper for OVR_CAPI.h
-
-Generated with:
-../../../ctypesgen/ctypesgen.py -o wrapper.py -l libovr.dll OVR_CAPI.h
-
-Do not modify this file.
-'''
 
 __docformat__ =  'restructuredtext'
 
