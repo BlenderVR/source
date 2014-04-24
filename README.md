@@ -9,7 +9,9 @@ for Windows. As soon as Linux and OSX becomes available, I'll be updating
 it to support them.
 
 ### Installation
-Keep it simple. Download the package and drop it in your project. Done.
+```
+python setup.py install
+```
 
 ### Use
 
