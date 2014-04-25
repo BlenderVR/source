@@ -10,7 +10,7 @@ it to support them.
 
 ### Installation
 ```
-python setup.py install
+pip install python-ovrsdk
 ```
 
 ### Use
