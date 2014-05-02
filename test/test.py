@@ -7,13 +7,14 @@ hmdDesc = ovrHmdDesc()
 ovrHmd_GetDesc(hmd, byref(hmdDesc))
 print hmdDesc.ProductName
 ovrHmd_StartSensor( \
-	hmd, ovrHmdCap_Orientation | ovrHmdCap_YawCorrection |
-	ovrHmdCap_Position | ovrHmdCap_LowPersistence,
-	ovrHmdCap_Orientation
+	hmd, 
+	ovrHmdCap_Orientation | 
+	ovrHmdCap_YawCorrection, 
+	0
 )
 
 while True:
-	ss = ovrHmd_GetSensorState(hmd, 0.0)
+	ss = ovrHmd_GetSensorState(hmd, ovr_GetTimeInSeconds())
 	pose = ss.Predicted.Pose
 	print "%10f   %10f   %10f   %10f" % ( \
 		pose.Orientation.w, 
@@ -21,7 +22,7 @@ while True:
 		pose.Orientation.y, 
 		pose.Orientation.z
 	)
-	time.sleep(0.1)
+	time.sleep(0.016)
 
 ovrHmd_Destroy(hmd)
 ovr_Shutdown()

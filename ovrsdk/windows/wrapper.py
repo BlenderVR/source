@@ -1,3 +1,10 @@
+'''Wrapper for capi.h
+
+Generated with:
+c:/Python27/Scripts/ctypesgen.py capi.h
+
+Do not modify this file.
+'''
 
 __docformat__ =  'restructuredtext'
 
@@ -595,21 +602,15 @@ del loaderclass
 
 add_library_search_dirs([])
 
-# Begin libraries
-
-ovrpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "libovr.dll")
-_libs["libovr.dll"] = load_library(ovrpath)
-
-# 1 libraries
-# End libraries
+# No libraries
 
 # No modules
 
-uintptr_t = c_uint # stdint.h: 87
+uintptr_t = c_uint # capi.h: 1
 
-ovrBool = c_char # OVR_CAPI.h: 31
+ovrBool = c_char # capi.h: 2
 
-# OVR_CAPI.h: 51
+# capi.h: 6
 class struct_ovrVector2i_(Structure):
     pass
 
@@ -622,9 +623,9 @@ struct_ovrVector2i_._fields_ = [
     ('y', c_int),
 ]
 
-ovrVector2i = struct_ovrVector2i_ # OVR_CAPI.h: 51
+ovrVector2i = struct_ovrVector2i_ # capi.h: 6
 
-# OVR_CAPI.h: 55
+# capi.h: 10
 class struct_ovrSizei_(Structure):
     pass
 
@@ -637,9 +638,9 @@ struct_ovrSizei_._fields_ = [
     ('h', c_int),
 ]
 
-ovrSizei = struct_ovrSizei_ # OVR_CAPI.h: 55
+ovrSizei = struct_ovrSizei_ # capi.h: 10
 
-# OVR_CAPI.h: 60
+# capi.h: 15
 class struct_ovrRecti_(Structure):
     pass
 
@@ -652,9 +653,9 @@ struct_ovrRecti_._fields_ = [
     ('Size', ovrSizei),
 ]
 
-ovrRecti = struct_ovrRecti_ # OVR_CAPI.h: 60
+ovrRecti = struct_ovrRecti_ # capi.h: 15
 
-# OVR_CAPI.h: 66
+# capi.h: 19
 class struct_ovrQuatf_(Structure):
     pass
 
@@ -671,9 +672,9 @@ struct_ovrQuatf_._fields_ = [
     ('w', c_float),
 ]
 
-ovrQuatf = struct_ovrQuatf_ # OVR_CAPI.h: 66
+ovrQuatf = struct_ovrQuatf_ # capi.h: 19
 
-# OVR_CAPI.h: 70
+# capi.h: 23
 class struct_ovrVector2f_(Structure):
     pass
 
@@ -686,9 +687,9 @@ struct_ovrVector2f_._fields_ = [
     ('y', c_float),
 ]
 
-ovrVector2f = struct_ovrVector2f_ # OVR_CAPI.h: 70
+ovrVector2f = struct_ovrVector2f_ # capi.h: 23
 
-# OVR_CAPI.h: 74
+# capi.h: 27
 class struct_ovrVector3f_(Structure):
     pass
 
@@ -703,9 +704,9 @@ struct_ovrVector3f_._fields_ = [
     ('z', c_float),
 ]
 
-ovrVector3f = struct_ovrVector3f_ # OVR_CAPI.h: 74
+ovrVector3f = struct_ovrVector3f_ # capi.h: 27
 
-# OVR_CAPI.h: 78
+# capi.h: 31
 class struct_ovrMatrix4f_(Structure):
     pass
 
@@ -716,9 +717,9 @@ struct_ovrMatrix4f_._fields_ = [
     ('M', (c_float * 4) * 4),
 ]
 
-ovrMatrix4f = struct_ovrMatrix4f_ # OVR_CAPI.h: 78
+ovrMatrix4f = struct_ovrMatrix4f_ # capi.h: 31
 
-# OVR_CAPI.h: 84
+# capi.h: 36
 class struct_ovrPosef_(Structure):
     pass
 
@@ -731,9 +732,9 @@ struct_ovrPosef_._fields_ = [
     ('Position', ovrVector3f),
 ]
 
-ovrPosef = struct_ovrPosef_ # OVR_CAPI.h: 84
+ovrPosef = struct_ovrPosef_ # capi.h: 36
 
-# OVR_CAPI.h: 95
+# capi.h: 45
 class struct_ovrPoseStatef_(Structure):
     pass
 
@@ -754,9 +755,9 @@ struct_ovrPoseStatef_._fields_ = [
     ('TimeInSeconds', c_double),
 ]
 
-ovrPoseStatef = struct_ovrPoseStatef_ # OVR_CAPI.h: 95
+ovrPoseStatef = struct_ovrPoseStatef_ # capi.h: 45
 
-# OVR_CAPI.h: 106
+# capi.h: 52
 class struct_ovrFovPort_(Structure):
     pass
 
@@ -773,73 +774,73 @@ struct_ovrFovPort_._fields_ = [
     ('RightTan', c_float),
 ]
 
-ovrFovPort = struct_ovrFovPort_ # OVR_CAPI.h: 106
+ovrFovPort = struct_ovrFovPort_ # capi.h: 52
 
-enum_anon_1 = c_int # OVR_CAPI.h: 121
+enum_anon_1 = c_int # capi.h: 61
 
-ovrHmd_None = 0 # OVR_CAPI.h: 121
+ovrHmd_None = 0 # capi.h: 61
 
-ovrHmd_DK1 = 3 # OVR_CAPI.h: 121
+ovrHmd_DK1 = 3 # capi.h: 61
 
-ovrHmd_DKHD = 4 # OVR_CAPI.h: 121
+ovrHmd_DKHD = 4 # capi.h: 61
 
-ovrHmd_CrystalCoveProto = 5 # OVR_CAPI.h: 121
+ovrHmd_CrystalCoveProto = 5 # capi.h: 61
 
-ovrHmd_DK2 = 6 # OVR_CAPI.h: 121
+ovrHmd_DK2 = 6 # capi.h: 61
 
-ovrHmd_Other = (ovrHmd_DK2 + 1) # OVR_CAPI.h: 121
+ovrHmd_Other = (ovrHmd_DK2 + 1) # capi.h: 61
 
-ovrHmdType = enum_anon_1 # OVR_CAPI.h: 121
+ovrHmdType = enum_anon_1 # capi.h: 61
 
-enum_anon_2 = c_int # OVR_CAPI.h: 138
+enum_anon_2 = c_int # capi.h: 73
 
-ovrHmdCap_Present = 1 # OVR_CAPI.h: 138
+ovrHmdCap_Present = 1 # capi.h: 73
 
-ovrHmdCap_Available = 2 # OVR_CAPI.h: 138
+ovrHmdCap_Available = 2 # capi.h: 73
 
-ovrHmdCap_Orientation = 16 # OVR_CAPI.h: 138
+ovrHmdCap_Orientation = 16 # capi.h: 73
 
-ovrHmdCap_YawCorrection = 32 # OVR_CAPI.h: 138
+ovrHmdCap_YawCorrection = 32 # capi.h: 73
 
-ovrHmdCap_Position = 64 # OVR_CAPI.h: 138
+ovrHmdCap_Position = 64 # capi.h: 73
 
-ovrHmdCap_LowPersistence = 128 # OVR_CAPI.h: 138
+ovrHmdCap_LowPersistence = 128 # capi.h: 73
 
-ovrHmdCap_LatencyTest = 256 # OVR_CAPI.h: 138
+ovrHmdCap_LatencyTest = 256 # capi.h: 73
 
-ovrHmdCap_DynamicPrediction = 512 # OVR_CAPI.h: 138
+ovrHmdCap_DynamicPrediction = 512 # capi.h: 73
 
-ovrHmdCap_NoVSync = 4096 # OVR_CAPI.h: 138
+ovrHmdCap_NoVSync = 4096 # capi.h: 73
 
-ovrHmdCapBits = enum_anon_2 # OVR_CAPI.h: 138
+ovrHmdCapBits = enum_anon_2 # capi.h: 73
 
-enum_anon_3 = c_int # OVR_CAPI.h: 147
+enum_anon_3 = c_int # capi.h: 79
 
-ovrDistortion_Chromatic = 1 # OVR_CAPI.h: 147
+ovrDistortion_Chromatic = 1 # capi.h: 79
 
-ovrDistortion_TimeWarp = 2 # OVR_CAPI.h: 147
+ovrDistortion_TimeWarp = 2 # capi.h: 79
 
-ovrDistortion_Vignette = 8 # OVR_CAPI.h: 147
+ovrDistortion_Vignette = 8 # capi.h: 79
 
-ovrDistortionCaps = enum_anon_3 # OVR_CAPI.h: 147
+ovrDistortionCaps = enum_anon_3 # capi.h: 79
 
-enum_anon_4 = c_int # OVR_CAPI.h: 158
+enum_anon_4 = c_int # capi.h: 85
 
-ovrEye_Left = 0 # OVR_CAPI.h: 158
+ovrEye_Left = 0 # capi.h: 85
 
-ovrEye_Right = 1 # OVR_CAPI.h: 158
+ovrEye_Right = 1 # capi.h: 85
 
-ovrEye_Count = 2 # OVR_CAPI.h: 158
+ovrEye_Count = 2 # capi.h: 85
 
-ovrEyeType = enum_anon_4 # OVR_CAPI.h: 158
+ovrEyeType = enum_anon_4 # capi.h: 85
 
-# OVR_CAPI.h: 162
+# capi.h: 86
 class struct_ovrHmdStruct(Structure):
     pass
 
-ovrHmd = POINTER(struct_ovrHmdStruct) # OVR_CAPI.h: 162
+ovrHmd = POINTER(struct_ovrHmdStruct) # capi.h: 86
 
-# OVR_CAPI.h: 201
+# capi.h: 102
 class struct_ovrHmdDesc_(Structure):
     pass
 
@@ -874,21 +875,21 @@ struct_ovrHmdDesc_._fields_ = [
     ('DisplayId', c_long),
 ]
 
-ovrHmdDesc = struct_ovrHmdDesc_ # OVR_CAPI.h: 201
+ovrHmdDesc = struct_ovrHmdDesc_ # capi.h: 102
 
-enum_anon_5 = c_int # OVR_CAPI.h: 221
+enum_anon_5 = c_int # capi.h: 109
 
-ovrStatus_OrientationTracked = 1 # OVR_CAPI.h: 221
+ovrStatus_OrientationTracked = 1 # capi.h: 109
 
-ovrStatus_PositionTracked = 2 # OVR_CAPI.h: 221
+ovrStatus_PositionTracked = 2 # capi.h: 109
 
-ovrStatus_PositionConnected = 32 # OVR_CAPI.h: 221
+ovrStatus_PositionConnected = 32 # capi.h: 109
 
-ovrStatus_HmdConnected = 128 # OVR_CAPI.h: 221
+ovrStatus_HmdConnected = 128 # capi.h: 109
 
-ovrStatusBits = enum_anon_5 # OVR_CAPI.h: 221
+ovrStatusBits = enum_anon_5 # capi.h: 109
 
-# OVR_CAPI.h: 239
+# capi.h: 116
 class struct_ovrSensorState_(Structure):
     pass
 
@@ -905,9 +906,9 @@ struct_ovrSensorState_._fields_ = [
     ('StatusFlags', c_uint),
 ]
 
-ovrSensorState = struct_ovrSensorState_ # OVR_CAPI.h: 239
+ovrSensorState = struct_ovrSensorState_ # capi.h: 116
 
-# OVR_CAPI.h: 250
+# capi.h: 122
 class struct_ovrSensorDesc_(Structure):
     pass
 
@@ -922,9 +923,9 @@ struct_ovrSensorDesc_._fields_ = [
     ('SerialNumber', c_char * 24),
 ]
 
-ovrSensorDesc = struct_ovrSensorDesc_ # OVR_CAPI.h: 250
+ovrSensorDesc = struct_ovrSensorDesc_ # capi.h: 122
 
-# OVR_CAPI.h: 282
+# capi.h: 131
 class struct_ovrFrameTiming_(Structure):
     pass
 
@@ -945,9 +946,9 @@ struct_ovrFrameTiming_._fields_ = [
     ('EyeScanoutSeconds', c_double * 2),
 ]
 
-ovrFrameTiming = struct_ovrFrameTiming_ # OVR_CAPI.h: 282
+ovrFrameTiming = struct_ovrFrameTiming_ # capi.h: 131
 
-# OVR_CAPI.h: 301
+# capi.h: 138
 class struct_ovrEyeDesc_(Structure):
     pass
 
@@ -964,9 +965,9 @@ struct_ovrEyeDesc_._fields_ = [
     ('Fov', ovrFovPort),
 ]
 
-ovrEyeDesc = struct_ovrEyeDesc_ # OVR_CAPI.h: 301
+ovrEyeDesc = struct_ovrEyeDesc_ # capi.h: 138
 
-# OVR_CAPI.h: 310
+# capi.h: 145
 class struct_ovrEyeRenderDesc_(Structure):
     pass
 
@@ -983,27 +984,27 @@ struct_ovrEyeRenderDesc_._fields_ = [
     ('ViewAdjust', ovrVector3f),
 ]
 
-ovrEyeRenderDesc = struct_ovrEyeRenderDesc_ # OVR_CAPI.h: 310
+ovrEyeRenderDesc = struct_ovrEyeRenderDesc_ # capi.h: 145
 
-enum_anon_6 = c_int # OVR_CAPI.h: 334
+enum_anon_6 = c_int # capi.h: 155
 
-ovrRenderAPI_None = 0 # OVR_CAPI.h: 334
+ovrRenderAPI_None = 0 # capi.h: 155
 
-ovrRenderAPI_OpenGL = (ovrRenderAPI_None + 1) # OVR_CAPI.h: 334
+ovrRenderAPI_OpenGL = (ovrRenderAPI_None + 1) # capi.h: 155
 
-ovrRenderAPI_Android_GLES = (ovrRenderAPI_OpenGL + 1) # OVR_CAPI.h: 334
+ovrRenderAPI_Android_GLES = (ovrRenderAPI_OpenGL + 1) # capi.h: 155
 
-ovrRenderAPI_D3D9 = (ovrRenderAPI_Android_GLES + 1) # OVR_CAPI.h: 334
+ovrRenderAPI_D3D9 = (ovrRenderAPI_Android_GLES + 1) # capi.h: 155
 
-ovrRenderAPI_D3D10 = (ovrRenderAPI_D3D9 + 1) # OVR_CAPI.h: 334
+ovrRenderAPI_D3D10 = (ovrRenderAPI_D3D9 + 1) # capi.h: 155
 
-ovrRenderAPI_D3D11 = (ovrRenderAPI_D3D10 + 1) # OVR_CAPI.h: 334
+ovrRenderAPI_D3D11 = (ovrRenderAPI_D3D10 + 1) # capi.h: 155
 
-ovrRenderAPI_Count = (ovrRenderAPI_D3D11 + 1) # OVR_CAPI.h: 334
+ovrRenderAPI_Count = (ovrRenderAPI_D3D11 + 1) # capi.h: 155
 
-ovrRenderAPIType = enum_anon_6 # OVR_CAPI.h: 334
+ovrRenderAPIType = enum_anon_6 # capi.h: 155
 
-# OVR_CAPI.h: 343
+# capi.h: 161
 class struct_ovrRenderAPIConfigHeader_(Structure):
     pass
 
@@ -1018,9 +1019,9 @@ struct_ovrRenderAPIConfigHeader_._fields_ = [
     ('Multisample', c_int),
 ]
 
-ovrRenderAPIConfigHeader = struct_ovrRenderAPIConfigHeader_ # OVR_CAPI.h: 343
+ovrRenderAPIConfigHeader = struct_ovrRenderAPIConfigHeader_ # capi.h: 161
 
-# OVR_CAPI.h: 349
+# capi.h: 166
 class struct_ovrRenderAPIConfig_(Structure):
     pass
 
@@ -1033,9 +1034,9 @@ struct_ovrRenderAPIConfig_._fields_ = [
     ('PlatformData', uintptr_t * 8),
 ]
 
-ovrRenderAPIConfig = struct_ovrRenderAPIConfig_ # OVR_CAPI.h: 349
+ovrRenderAPIConfig = struct_ovrRenderAPIConfig_ # capi.h: 166
 
-# OVR_CAPI.h: 359
+# capi.h: 172
 class struct_ovrTextureHeader_(Structure):
     pass
 
@@ -1050,9 +1051,9 @@ struct_ovrTextureHeader_._fields_ = [
     ('RenderViewport', ovrRecti),
 ]
 
-ovrTextureHeader = struct_ovrTextureHeader_ # OVR_CAPI.h: 359
+ovrTextureHeader = struct_ovrTextureHeader_ # capi.h: 172
 
-# OVR_CAPI.h: 365
+# capi.h: 177
 class struct_ovrTexture_(Structure):
     pass
 
@@ -1065,133 +1066,193 @@ struct_ovrTexture_._fields_ = [
     ('PlatformData', uintptr_t * 8),
 ]
 
-ovrTexture = struct_ovrTexture_ # OVR_CAPI.h: 365
+ovrTexture = struct_ovrTexture_ # capi.h: 177
 
-# OVR_CAPI.h: 401
-if hasattr(_libs['libovr.dll'], 'ovr_Initialize'):
-    ovr_Initialize = _libs['libovr.dll'].ovr_Initialize
+# capi.h: 178
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovr_Initialize'):
+        continue
+    ovr_Initialize = _lib.ovr_Initialize
     ovr_Initialize.argtypes = []
     ovr_Initialize.restype = ovrBool
+    break
 
-# OVR_CAPI.h: 402
-if hasattr(_libs['libovr.dll'], 'ovr_Shutdown'):
-    ovr_Shutdown = _libs['libovr.dll'].ovr_Shutdown
+# capi.h: 179
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovr_Shutdown'):
+        continue
+    ovr_Shutdown = _lib.ovr_Shutdown
     ovr_Shutdown.argtypes = []
     ovr_Shutdown.restype = None
+    break
 
-# OVR_CAPI.h: 407
-if hasattr(_libs['libovr.dll'], 'ovrHmd_Detect'):
-    ovrHmd_Detect = _libs['libovr.dll'].ovrHmd_Detect
+# capi.h: 180
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_Detect'):
+        continue
+    ovrHmd_Detect = _lib.ovrHmd_Detect
     ovrHmd_Detect.argtypes = []
     ovrHmd_Detect.restype = c_int
+    break
 
-# OVR_CAPI.h: 413
-if hasattr(_libs['libovr.dll'], 'ovrHmd_Create'):
-    ovrHmd_Create = _libs['libovr.dll'].ovrHmd_Create
+# capi.h: 181
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_Create'):
+        continue
+    ovrHmd_Create = _lib.ovrHmd_Create
     ovrHmd_Create.argtypes = [c_int]
     ovrHmd_Create.restype = ovrHmd
+    break
 
-# OVR_CAPI.h: 414
-if hasattr(_libs['libovr.dll'], 'ovrHmd_Destroy'):
-    ovrHmd_Destroy = _libs['libovr.dll'].ovrHmd_Destroy
+# capi.h: 182
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_Destroy'):
+        continue
+    ovrHmd_Destroy = _lib.ovrHmd_Destroy
     ovrHmd_Destroy.argtypes = [ovrHmd]
     ovrHmd_Destroy.restype = None
+    break
 
-# OVR_CAPI.h: 418
-if hasattr(_libs['libovr.dll'], 'ovrHmd_CreateDebug'):
-    ovrHmd_CreateDebug = _libs['libovr.dll'].ovrHmd_CreateDebug
+# capi.h: 183
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_CreateDebug'):
+        continue
+    ovrHmd_CreateDebug = _lib.ovrHmd_CreateDebug
     ovrHmd_CreateDebug.argtypes = [ovrHmdType]
     ovrHmd_CreateDebug.restype = ovrHmd
+    break
 
-# OVR_CAPI.h: 424
-if hasattr(_libs['libovr.dll'], 'ovrHmd_GetLastError'):
-    ovrHmd_GetLastError = _libs['libovr.dll'].ovrHmd_GetLastError
+# capi.h: 184
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetLastError'):
+        continue
+    ovrHmd_GetLastError = _lib.ovrHmd_GetLastError
     ovrHmd_GetLastError.argtypes = [ovrHmd]
     if sizeof(c_int) == sizeof(c_void_p):
         ovrHmd_GetLastError.restype = ReturnString
     else:
         ovrHmd_GetLastError.restype = String
         ovrHmd_GetLastError.errcheck = ReturnString
+    break
 
-# OVR_CAPI.h: 440
-if hasattr(_libs['libovr.dll'], 'ovrHmd_StartSensor'):
-    ovrHmd_StartSensor = _libs['libovr.dll'].ovrHmd_StartSensor
+# capi.h: 185
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_StartSensor'):
+        continue
+    ovrHmd_StartSensor = _lib.ovrHmd_StartSensor
     ovrHmd_StartSensor.argtypes = [ovrHmd, c_uint, c_uint]
     ovrHmd_StartSensor.restype = ovrBool
+    break
 
-# OVR_CAPI.h: 443
-if hasattr(_libs['libovr.dll'], 'ovrHmd_StopSensor'):
-    ovrHmd_StopSensor = _libs['libovr.dll'].ovrHmd_StopSensor
+# capi.h: 187
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_StopSensor'):
+        continue
+    ovrHmd_StopSensor = _lib.ovrHmd_StopSensor
     ovrHmd_StopSensor.argtypes = [ovrHmd]
     ovrHmd_StopSensor.restype = None
+    break
 
-# OVR_CAPI.h: 445
-if hasattr(_libs['libovr.dll'], 'ovrHmd_ResetSensor'):
-    ovrHmd_ResetSensor = _libs['libovr.dll'].ovrHmd_ResetSensor
+# capi.h: 188
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_ResetSensor'):
+        continue
+    ovrHmd_ResetSensor = _lib.ovrHmd_ResetSensor
     ovrHmd_ResetSensor.argtypes = [ovrHmd]
     ovrHmd_ResetSensor.restype = None
+    break
 
-# OVR_CAPI.h: 452
-if hasattr(_libs['libovr.dll'], 'ovrHmd_GetSensorState'):
-    ovrHmd_GetSensorState = _libs['libovr.dll'].ovrHmd_GetSensorState
+# capi.h: 189
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetSensorState'):
+        continue
+    ovrHmd_GetSensorState = _lib.ovrHmd_GetSensorState
     ovrHmd_GetSensorState.argtypes = [ovrHmd, c_double]
     ovrHmd_GetSensorState.restype = ovrSensorState
+    break
 
-# OVR_CAPI.h: 456
-if hasattr(_libs['libovr.dll'], 'ovrHmd_GetSensorDesc'):
-    ovrHmd_GetSensorDesc = _libs['libovr.dll'].ovrHmd_GetSensorDesc
+# capi.h: 190
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetSensorDesc'):
+        continue
+    ovrHmd_GetSensorDesc = _lib.ovrHmd_GetSensorDesc
     ovrHmd_GetSensorDesc.argtypes = [ovrHmd, POINTER(ovrSensorDesc)]
     ovrHmd_GetSensorDesc.restype = ovrBool
+    break
 
-# OVR_CAPI.h: 463
-if hasattr(_libs['libovr.dll'], 'ovrHmd_GetDesc'):
-    ovrHmd_GetDesc = _libs['libovr.dll'].ovrHmd_GetDesc
+# capi.h: 191
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetDesc'):
+        continue
+    ovrHmd_GetDesc = _lib.ovrHmd_GetDesc
     ovrHmd_GetDesc.argtypes = [ovrHmd, POINTER(ovrHmdDesc)]
     ovrHmd_GetDesc.restype = None
+    break
 
-# OVR_CAPI.h: 470
-if hasattr(_libs['libovr.dll'], 'ovrHmd_GetFovTextureSize'):
-    ovrHmd_GetFovTextureSize = _libs['libovr.dll'].ovrHmd_GetFovTextureSize
+# capi.h: 192
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetFovTextureSize'):
+        continue
+    ovrHmd_GetFovTextureSize = _lib.ovrHmd_GetFovTextureSize
     ovrHmd_GetFovTextureSize.argtypes = [ovrHmd, ovrEyeType, ovrFovPort, c_float]
     ovrHmd_GetFovTextureSize.restype = ovrSizei
+    break
 
-# OVR_CAPI.h: 512
-if hasattr(_libs['libovr.dll'], 'ovrHmd_ConfigureRendering'):
-    ovrHmd_ConfigureRendering = _libs['libovr.dll'].ovrHmd_ConfigureRendering
+# capi.h: 194
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_ConfigureRendering'):
+        continue
+    ovrHmd_ConfigureRendering = _lib.ovrHmd_ConfigureRendering
     ovrHmd_ConfigureRendering.argtypes = [ovrHmd, POINTER(ovrRenderAPIConfig), c_uint, c_uint, ovrEyeDesc * 2, ovrEyeRenderDesc * 2]
     ovrHmd_ConfigureRendering.restype = ovrBool
+    break
 
-# OVR_CAPI.h: 524
-if hasattr(_libs['libovr.dll'], 'ovrHmd_BeginFrame'):
-    ovrHmd_BeginFrame = _libs['libovr.dll'].ovrHmd_BeginFrame
+# capi.h: 200
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_BeginFrame'):
+        continue
+    ovrHmd_BeginFrame = _lib.ovrHmd_BeginFrame
     ovrHmd_BeginFrame.argtypes = [ovrHmd, c_uint]
     ovrHmd_BeginFrame.restype = ovrFrameTiming
+    break
 
-# OVR_CAPI.h: 530
-if hasattr(_libs['libovr.dll'], 'ovrHmd_EndFrame'):
-    ovrHmd_EndFrame = _libs['libovr.dll'].ovrHmd_EndFrame
+# capi.h: 201
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_EndFrame'):
+        continue
+    ovrHmd_EndFrame = _lib.ovrHmd_EndFrame
     ovrHmd_EndFrame.argtypes = [ovrHmd]
     ovrHmd_EndFrame.restype = None
+    break
 
-# OVR_CAPI.h: 540
-if hasattr(_libs['libovr.dll'], 'ovrHmd_BeginEyeRender'):
-    ovrHmd_BeginEyeRender = _libs['libovr.dll'].ovrHmd_BeginEyeRender
+# capi.h: 202
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_BeginEyeRender'):
+        continue
+    ovrHmd_BeginEyeRender = _lib.ovrHmd_BeginEyeRender
     ovrHmd_BeginEyeRender.argtypes = [ovrHmd, ovrEyeType]
     ovrHmd_BeginEyeRender.restype = ovrPosef
+    break
 
-# OVR_CAPI.h: 548
-if hasattr(_libs['libovr.dll'], 'ovrHmd_EndEyeRender'):
-    ovrHmd_EndEyeRender = _libs['libovr.dll'].ovrHmd_EndEyeRender
+# capi.h: 203
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_EndEyeRender'):
+        continue
+    ovrHmd_EndEyeRender = _lib.ovrHmd_EndEyeRender
     ovrHmd_EndEyeRender.argtypes = [ovrHmd, ovrEyeType, ovrPosef, POINTER(ovrTexture)]
     ovrHmd_EndEyeRender.restype = None
+    break
 
-# OVR_CAPI.h: 575
-if hasattr(_libs['libovr.dll'], 'ovrHmd_GetRenderDesc'):
-    ovrHmd_GetRenderDesc = _libs['libovr.dll'].ovrHmd_GetRenderDesc
+# capi.h: 205
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetRenderDesc'):
+        continue
+    ovrHmd_GetRenderDesc = _lib.ovrHmd_GetRenderDesc
     ovrHmd_GetRenderDesc.argtypes = [ovrHmd, ovrEyeDesc]
     ovrHmd_GetRenderDesc.restype = ovrEyeRenderDesc
+    break
 
-# OVR_CAPI.h: 590
+# capi.h: 214
 class struct_ovrDistortionVertex_(Structure):
     pass
 
@@ -1212,9 +1273,9 @@ struct_ovrDistortionVertex_._fields_ = [
     ('TexB', ovrVector2f),
 ]
 
-ovrDistortionVertex = struct_ovrDistortionVertex_ # OVR_CAPI.h: 590
+ovrDistortionVertex = struct_ovrDistortionVertex_ # capi.h: 214
 
-# OVR_CAPI.h: 600
+# capi.h: 221
 class struct_ovrDistortionMesh_(Structure):
     pass
 
@@ -1231,81 +1292,126 @@ struct_ovrDistortionMesh_._fields_ = [
     ('IndexCount', c_uint),
 ]
 
-ovrDistortionMesh = struct_ovrDistortionMesh_ # OVR_CAPI.h: 600
+ovrDistortionMesh = struct_ovrDistortionMesh_ # capi.h: 221
 
-# OVR_CAPI.h: 610
-if hasattr(_libs['libovr.dll'], 'ovrHmd_CreateDistortionMesh'):
-    ovrHmd_CreateDistortionMesh = _libs['libovr.dll'].ovrHmd_CreateDistortionMesh
+# capi.h: 222
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_CreateDistortionMesh'):
+        continue
+    ovrHmd_CreateDistortionMesh = _lib.ovrHmd_CreateDistortionMesh
     ovrHmd_CreateDistortionMesh.argtypes = [ovrHmd, ovrEyeDesc, c_uint, ovrVector2f * 2, POINTER(ovrDistortionMesh)]
     ovrHmd_CreateDistortionMesh.restype = ovrBool
+    break
 
-# OVR_CAPI.h: 617
-if hasattr(_libs['libovr.dll'], 'ovrHmd_DestroyDistortionMesh'):
-    ovrHmd_DestroyDistortionMesh = _libs['libovr.dll'].ovrHmd_DestroyDistortionMesh
+# capi.h: 226
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_DestroyDistortionMesh'):
+        continue
+    ovrHmd_DestroyDistortionMesh = _lib.ovrHmd_DestroyDistortionMesh
     ovrHmd_DestroyDistortionMesh.argtypes = [POINTER(ovrDistortionMesh)]
     ovrHmd_DestroyDistortionMesh.restype = None
+    break
 
-# OVR_CAPI.h: 621
-if hasattr(_libs['libovr.dll'], 'ovrHmd_GetRenderScaleAndOffset'):
-    ovrHmd_GetRenderScaleAndOffset = _libs['libovr.dll'].ovrHmd_GetRenderScaleAndOffset
+# capi.h: 227
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetRenderScaleAndOffset'):
+        continue
+    ovrHmd_GetRenderScaleAndOffset = _lib.ovrHmd_GetRenderScaleAndOffset
     ovrHmd_GetRenderScaleAndOffset.argtypes = [ovrHmd, ovrEyeDesc, c_uint, ovrVector2f * 2]
     ovrHmd_GetRenderScaleAndOffset.restype = None
+    break
 
-# OVR_CAPI.h: 628
-if hasattr(_libs['libovr.dll'], 'ovrHmd_GetFrameTiming'):
-    ovrHmd_GetFrameTiming = _libs['libovr.dll'].ovrHmd_GetFrameTiming
+# capi.h: 230
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetFrameTiming'):
+        continue
+    ovrHmd_GetFrameTiming = _lib.ovrHmd_GetFrameTiming
     ovrHmd_GetFrameTiming.argtypes = [ovrHmd, c_uint]
     ovrHmd_GetFrameTiming.restype = ovrFrameTiming
+    break
 
-# OVR_CAPI.h: 633
-if hasattr(_libs['libovr.dll'], 'ovrHmd_BeginFrameTiming'):
-    ovrHmd_BeginFrameTiming = _libs['libovr.dll'].ovrHmd_BeginFrameTiming
+# capi.h: 231
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_BeginFrameTiming'):
+        continue
+    ovrHmd_BeginFrameTiming = _lib.ovrHmd_BeginFrameTiming
     ovrHmd_BeginFrameTiming.argtypes = [ovrHmd, c_uint]
     ovrHmd_BeginFrameTiming.restype = ovrFrameTiming
+    break
 
-# OVR_CAPI.h: 638
-if hasattr(_libs['libovr.dll'], 'ovrHmd_EndFrameTiming'):
-    ovrHmd_EndFrameTiming = _libs['libovr.dll'].ovrHmd_EndFrameTiming
+# capi.h: 232
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_EndFrameTiming'):
+        continue
+    ovrHmd_EndFrameTiming = _lib.ovrHmd_EndFrameTiming
     ovrHmd_EndFrameTiming.argtypes = [ovrHmd]
     ovrHmd_EndFrameTiming.restype = None
+    break
 
-# OVR_CAPI.h: 648
-if hasattr(_libs['libovr.dll'], 'ovrHmd_GetEyePose'):
-    ovrHmd_GetEyePose = _libs['libovr.dll'].ovrHmd_GetEyePose
+# capi.h: 233
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_ResetFrameTiming'):
+        continue
+    ovrHmd_ResetFrameTiming = _lib.ovrHmd_ResetFrameTiming
+    ovrHmd_ResetFrameTiming.argtypes = [ovrHmd, c_uint, ovrBool]
+    ovrHmd_ResetFrameTiming.restype = None
+    break
+
+# capi.h: 234
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetEyePose'):
+        continue
+    ovrHmd_GetEyePose = _lib.ovrHmd_GetEyePose
     ovrHmd_GetEyePose.argtypes = [ovrHmd, ovrEyeType]
     ovrHmd_GetEyePose.restype = ovrPosef
+    break
 
-# OVR_CAPI.h: 655
-if hasattr(_libs['libovr.dll'], 'ovrHmd_GetEyeTimewarpMatrices'):
-    ovrHmd_GetEyeTimewarpMatrices = _libs['libovr.dll'].ovrHmd_GetEyeTimewarpMatrices
+# capi.h: 235
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetEyeTimewarpMatrices'):
+        continue
+    ovrHmd_GetEyeTimewarpMatrices = _lib.ovrHmd_GetEyeTimewarpMatrices
     ovrHmd_GetEyeTimewarpMatrices.argtypes = [ovrHmd, ovrEyeType, ovrPosef, ovrMatrix4f * 2]
     ovrHmd_GetEyeTimewarpMatrices.restype = None
+    break
 
-# OVR_CAPI.h: 664
-if hasattr(_libs['libovr.dll'], 'ovrMatrix4f_Projection'):
-    ovrMatrix4f_Projection = _libs['libovr.dll'].ovrMatrix4f_Projection
+# capi.h: 237
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrMatrix4f_Projection'):
+        continue
+    ovrMatrix4f_Projection = _lib.ovrMatrix4f_Projection
     ovrMatrix4f_Projection.argtypes = [ovrFovPort, c_float, c_float, ovrBool]
     ovrMatrix4f_Projection.restype = ovrMatrix4f
+    break
 
-# OVR_CAPI.h: 670
-if hasattr(_libs['libovr.dll'], 'ovrMatrix4f_OrthoSubProjection'):
-    ovrMatrix4f_OrthoSubProjection = _libs['libovr.dll'].ovrMatrix4f_OrthoSubProjection
+# capi.h: 239
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrMatrix4f_OrthoSubProjection'):
+        continue
+    ovrMatrix4f_OrthoSubProjection = _lib.ovrMatrix4f_OrthoSubProjection
     ovrMatrix4f_OrthoSubProjection.argtypes = [ovrMatrix4f, ovrVector2f, c_float, c_float]
     ovrMatrix4f_OrthoSubProjection.restype = ovrMatrix4f
+    break
 
-# OVR_CAPI.h: 675
-if hasattr(_libs['libovr.dll'], 'ovr_GetTimeInSeconds'):
-    ovr_GetTimeInSeconds = _libs['libovr.dll'].ovr_GetTimeInSeconds
+# capi.h: 241
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovr_GetTimeInSeconds'):
+        continue
+    ovr_GetTimeInSeconds = _lib.ovr_GetTimeInSeconds
     ovr_GetTimeInSeconds.argtypes = []
     ovr_GetTimeInSeconds.restype = c_double
+    break
 
-# OVR_CAPI.h: 678
-if hasattr(_libs['libovr.dll'], 'ovr_WaitTillTime'):
-    ovr_WaitTillTime = _libs['libovr.dll'].ovr_WaitTillTime
+# capi.h: 242
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovr_WaitTillTime'):
+        continue
+    ovr_WaitTillTime = _lib.ovr_WaitTillTime
     ovr_WaitTillTime.argtypes = [c_double]
     ovr_WaitTillTime.restype = c_double
+    break
 
-# OVR_CAPI.h: 687
+# capi.h: 243
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_ProcessLatencyTest'):
         continue
@@ -1314,191 +1420,209 @@ for _lib in _libs.itervalues():
     ovrHmd_ProcessLatencyTest.restype = ovrBool
     break
 
-# OVR_CAPI.h: 691
-if hasattr(_libs['libovr.dll'], 'ovrHmd_GetLatencyTestResult'):
-    ovrHmd_GetLatencyTestResult = _libs['libovr.dll'].ovrHmd_GetLatencyTestResult
+# capi.h: 244
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetLatencyTestResult'):
+        continue
+    ovrHmd_GetLatencyTestResult = _lib.ovrHmd_GetLatencyTestResult
     ovrHmd_GetLatencyTestResult.argtypes = [ovrHmd]
     if sizeof(c_int) == sizeof(c_void_p):
         ovrHmd_GetLatencyTestResult.restype = ReturnString
     else:
         ovrHmd_GetLatencyTestResult.restype = String
         ovrHmd_GetLatencyTestResult.errcheck = ReturnString
+    break
 
-# OVR_CAPI.h: 695
-if hasattr(_libs['libovr.dll'], 'ovrHmd_GetMeasuredLatencyTest2'):
-    ovrHmd_GetMeasuredLatencyTest2 = _libs['libovr.dll'].ovrHmd_GetMeasuredLatencyTest2
+# capi.h: 245
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetMeasuredLatencyTest2'):
+        continue
+    ovrHmd_GetMeasuredLatencyTest2 = _lib.ovrHmd_GetMeasuredLatencyTest2
     ovrHmd_GetMeasuredLatencyTest2.argtypes = [ovrHmd]
     ovrHmd_GetMeasuredLatencyTest2.restype = c_double
+    break
 
-# OVR_CAPI.h: 731
-if hasattr(_libs['libovr.dll'], 'ovrHmd_GetFloat'):
-    ovrHmd_GetFloat = _libs['libovr.dll'].ovrHmd_GetFloat
+# capi.h: 246
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetFloat'):
+        continue
+    ovrHmd_GetFloat = _lib.ovrHmd_GetFloat
     ovrHmd_GetFloat.argtypes = [ovrHmd, String, c_float]
     ovrHmd_GetFloat.restype = c_float
+    break
 
-# OVR_CAPI.h: 734
-if hasattr(_libs['libovr.dll'], 'ovrHmd_SetFloat'):
-    ovrHmd_SetFloat = _libs['libovr.dll'].ovrHmd_SetFloat
+# capi.h: 247
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_SetFloat'):
+        continue
+    ovrHmd_SetFloat = _lib.ovrHmd_SetFloat
     ovrHmd_SetFloat.argtypes = [ovrHmd, String, c_float]
     ovrHmd_SetFloat.restype = ovrBool
+    break
 
-# OVR_CAPI.h: 739
-if hasattr(_libs['libovr.dll'], 'ovrHmd_GetFloatArray'):
-    ovrHmd_GetFloatArray = _libs['libovr.dll'].ovrHmd_GetFloatArray
+# capi.h: 248
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetFloatArray'):
+        continue
+    ovrHmd_GetFloatArray = _lib.ovrHmd_GetFloatArray
     ovrHmd_GetFloatArray.argtypes = [ovrHmd, String, POINTER(c_float), c_uint]
     ovrHmd_GetFloatArray.restype = c_uint
+    break
 
-# OVR_CAPI.h: 743
-if hasattr(_libs['libovr.dll'], 'ovrHmd_SetFloatArray'):
-    ovrHmd_SetFloatArray = _libs['libovr.dll'].ovrHmd_SetFloatArray
+# capi.h: 250
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_SetFloatArray'):
+        continue
+    ovrHmd_SetFloatArray = _lib.ovrHmd_SetFloatArray
     ovrHmd_SetFloatArray.argtypes = [ovrHmd, String, POINTER(c_float), c_uint]
     ovrHmd_SetFloatArray.restype = ovrBool
+    break
 
-# OVR_CAPI.h: 749
-if hasattr(_libs['libovr.dll'], 'ovrHmd_GetString'):
-    ovrHmd_GetString = _libs['libovr.dll'].ovrHmd_GetString
+# capi.h: 252
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetString'):
+        continue
+    ovrHmd_GetString = _lib.ovrHmd_GetString
     ovrHmd_GetString.argtypes = [ovrHmd, String, String]
     if sizeof(c_int) == sizeof(c_void_p):
         ovrHmd_GetString.restype = ReturnString
     else:
         ovrHmd_GetString.restype = String
         ovrHmd_GetString.errcheck = ReturnString
+    break
 
-# OVR_CAPI.h: 754
-if hasattr(_libs['libovr.dll'], 'ovrHmd_GetArraySize'):
-    ovrHmd_GetArraySize = _libs['libovr.dll'].ovrHmd_GetArraySize
+# capi.h: 254
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetArraySize'):
+        continue
+    ovrHmd_GetArraySize = _lib.ovrHmd_GetArraySize
     ovrHmd_GetArraySize.argtypes = [ovrHmd, String]
     ovrHmd_GetArraySize.restype = c_uint
+    break
 
-# OVR_CAPI.h: 711
-try:
-    OVR_KEY_USER = 'User'
-except:
+HWND = POINTER(None) # capi.h: 255
+
+HGLRC = POINTER(None) # capi.h: 256
+
+HDC = POINTER(None) # capi.h: 257
+
+GLuint = c_uint # capi.h: 258
+
+# capi.h: 265
+class struct_ovrGLConfigData_s(Structure):
     pass
 
-# OVR_CAPI.h: 712
-try:
-    OVR_KEY_NAME = 'Name'
-except:
+struct_ovrGLConfigData_s.__slots__ = [
+    'Header',
+    'Window',
+    'WglContext',
+    'GdiDc',
+]
+struct_ovrGLConfigData_s._fields_ = [
+    ('Header', ovrRenderAPIConfigHeader),
+    ('Window', HWND),
+    ('WglContext', HGLRC),
+    ('GdiDc', HDC),
+]
+
+ovrGLConfigData = struct_ovrGLConfigData_s # capi.h: 265
+
+# capi.h: 266
+class union_ovrGLConfig(Union):
     pass
 
-# OVR_CAPI.h: 713
-try:
-    OVR_KEY_GENDER = 'Gender'
-except:
+union_ovrGLConfig.__slots__ = [
+    'Config',
+    'OGL',
+]
+union_ovrGLConfig._fields_ = [
+    ('Config', ovrRenderAPIConfig),
+    ('OGL', ovrGLConfigData),
+]
+
+# capi.h: 275
+class struct_ovrGLTextureData_s(Structure):
     pass
 
-# OVR_CAPI.h: 714
-try:
-    OVR_KEY_PLAYER_HEIGHT = 'PlayerHeight'
-except:
+struct_ovrGLTextureData_s.__slots__ = [
+    'Header',
+    'TexId',
+]
+struct_ovrGLTextureData_s._fields_ = [
+    ('Header', ovrTextureHeader),
+    ('TexId', GLuint),
+]
+
+ovrGLTextureData = struct_ovrGLTextureData_s # capi.h: 275
+
+# capi.h: 280
+class union_ovrGLTexture_s(Union):
     pass
 
-# OVR_CAPI.h: 715
-try:
-    OVR_KEY_EYE_HEIGHT = 'EyeHeight'
-except:
-    pass
+union_ovrGLTexture_s.__slots__ = [
+    'Texture',
+    'OGL',
+]
+union_ovrGLTexture_s._fields_ = [
+    ('Texture', ovrTexture),
+    ('OGL', ovrGLTextureData),
+]
 
-# OVR_CAPI.h: 716
-try:
-    OVR_KEY_IPD = 'IPD'
-except:
-    pass
+ovrGLTexture = union_ovrGLTexture_s # capi.h: 280
 
-# OVR_CAPI.h: 717
-try:
-    OVR_KEY_NECK_TO_EYE_HORIZONTAL = 'NeckEyeHori'
-except:
-    pass
+ovrVector2i_ = struct_ovrVector2i_ # capi.h: 6
 
-# OVR_CAPI.h: 718
-try:
-    OVR_KEY_NECK_TO_EYE_VERTICAL = 'NeckEyeVert'
-except:
-    pass
+ovrSizei_ = struct_ovrSizei_ # capi.h: 10
 
-# OVR_CAPI.h: 720
-try:
-    OVR_DEFAULT_GENDER = 'Male'
-except:
-    pass
+ovrRecti_ = struct_ovrRecti_ # capi.h: 15
 
-# OVR_CAPI.h: 721
-try:
-    OVR_DEFAULT_PLAYER_HEIGHT = 1.778
-except:
-    pass
+ovrQuatf_ = struct_ovrQuatf_ # capi.h: 19
 
-# OVR_CAPI.h: 722
-try:
-    OVR_DEFAULT_EYE_HEIGHT = 1.675
-except:
-    pass
+ovrVector2f_ = struct_ovrVector2f_ # capi.h: 23
 
-# OVR_CAPI.h: 723
-try:
-    OVR_DEFAULT_IPD = 0.064
-except:
-    pass
+ovrVector3f_ = struct_ovrVector3f_ # capi.h: 27
 
-# OVR_CAPI.h: 724
-try:
-    OVR_DEFAULT_NECK_TO_EYE_HORIZONTAL = 0.12
-except:
-    pass
+ovrMatrix4f_ = struct_ovrMatrix4f_ # capi.h: 31
 
-# OVR_CAPI.h: 725
-try:
-    OVR_DEFAULT_NECK_TO_EYE_VERTICAL = 0.12
-except:
-    pass
+ovrPosef_ = struct_ovrPosef_ # capi.h: 36
 
-ovrVector2i_ = struct_ovrVector2i_ # OVR_CAPI.h: 51
+ovrPoseStatef_ = struct_ovrPoseStatef_ # capi.h: 45
 
-ovrSizei_ = struct_ovrSizei_ # OVR_CAPI.h: 55
+ovrFovPort_ = struct_ovrFovPort_ # capi.h: 52
 
-ovrRecti_ = struct_ovrRecti_ # OVR_CAPI.h: 60
+ovrHmdStruct = struct_ovrHmdStruct # capi.h: 86
 
-ovrQuatf_ = struct_ovrQuatf_ # OVR_CAPI.h: 66
+ovrHmdDesc_ = struct_ovrHmdDesc_ # capi.h: 102
 
-ovrVector2f_ = struct_ovrVector2f_ # OVR_CAPI.h: 70
+ovrSensorState_ = struct_ovrSensorState_ # capi.h: 116
 
-ovrVector3f_ = struct_ovrVector3f_ # OVR_CAPI.h: 74
+ovrSensorDesc_ = struct_ovrSensorDesc_ # capi.h: 122
 
-ovrMatrix4f_ = struct_ovrMatrix4f_ # OVR_CAPI.h: 78
+ovrFrameTiming_ = struct_ovrFrameTiming_ # capi.h: 131
 
-ovrPosef_ = struct_ovrPosef_ # OVR_CAPI.h: 84
+ovrEyeDesc_ = struct_ovrEyeDesc_ # capi.h: 138
 
-ovrPoseStatef_ = struct_ovrPoseStatef_ # OVR_CAPI.h: 95
+ovrEyeRenderDesc_ = struct_ovrEyeRenderDesc_ # capi.h: 145
 
-ovrFovPort_ = struct_ovrFovPort_ # OVR_CAPI.h: 106
+ovrRenderAPIConfigHeader_ = struct_ovrRenderAPIConfigHeader_ # capi.h: 161
 
-ovrHmdStruct = struct_ovrHmdStruct # OVR_CAPI.h: 162
+ovrRenderAPIConfig_ = struct_ovrRenderAPIConfig_ # capi.h: 166
 
-ovrHmdDesc_ = struct_ovrHmdDesc_ # OVR_CAPI.h: 201
+ovrTextureHeader_ = struct_ovrTextureHeader_ # capi.h: 172
 
-ovrSensorState_ = struct_ovrSensorState_ # OVR_CAPI.h: 239
+ovrTexture_ = struct_ovrTexture_ # capi.h: 177
 
-ovrSensorDesc_ = struct_ovrSensorDesc_ # OVR_CAPI.h: 250
+ovrDistortionVertex_ = struct_ovrDistortionVertex_ # capi.h: 214
 
-ovrFrameTiming_ = struct_ovrFrameTiming_ # OVR_CAPI.h: 282
+ovrDistortionMesh_ = struct_ovrDistortionMesh_ # capi.h: 221
 
-ovrEyeDesc_ = struct_ovrEyeDesc_ # OVR_CAPI.h: 301
+ovrGLConfigData_s = struct_ovrGLConfigData_s # capi.h: 265
 
-ovrEyeRenderDesc_ = struct_ovrEyeRenderDesc_ # OVR_CAPI.h: 310
+ovrGLConfig = union_ovrGLConfig # capi.h: 266
 
-ovrRenderAPIConfigHeader_ = struct_ovrRenderAPIConfigHeader_ # OVR_CAPI.h: 343
+ovrGLTextureData_s = struct_ovrGLTextureData_s # capi.h: 275
 
-ovrRenderAPIConfig_ = struct_ovrRenderAPIConfig_ # OVR_CAPI.h: 349
-
-ovrTextureHeader_ = struct_ovrTextureHeader_ # OVR_CAPI.h: 359
-
-ovrTexture_ = struct_ovrTexture_ # OVR_CAPI.h: 365
-
-ovrDistortionVertex_ = struct_ovrDistortionVertex_ # OVR_CAPI.h: 590
-
-ovrDistortionMesh_ = struct_ovrDistortionMesh_ # OVR_CAPI.h: 600
+ovrGLTexture_s = union_ovrGLTexture_s # capi.h: 280
 
 # No inserted files
 
