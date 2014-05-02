@@ -1,10 +1,3 @@
-'''Wrapper for capi.h
-
-Generated with:
-c:/Python27/Scripts/ctypesgen.py capi.h
-
-Do not modify this file.
-'''
 
 __docformat__ =  'restructuredtext'
 
