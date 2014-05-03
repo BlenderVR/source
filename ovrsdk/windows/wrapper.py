@@ -1,10 +1,3 @@
-'''Wrapper for capi.h
-
-Generated with:
-c:/Python27/Scripts/ctypesgen.py capi.h
-
-Do not modify this file.
-'''
 
 __docformat__ =  'restructuredtext'
 
@@ -602,8 +595,12 @@ del loaderclass
 
 add_library_search_dirs([])
 
-# No libraries
+# Begin libraries
 
+ovrpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "libovr.dll")
+_libs["libovr.dll"] = load_library(ovrpath)
+
+# 1 libraries
 # No modules
 
 uintptr_t = c_uint # capi.h: 1
