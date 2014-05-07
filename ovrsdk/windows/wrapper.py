@@ -596,11 +596,10 @@ del loaderclass
 add_library_search_dirs([])
 
 # Begin libraries
-if getattr(sys, 'frozen', False):
-    ovrpath = os.path.dirname(sys.executable)
-elif __file__:
-    ovrpath = os.path.dirname(__file__)
-ovrpath = os.path.join(ovrpath, "libovr.dll")
+if "libovr_path" in os.environ:
+    ovrpath = os.environ["libovr_path"]
+else:
+    ovrpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "libovr.dll")
 _libs["libovr.dll"] = load_library(ovrpath)
 
 # 1 libraries

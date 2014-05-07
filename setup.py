@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 setup ( \
     name = 'python-ovrsdk',
-    version = '0.1.8',
+    version = '0.2.1',
     description = 'Python wrapper for Oculus VR SDK.',
     long_description = open('README.rst', 'r').read(),
     author = 'Rye Terrell',
