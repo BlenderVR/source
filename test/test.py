@@ -8,8 +8,8 @@ ovrHmd_GetDesc(hmd, byref(hmdDesc))
 print hmdDesc.ProductName
 ovrHmd_StartSensor( \
 	hmd, 
-	ovrHmdCap_Orientation | 
-	ovrHmdCap_YawCorrection, 
+	ovrSensorCap_Orientation | 
+	ovrSensorCap_YawCorrection, 
 	0
 )
 
