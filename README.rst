@@ -4,7 +4,7 @@ python-ovrsdk
 Cross-platform wrapper for the Oculus VR SDK C API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Windows support only, Linux coming soon. OSX support planned.
+Works on Linux and Windows. Precompiled Oculus VR SDK shared library included, so just install it and go.
 
 Installation
 ~~~~~~~~~~~~
