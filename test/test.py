@@ -1,28 +1,27 @@
 import time
-from ovrsdk import *
+from oculusvr import Rift
 
-ovr_Initialize()
-hmd = ovrHmd_Create(0)
-hmdDesc = ovrHmdDesc()
-ovrHmd_GetDesc(hmd, byref(hmdDesc))
+Rift.initialize()
+
+rift = Rift()
+time.sleep(0.1)
+rift.start_sensor()
+hmdDesc = rift.get_desc()
 print hmdDesc.ProductName
-ovrHmd_StartSensor( \
-	hmd, 
-	ovrSensorCap_Orientation | 
-	ovrSensorCap_YawCorrection, 
-	0
-)
+print hmdDesc.MaxEyeFov[0].UpTan
+
 
 while True:
-	ss = ovrHmd_GetSensorState(hmd, ovr_GetTimeInSeconds())
-	pose = ss.Predicted.Pose
-	print "%10f   %10f   %10f   %10f" % ( \
-		pose.Orientation.w, 
-		pose.Orientation.x, 
-		pose.Orientation.y, 
-		pose.Orientation.z
-	)
-	time.sleep(0.016)
+    ss = rift.get_sensor_state()
+    pose = ss.Predicted.Pose
+    print "%10f   %10f   %10f   %10f" % ( \
+        pose.Orientation.w, 
+        pose.Orientation.x, 
+        pose.Orientation.y, 
+        pose.Orientation.z
+    )
+    time.sleep(0.5)
 
-ovrHmd_Destroy(hmd)
-ovr_Shutdown()
+rift.destroy()
+rift = None
+Rift.shutdown()
