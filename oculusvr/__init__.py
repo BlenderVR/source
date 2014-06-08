@@ -1563,7 +1563,7 @@ class Rift():
             raise SystemError("Unable to start the sensor")
 
     def stop_sensor(self):
-        return ovrHmd_StartSensor(self.hmd)
+        return ovrHmd_StopSensor(self.hmd)
 
     def reset_sensor(self):
         return ovrHmd_ResetSensor(self.hmd)
@@ -1595,19 +1595,10 @@ class Rift():
         result = [ eye_render_desc(), eye_render_desc() ]
         out_arr  = (eye_render_desc * 2)(*result)
         in_arr = (fov_port * 2)(*fovPorts)
-        
+
         if (0 == ovrHmd_ConfigureRendering(self.hmd, byref(config), distortion_caps, in_arr, out_arr)):
             raise SystemError("Unable to configure rendering")
         return out_arr
-
-# # OVR_CAPI.h: 544
-# for _lib in _libs.itervalues():
-#     if not hasattr(_lib, 'ovrHmd_ConfigureRendering'):
-#         continue
-#     ovrHmd_ConfigureRendering = _lib.ovrHmd_ConfigureRendering
-#     ovrHmd_ConfigureRendering.argtypes = [hmd, POINTER(ovrRenderAPIConfig), c_uint, fov_port * 2, eye_render_desc * 2]
-#     ovrHmd_ConfigureRendering.restype = ovrBool
-#     break
 
     def begin_frame(self, frame_index = 0):
         return ovrHmd_BeginFrame(self.hmd, frame_index)
@@ -1643,7 +1634,9 @@ class Rift():
     def wait_till_time(time_in_seconds):
         return ovr_WaitTillTime(time_in_seconds)
 
-
+# TODO finish writing wrapper functionality for the functions used in 
+# client-side distortion
+#
 # # OVR_CAPI.h: 642
 # for _lib in _libs.itervalues():
 #     if not hasattr(_lib, 'ovrHmd_CreateDistortionMesh'):

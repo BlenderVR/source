@@ -11,7 +11,7 @@ projections = [ mat4(), mat4() ]
 eyeTextures = [texture(), texture() ]
 fbo = [ 0, 0 ]
 eyeRenderDescs = [ eye_render_desc(), eye_render_desc() ]
-
+modelview = ()
 
 def normalize(v, tolerance=0.00001):
     mag2 = sum(n * n for n in v)
@@ -101,8 +101,21 @@ def q_to_rotation_matrix(q):
             (xz - yw), (yz + xw), 1 - (xx + yy), 0, 
             0, 0, 0, 1)
 
+def translate(v):
+    glTranslate(v.x, v.y, v.z)
+
+def rotate(q):
+    q = (q.w, q.x, q.y, q.z)
+    m = q_to_rotation_matrix(q)
+    glMultMatrixf(m)
+
 def keyboard(key, x, y):
     if key == chr(27):
+        global rift
+        rift.stop_sensor()
+        rift.destroy()
+        rift = None
+        Rift.shutdown()
         sys.exit(0)
 
 #  Initialize material property and light source.
@@ -120,6 +133,15 @@ def init():
     glEnable(GL_LIGHT0)
     glEnable(GL_DEPTH_TEST)
     
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
+    gluLookAt(0, 0, 5,
+              0, 0, 0,
+              0, 1, 0)
+    global modelview
+    modelview = glGetFloatv(GL_MODELVIEW_MATRIX)
+    glLoadIdentity()
+
     for eye in range(0, 2):
         fbo[eye] =  glGenFramebuffers(1)
         glBindFramebuffer(GL_FRAMEBUFFER, fbo[eye])
@@ -167,7 +189,6 @@ def reshape(w, h):
         gluPerspective(80, 1, 0.01, 100)
         #glOrtho(-2.5 * w / h, 2.5 * w / h, -2.5, 2.5, -10.0, 10.0)
     glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
 
 def renderScene():
     glClearColor(0.2, 0.2, 0.2, 1)
@@ -199,49 +220,22 @@ def display():
         eye = hmdDesc.EyeRenderOrder[i];
         pose = rift.begin_eye_render(eye)
 
-        # FIXME set the projection matrix
-        #pr = []
-        #for i in range(0, 4):
-        #    for j in range(0, 4):
-        #        pr.append(projections[eye].M[i][j])
-        #pr = tuple(pr)
-        #glMatrixMode(GL_PROJECTION)
-        #gluPerspective(80, 1, 0.01, 100)
+        glMatrixMode(GL_PROJECTION)
+        glLoadMatrixf(projections[eye])
 
         glMatrixMode(GL_MODELVIEW)
-        glPushMatrix()
-        gluLookAt(0, 0, 5,
-                  0, 0, 0,
-                  0, 1, 0)
-        mv = glGetFloatv(GL_MODELVIEW_MATRIX)
         glLoadIdentity()
-        eyeOffset = eyeRenderDescs[eye].ViewAdjust
-        glTranslate(eyeOffset.x, eyeOffset.y, eyeOffset.z)
-
-        q = pose.Orientation
-        q = (q.w, q.x, q.y, q.z)
-        m = q_to_rotation_matrix(q)
-        glMultMatrixf(m)
-        glTranslate(pose.Position.x, pose.Position.y, pose.Position.z)
-        glMultMatrixf(mv)
-
-        # TODO set the eye view offset
-        #       MatrixStack mv = MatrixStack.MODELVIEW;
-        #       mv.push();
-        #       {
-        #         mv.preTranslate(
-        #           RiftUtils.toVector3f(
-        #             pose.Position).mult(-1));
-        #         mv.preRotate(
-        #           RiftUtils.toQuaternion(
-        #             pose.Orientation).inverse());
-        #         mv.preTranslate(
-        #           RiftUtils.toVector3f(
-        #             eyeRenderDescs[eye].ViewAdjust));
-        #         frameBuffers[eye].activate();
-        #         renderScene();
-        #         frameBuffers[eye].deactivate();
-        #       }
+        #
+        # TODO make a better scene content with a color cube to validate 
+        # this order of operations
+        #
+        # Apply the per-eye offset
+        translate(eyeRenderDescs[eye].ViewAdjust)
+        # Apply the head orientation
+        rotate(pose.Orientation)
+        # Apply the head position
+        translate(pose.Position)
+        glMultMatrixf(modelview)
 
         glBindFramebuffer(GL_FRAMEBUFFER, fbo[eye])
         size = eyeTextures[eye].RenderViewport.Size
@@ -249,27 +243,33 @@ def display():
         renderScene()
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
         rift.end_eye_render(eye, eyeTextures[eye], pose)
-        glPopMatrix()
-
     rift.end_frame()
     glutSwapBuffers()
     glutPostRedisplay()
 
+
+def ovrMat4ToTuple(m):
+    mm = []
+    for i in range(0, 4):
+        for j in range(0, 4):
+            mm.append(m.M[j][i])
+    return tuple(mm)
+
 Rift.initialize()
 rift = Rift()
 hmdDesc = rift.get_desc()
+# Workaround for a race condition bug in the SDK
 time.sleep(0.1)
 rift.start_sensor()
 
 for eye in range(0, 2):
     fovPorts[eye] = hmdDesc.DefaultEyeFov[eye]
-    projections[eye] = Rift.get_perspective(fovPorts[eye], -10, 1000, True)
+    projections[eye] = ovrMat4ToTuple(Rift.get_perspective(fovPorts[eye], 0.01, 1000, True))
     eyeTextures[eye].API = ovrRenderAPI_OpenGL
     size = eyeTextures[eye].TextureSize = rift.get_fov_texture_size(eye, fovPorts[eye])
     eyeTextures[eye].RenderViewport.Size = size 
     eyeTextures[eye].RenderViewport.Pos.x = 0
     eyeTextures[eye].RenderViewport.Pos.y = 0
-
 
 glutInit(sys.argv)
 glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH)
@@ -284,17 +284,3 @@ glutKeyboardFunc(keyboard)
 glutDisplayFunc(display)
 glutMainLoop()
 
-while True:
-    ss = rift.get_sensor_state()
-    pose = ss.Predicted.Pose
-    print "%10f   %10f   %10f   %10f" % (\
-        pose.Orientation.w,
-        pose.Orientation.x,
-        pose.Orientation.y,
-        pose.Orientation.z
-    )
-    time.sleep(0.5)
-
-rift.destroy()
-rift = None
-Rift.shutdown()
