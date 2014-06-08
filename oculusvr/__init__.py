@@ -598,15 +598,18 @@ add_library_search_dirs([])
 import struct
 
 suffix = "-x86"
+prefix = "win32"
+file = "OVR_C.dll"
 if 64 == 8 * struct.calcsize("P"):
     suffix = "-x86-64"
-file = {
-    "win32" : "OVR_C.dll",
-    "darwin" : "libOVR_C.dylib",
-    "linux" : "libOVR_C.so",
-}[sys.platform]
+if ("linux" in sys.platform):
+    file = "libOVR_C.so"
+    prefix = "linux"
+elif ("darwin" in sys.platform):
+    file = "libOVR_C.dylib"
+    prefix = "darwin"
 
-libfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), sys.platform + suffix, file)
+libfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), prefix + suffix, file)
 _libs["OVR_C"] = load_library(libfile)
 
 # 1 libraries
@@ -837,6 +840,8 @@ ovrDistortionCap_Chromatic = 1 # OVR_CAPI.h: 175
 
 ovrDistortionCap_TimeWarp = 2 # OVR_CAPI.h: 175
 
+ovrDistortionCap_NoSwapBuffers = 4 # OVR_CAPI.h: 175
+
 ovrDistortionCap_Vignette = 8 # OVR_CAPI.h: 175
 
 ovrDistortionCaps = enum_anon_4 # OVR_CAPI.h: 175
@@ -1006,33 +1011,20 @@ ovrRenderAPI_Count = (ovrRenderAPI_D3D11 + 1) # OVR_CAPI.h: 354
 
 ovrRenderAPIType = enum_anon_7 # OVR_CAPI.h: 354
 
-# OVR_CAPI.h: 363
-class struct_ovrRenderAPIConfigHeader_(Structure):
-    pass
-
-struct_ovrRenderAPIConfigHeader_.__slots__ = [
-    'API',
-    'RTSize',
-    'Multisample',
-]
-struct_ovrRenderAPIConfigHeader_._fields_ = [
-    ('API', ovrRenderAPIType),
-    ('RTSize', sizei),
-    ('Multisample', c_int),
-]
-
-ovrRenderAPIConfigHeader = struct_ovrRenderAPIConfigHeader_ # OVR_CAPI.h: 363
-
 # OVR_CAPI.h: 369
 class struct_ovrRenderAPIConfig_(Structure):
     pass
 
 struct_ovrRenderAPIConfig_.__slots__ = [
-    'Header',
+    'API',
+    'RTSize',
+    'Multisample',
     'PlatformData',
 ]
 struct_ovrRenderAPIConfig_._fields_ = [
-    ('Header', ovrRenderAPIConfigHeader),
+    ('API', ovrRenderAPIType),
+    ('RTSize', sizei),
+    ('Multisample', c_int),
     ('PlatformData', uintptr_t * 8),
 ]
 
@@ -1594,16 +1586,20 @@ class Rift():
     def get_fov_texture_size(self, eye, fov_port, pixels_per_display_pixel = 1):
         return ovrHmd_GetFovTextureSize(self.hmd, eye, fov_port, pixels_per_display_pixel);
 
-#     def configure_rendering(self, config, 
-#                             distortion_caps = 
-#                             ovrDistortionCap_Chromatic |
-#                             ovrDistortionCap_TimeWarp |
-#                             ovrDistortionCap_Vignette,
-#                             fovPorts):
-#         result = eye_render_desc * 2;
-#         if (0 == ovrHmd_ConfigureRendering(self.hmd, byref(config), distortion_caps, result)):
-#             raise SystemError("Unable to configure rendering")
-#         return result
+    def configure_rendering(self, config, fovPorts, 
+                            distortion_caps = 
+                            ovrDistortionCap_Chromatic |
+                            ovrDistortionCap_TimeWarp |
+                            ovrDistortionCap_NoSwapBuffers |
+                            ovrDistortionCap_Vignette):
+        result = [ eye_render_desc(), eye_render_desc() ]
+        out_arr  = (eye_render_desc * 2)(*result)
+        in_arr = (fov_port * 2)(*fovPorts)
+        
+        if (0 == ovrHmd_ConfigureRendering(self.hmd, byref(config), distortion_caps, in_arr, out_arr)):
+            raise SystemError("Unable to configure rendering")
+        return out_arr
+
 # # OVR_CAPI.h: 544
 # for _lib in _libs.itervalues():
 #     if not hasattr(_lib, 'ovrHmd_ConfigureRendering'):
@@ -1626,14 +1622,14 @@ class Rift():
     def end_eye_render(self, eye, texture, pose = None):
         if (None == pose):
             pose = self.pose
-        ovrHmd_BeginEyeRender(self.hmd, eye, pose, byref(texture))
+        ovrHmd_EndEyeRender(self.hmd, eye, pose, byref(texture))
 
     def get_render_desc(self, eye, fov):
         return ovrHmd_GetRenderDesc(self.hmd, eye, fov)
 
     @staticmethod
     def get_perspective(fov, near, far, right_handed):
-        return ovrMatrix4f_Projection(fov, near, far, right_handed)
+        return ovrMatrix4f_Projection(fov, near, far, '\x01' if right_handed else '\x00')
 
     @staticmethod
     def get_orthographic(perspective, scale, distance, eye_x_offset):
