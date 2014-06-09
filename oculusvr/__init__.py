@@ -1521,6 +1521,20 @@ try:
 except:
     pass
 
+def ovrVec3ToTuple(v):
+    return (v.x, v.y, v.z)
+
+def ovrQuatToTuple(q):
+    return (q.x, q.y, q.z, q.w)
+
+def ovrMat4ToTuple(m):
+    mm = []
+    for i in range(0, 4):
+        for j in range(0, 4):
+            mm.append(m.M[j][i])
+    return tuple(mm)
+
+
 class Rift():
     @staticmethod
     def initialize():
