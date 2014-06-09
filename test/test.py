@@ -1,10 +1,11 @@
 #! /usr/bin/env python
-import sys, time
-from math import sqrt, sin, cos, acos
+import time
+from math import sqrt
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from oculusvr import *
+#from RiftApp import *
 
 fovPorts = [ fov_port(), fov_port() ]
 projections = [ mat4(), mat4() ]
@@ -19,40 +20,6 @@ def normalize(v, tolerance=0.00001):
         mag = sqrt(mag2)
         v = tuple(n / mag for n in v)
     return v
-
-def q_mult(q1, q2):
-    w1, x1, y1, z1 = q1
-    w2, x2, y2, z2 = q2
-    w = w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2
-    x = w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2
-    y = w1 * y2 + y1 * w2 + z1 * x2 - x1 * z2
-    z = w1 * z2 + z1 * w2 + x1 * y2 - y1 * x2
-    return w, x, y, z
-
-def q_conjugate(q):
-    q = normalize(q)
-    w, x, y, z = q
-    return (w, -x, -y, -z)
-
-def qv_mult(q1, v1):
-    v1 = normalize(v1)
-    q2 = (0.0,) + v1
-    return q_mult(q_mult(q1, q2), q_conjugate(q1))[1:]
-
-def axisangle_to_q(v, theta):
-    v = normalize(v)
-    x, y, z = v
-    theta /= 2
-    w = cos(theta)
-    x = x * sin(theta)
-    y = y * sin(theta)
-    z = z * sin(theta)
-    return w, x, y, z
-
-def q_to_axisangle(q):
-    w, v = q[0], q[1:]
-    theta = acos(w) * 2.0
-    return normalize(v), theta
 
 def dot(v1, v2):
     if (len(v1) != len(v2)):
@@ -70,8 +37,8 @@ def q_inverse(q):
     if (norm <= 0.0):
         raise Exception("Invalid quaternion")
     invNorm = 1.0 / norm
-    w, x, y, z = q
-    return (w * invNorm, -x * invNorm, -y * invNorm, -z * invNorm)
+    x, y, z, w = q
+    return (-x * invNorm, -y * invNorm, -z * invNorm, w * invNorm)
 
 def q_to_rotation_matrix(q):
     norm = q_norm(q)
@@ -81,7 +48,7 @@ def q_to_rotation_matrix(q):
         s = 2  / norm
     else:
         s = 0;
-    w, x, y, z = q
+    x, y, z, w = q
 
     xs = x * s;
     ys = y * s;
@@ -101,14 +68,6 @@ def q_to_rotation_matrix(q):
             (xz - yw), (yz + xw), 1 - (xx + yy), 0, 
             0, 0, 0, 1)
 
-def translate(v):
-    glTranslate(v.x, v.y, v.z)
-
-def rotate(q):
-    q = (q.w, q.x, q.y, q.z)
-    m = q_to_rotation_matrix(q)
-    glMultMatrixf(m)
-
 def keyboard(key, x, y):
     if key == chr(27):
         global rift
@@ -120,22 +79,11 @@ def keyboard(key, x, y):
 
 #  Initialize material property and light source.
 def init():
-    light_ambient = [0.0, 0.0, 0.0, 1.0]
-    light_diffuse = [1.0, 1.0, 1.0, 1.0]
-    light_specular = [1.0, 1.0, 1.0, 1.0]
-    light_position = [1.0, 1.0, 1.0, 0.0]
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient)
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse)
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular)
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position)
-
-    glEnable(GL_LIGHTING)
-    glEnable(GL_LIGHT0)
     glEnable(GL_DEPTH_TEST)
     
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(0, 0, 5,
+    gluLookAt(0, 0, 0.5,
               0, 0, 0,
               0, 1, 0)
     global modelview
@@ -177,41 +125,72 @@ def init():
     eyeRenderDescs = rift.configure_rendering(rc, fovPorts)
     glUseProgram(0)
 
+def drawColorCube(size = 1.0):
+    p = size / 2.0
+    n = -p
+    glBegin(GL_QUADS)
 
-def reshape(w, h):
-    glViewport(0, 0, w, h)
-    glMatrixMode (GL_PROJECTION)
-    glLoadIdentity()
-    if w <= h:
-        gluPerspective(80, 1, 0.01, 100)
-        #glOrtho(-2.5, 2.5, -2.5 * h / w, 2.5 * h / w, -10.0, 10.0)
-    else:
-        gluPerspective(80, 1, 0.01, 100)
-        #glOrtho(-2.5 * w / h, 2.5 * w / h, -2.5, 2.5, -10.0, 10.0)
-    glMatrixMode(GL_MODELVIEW)
+    # front
+    glColor3f(1, 1, 0, 1)
+    glVertex3f(n, n, n)
+    glVertex3f(p, n, n)
+    glVertex3f(p, p, n)
+    glVertex3f(n, p, n)
+    # back
+    glColor3f(0, 0.2, 1, 1)
+    glVertex3f(n, n, p)
+    glVertex3f(p, n, p)
+    glVertex3f(p, p, p)
+    glVertex3f(n, p, p)
+    # right
+    glColor3f(1, 0, 0, 1)
+    glVertex3f(p, n, n)
+    glVertex3f(p, n, p)
+    glVertex3f(p, p, p)
+    glVertex3f(p, p, n)
+    # left
+    glColor3f(0, 1, 1, 1)
+    glVertex3f(n, n, n)
+    glVertex3f(n, n, p)
+    glVertex3f(n, p, p)
+    glVertex3f(n, p, n)
+    # top
+    glColor3f(0, 1, 0, 1)
+    glVertex3f(n, p, n)
+    glVertex3f(p, p, n)
+    glVertex3f(p, p, p)
+    glVertex3f(n, p, p)
+    # bottom
+    glColor3f(1, 0, 1, 1)
+    glVertex3f(n, n, n)
+    glVertex3f(p, n, n)
+    glVertex3f(p, n, p)
+    glVertex3f(n, n, p)
+    glEnd()
 
 def renderScene():
     glClearColor(0.2, 0.2, 0.2, 1)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    glPushMatrix()
-    glRotatef(20.0, 1.0, 0.0, 0.0)
-    glPushMatrix()
-    glTranslatef(-0.75, 0.5, 0.0);
-    glRotatef(90.0, 1.0, 0.0, 0.0)
-    glutSolidTorus(0.275, 0.85, 15, 15)
-    glPopMatrix()
- 
-    glPushMatrix()
-    glTranslatef(-0.75, -0.5, 0.0);
-    glRotatef (270.0, 1.0, 0.0, 0.0)
-    glutSolidCone(1.0, 2.0, 15, 15)
-    glPopMatrix()
- 
-    glPushMatrix()
-    glTranslatef(0.75, 0.0, -1.0)
-    glutSolidSphere(1.0, 15, 15)
-    glPopMatrix()
-    glPopMatrix()
+    drawColorCube(0.06)
+#     glPushMatrix()
+#     glRotatef(20.0, 1.0, 0.0, 0.0)
+#     glPushMatrix()
+#     glTranslatef(-0.75, 0.5, 0.0);
+#     glRotatef(90.0, 1.0, 0.0, 0.0)
+#     glutSolidTorus(0.275, 0.85, 15, 15)
+#     glPopMatrix()
+#  
+#     glPushMatrix()
+#     glTranslatef(-0.75, -0.5, 0.0);
+#     glRotatef (270.0, 1.0, 0.0, 0.0)
+#     glutSolidCone(1.0, 2.0, 15, 15)
+#     glPopMatrix()
+#  
+#     glPushMatrix()
+#     glTranslatef(0.75, 0.0, -1.0)
+#     glutSolidSphere(1.0, 15, 15)
+#     glPopMatrix()
+#     glPopMatrix()
 
 
 def display():
@@ -225,35 +204,32 @@ def display():
 
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
-        #
-        # TODO make a better scene content with a color cube to validate 
-        # this order of operations
-        #
+
+        eyeOffset = ovrVec3ToTuple(eyeRenderDescs[eye].ViewAdjust)
+        position = ovrVec3ToTuple(pose.Position)
+        orientation = ovrQuatToTuple(pose.Orientation)
+        orientation = q_to_rotation_matrix(orientation) 
+
         # Apply the per-eye offset
-        translate(eyeRenderDescs[eye].ViewAdjust)
+        glTranslate(eyeOffset[0], eyeOffset[1], eyeOffset[2])
         # Apply the head orientation
-        rotate(pose.Orientation)
+        glMultMatrixf(orientation)
         # Apply the head position
-        translate(pose.Position)
+        glTranslate(-position[0], -position[1], -position[2])
+        # apply the camera position
         glMultMatrixf(modelview)
 
+        # Active the offscreen framebuffer and render the scene
         glBindFramebuffer(GL_FRAMEBUFFER, fbo[eye])
         size = eyeTextures[eye].RenderViewport.Size
         glViewport(0, 0, size.w, size.h)
         renderScene()
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
+
         rift.end_eye_render(eye, eyeTextures[eye], pose)
     rift.end_frame()
     glutSwapBuffers()
     glutPostRedisplay()
-
-
-def ovrMat4ToTuple(m):
-    mm = []
-    for i in range(0, 4):
-        for j in range(0, 4):
-            mm.append(m.M[j][i])
-    return tuple(mm)
 
 Rift.initialize()
 rift = Rift()
@@ -279,7 +255,7 @@ glutCreateWindow('scene')
 
 init()
 
-glutReshapeFunc(reshape)
+#glutReshapeFunc(reshape)
 glutKeyboardFunc(keyboard)
 glutDisplayFunc(display)
 glutMainLoop()
