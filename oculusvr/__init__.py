@@ -610,6 +610,7 @@ elif ("darwin" in sys.platform):
     prefix = "darwin"
 
 libfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), prefix + suffix, file)
+#libfile = "c:\\Users\\bdavis\\Git\\OculusRiftExamples\\build32\\output\\OVR_Cd.dll"
 _libs["OVR_C"] = load_library(libfile)
 
 # 1 libraries
@@ -1045,7 +1046,7 @@ struct_ovrTexture_._fields_ = [
     ('API', ovrRenderAPIType),
     ('TextureSize', sizei),
     ('RenderViewport', recti),
-    ('TexId', GLuint),
+    ('TexId', uintptr_t),
     ('PlatformData', uintptr_t * 7),
 ]
 
@@ -1525,7 +1526,7 @@ def ovrVec3ToTuple(v):
     return (v.x, v.y, v.z)
 
 def ovrQuatToTuple(q):
-    return (q.x, q.y, q.z, q.w)
+    return (q.w, q.x, q.y, q.z)
 
 def ovrMat4ToTuple(m):
     mm = []
@@ -1535,7 +1536,7 @@ def ovrMat4ToTuple(m):
     return tuple(mm)
 
 
-class Rift():
+class Hmd():
     @staticmethod
     def initialize():
         if (0 == ovr_Initialize()):
@@ -1587,7 +1588,7 @@ class Rift():
 
     def get_sensor_desc(self):
         result = sensor_desc()
-        if (0 == ovrHmd_GetSensorDesc(self.hmd, byref(result))):
+        if (0 == ovrHmd_GetSensorDesc(self.hmd, result)):
             raise SystemError("Unable to fetch the sensor description")
         return result
 
@@ -1597,7 +1598,7 @@ class Rift():
             raise SystemError("Unable to fetch the hmd description")
         return result
 
-    def get_fov_texture_size(self, eye, fov_port, pixels_per_display_pixel = 1):
+    def get_fov_texture_size(self, eye, fov_port, pixels_per_display_pixel = 1.0):
         return ovrHmd_GetFovTextureSize(self.hmd, eye, fov_port, pixels_per_display_pixel);
 
     def configure_rendering(self, config, fovPorts, 
@@ -1642,12 +1643,18 @@ class Rift():
 
     @staticmethod
     def get_time_in_seconds():
-        ovr_GetTimeInSeconds()
+        return ovr_GetTimeInSeconds()
 
     @staticmethod
     def wait_till_time(time_in_seconds):
         return ovr_WaitTillTime(time_in_seconds)
 
+    def get_float(self, name, default):
+        return ovrHmd_GetFloat(self.hmd, name, default)
+
+    def get_string(self, name, default):
+        return ovrHmd_GetString(self.hmd, name, default)
+    
 # TODO finish writing wrapper functionality for the functions used in 
 # client-side distortion
 #
@@ -1763,60 +1770,3 @@ class Rift():
 #     ovrHmd_GetMeasuredLatencyTest2.restype = c_double
 #     break
 # 
-# # OVR_CAPI.h: 763
-# for _lib in _libs.itervalues():
-#     if not hasattr(_lib, 'ovrHmd_GetFloat'):
-#         continue
-#     ovrHmd_GetFloat = _lib.ovrHmd_GetFloat
-#     ovrHmd_GetFloat.argtypes = [hmd, String, c_float]
-#     ovrHmd_GetFloat.restype = c_float
-#     break
-# 
-# # OVR_CAPI.h: 766
-# for _lib in _libs.itervalues():
-#     if not hasattr(_lib, 'ovrHmd_SetFloat'):
-#         continue
-#     ovrHmd_SetFloat = _lib.ovrHmd_SetFloat
-#     ovrHmd_SetFloat.argtypes = [hmd, String, c_float]
-#     ovrHmd_SetFloat.restype = ovrBool
-#     break
-# 
-# # OVR_CAPI.h: 771
-# for _lib in _libs.itervalues():
-#     if not hasattr(_lib, 'ovrHmd_GetFloatArray'):
-#         continue
-#     ovrHmd_GetFloatArray = _lib.ovrHmd_GetFloatArray
-#     ovrHmd_GetFloatArray.argtypes = [hmd, String, POINTER(c_float), c_uint]
-#     ovrHmd_GetFloatArray.restype = c_uint
-#     break
-# 
-# # OVR_CAPI.h: 775
-# for _lib in _libs.itervalues():
-#     if not hasattr(_lib, 'ovrHmd_SetFloatArray'):
-#         continue
-#     ovrHmd_SetFloatArray = _lib.ovrHmd_SetFloatArray
-#     ovrHmd_SetFloatArray.argtypes = [hmd, String, POINTER(c_float), c_uint]
-#     ovrHmd_SetFloatArray.restype = ovrBool
-#     break
-# 
-# # OVR_CAPI.h: 781
-# for _lib in _libs.itervalues():
-#     if not hasattr(_lib, 'ovrHmd_GetString'):
-#         continue
-#     ovrHmd_GetString = _lib.ovrHmd_GetString
-#     ovrHmd_GetString.argtypes = [hmd, String, String]
-#     if sizeof(c_int) == sizeof(c_void_p):
-#         ovrHmd_GetString.restype = ReturnString
-#     else:
-#         ovrHmd_GetString.restype = String
-#         ovrHmd_GetString.errcheck = ReturnString
-#     break
-# 
-# # OVR_CAPI.h: 786
-# for _lib in _libs.itervalues():
-#     if not hasattr(_lib, 'ovrHmd_GetArraySize'):
-#         continue
-#     ovrHmd_GetArraySize = _lib.ovrHmd_GetArraySize
-#     ovrHmd_GetArraySize.argtypes = [hmd, String]
-#     ovrHmd_GetArraySize.restype = c_uint
-#     break
