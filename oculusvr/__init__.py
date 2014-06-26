@@ -670,7 +670,8 @@ recti = struct_ovrRecti_ # OVR_CAPI.h: 64
 
 # OVR_CAPI.h: 70
 class struct_ovrQuatf_(Structure):
-    pass
+    def toList(self):
+      return (self.w, self.x, self.y, self.z)
 
 struct_ovrQuatf_.__slots__ = [
     'x',
@@ -689,7 +690,8 @@ quat = struct_ovrQuatf_ # OVR_CAPI.h: 70
 
 # OVR_CAPI.h: 74
 class struct_ovrVector2f_(Structure):
-    pass
+    def toList(self):
+      return (self.x, self.y)
 
 struct_ovrVector2f_.__slots__ = [
     'x',
@@ -704,7 +706,8 @@ vec2 = struct_ovrVector2f_ # OVR_CAPI.h: 74
 
 # OVR_CAPI.h: 78
 class struct_ovrVector3f_(Structure):
-    pass
+    def toList(self):
+      return (self.x, self.y, self.z)
 
 struct_ovrVector3f_.__slots__ = [
     'x',
@@ -721,7 +724,15 @@ vec3 = struct_ovrVector3f_ # OVR_CAPI.h: 78
 
 # OVR_CAPI.h: 82
 class struct_ovrMatrix4f_(Structure):
-    pass
+    def toList(self, Transpose = False):
+      mm = []
+      for i in range(0, 4):
+        for j in range(0, 4):
+          if (Transpose):
+            mm.append(self.M[i][j])
+          else:
+            mm.append(self.M[j][i])
+      return tuple(mm)
 
 struct_ovrMatrix4f_.__slots__ = [
     'M',
@@ -1521,20 +1532,6 @@ try:
     OVR_DEFAULT_NECK_TO_EYE_VERTICAL = 0.12
 except:
     pass
-
-def ovrVec3ToTuple(v):
-    return (v.x, v.y, v.z)
-
-def ovrQuatToTuple(q):
-    return (q.w, q.x, q.y, q.z)
-
-def ovrMat4ToTuple(m):
-    mm = []
-    for i in range(0, 4):
-        for j in range(0, 4):
-            mm.append(m.M[j][i])
-    return tuple(mm)
-
 
 class Hmd():
     @staticmethod
