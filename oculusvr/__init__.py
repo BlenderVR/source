@@ -1,4 +1,16 @@
-import ctypes, sys
+'''Wrapper for OVR_CAPI.h
+
+Generated with:
+ctypesgen.py OVR_CAPI.h
+
+Do not modify this file.
+'''
+
+__docformat__ =  'restructuredtext'
+
+# Begin preamble
+
+import ctypes, os, sys
 from ctypes import *
 
 _int_types = (c_int16, c_int32)
@@ -590,40 +602,13 @@ del loaderclass
 
 add_library_search_dirs([])
 
-###############################################################################
-#                                                                             #
-# Begin libraries                                                             #
-#                                                                             #
-###############################################################################
-import struct
-
-suffix = "-x86"
-prefix = "win32"
-file = "OVR_C.dll"
-if 64 == 8 * struct.calcsize("P"):
-    suffix = "-x86-64"
-if ("linux" in sys.platform):
-    file = "libOVR_C.so"
-    prefix = "linux"
-elif ("darwin" in sys.platform):
-    file = "libOVR_C.dylib"
-    prefix = "darwin"
-
-libfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), prefix + suffix, file)
-#libfile = "c:\\Users\\bdavis\\Git\\OculusRiftExamples\\build32\\output\\OVR_Cd.dll"
-_libs["OVR_C"] = load_library(libfile)
-
-# 1 libraries
+# No libraries
 
 # No modules
 
-GLuint = c_uint # OVR_CAPI.h: 26
+ovrBool = c_char # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 59
 
-uintptr_t = POINTER(c_uint) # OVR_CAPI.h: 27
-
-ovrBool = c_char # OVR_CAPI.h: 35
-
-# OVR_CAPI.h: 55
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 81
 class struct_ovrVector2i_(Structure):
     pass
 
@@ -636,9 +621,9 @@ struct_ovrVector2i_._fields_ = [
     ('y', c_int),
 ]
 
-vector2i = struct_ovrVector2i_ # OVR_CAPI.h: 55
+ovrVector2i = struct_ovrVector2i_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 81
 
-# OVR_CAPI.h: 59
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 86
 class struct_ovrSizei_(Structure):
     pass
 
@@ -651,9 +636,9 @@ struct_ovrSizei_._fields_ = [
     ('h', c_int),
 ]
 
-sizei = struct_ovrSizei_ # OVR_CAPI.h: 59
+ovrSizei = struct_ovrSizei_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 86
 
-# OVR_CAPI.h: 64
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 93
 class struct_ovrRecti_(Structure):
     pass
 
@@ -662,16 +647,15 @@ struct_ovrRecti_.__slots__ = [
     'Size',
 ]
 struct_ovrRecti_._fields_ = [
-    ('Pos', vector2i),
-    ('Size', sizei),
+    ('Pos', ovrVector2i),
+    ('Size', ovrSizei),
 ]
 
-recti = struct_ovrRecti_ # OVR_CAPI.h: 64
+ovrRecti = struct_ovrRecti_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 93
 
-# OVR_CAPI.h: 70
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 99
 class struct_ovrQuatf_(Structure):
-    def toList(self):
-      return (self.w, self.x, self.y, self.z)
+    pass
 
 struct_ovrQuatf_.__slots__ = [
     'x',
@@ -686,12 +670,11 @@ struct_ovrQuatf_._fields_ = [
     ('w', c_float),
 ]
 
-quat = struct_ovrQuatf_ # OVR_CAPI.h: 70
+ovrQuatf = struct_ovrQuatf_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 99
 
-# OVR_CAPI.h: 74
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 104
 class struct_ovrVector2f_(Structure):
-    def toList(self):
-      return (self.x, self.y)
+    pass
 
 struct_ovrVector2f_.__slots__ = [
     'x',
@@ -702,12 +685,11 @@ struct_ovrVector2f_._fields_ = [
     ('y', c_float),
 ]
 
-vec2 = struct_ovrVector2f_ # OVR_CAPI.h: 74
+ovrVector2f = struct_ovrVector2f_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 104
 
-# OVR_CAPI.h: 78
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 109
 class struct_ovrVector3f_(Structure):
-    def toList(self):
-      return (self.x, self.y, self.z)
+    pass
 
 struct_ovrVector3f_.__slots__ = [
     'x',
@@ -720,19 +702,11 @@ struct_ovrVector3f_._fields_ = [
     ('z', c_float),
 ]
 
-vec3 = struct_ovrVector3f_ # OVR_CAPI.h: 78
+ovrVector3f = struct_ovrVector3f_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 109
 
-# OVR_CAPI.h: 82
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 114
 class struct_ovrMatrix4f_(Structure):
-    def toList(self, Transpose = False):
-      mm = []
-      for i in range(0, 4):
-        for j in range(0, 4):
-          if (Transpose):
-            mm.append(self.M[i][j])
-          else:
-            mm.append(self.M[j][i])
-      return tuple(mm)
+    pass
 
 struct_ovrMatrix4f_.__slots__ = [
     'M',
@@ -741,9 +715,9 @@ struct_ovrMatrix4f_._fields_ = [
     ('M', (c_float * 4) * 4),
 ]
 
-mat4 = struct_ovrMatrix4f_ # OVR_CAPI.h: 82
+ovrMatrix4f = struct_ovrMatrix4f_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 114
 
-# OVR_CAPI.h: 88
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 120
 class struct_ovrPosef_(Structure):
     pass
 
@@ -752,18 +726,18 @@ struct_ovrPosef_.__slots__ = [
     'Position',
 ]
 struct_ovrPosef_._fields_ = [
-    ('Orientation', quat),
-    ('Position', vec3),
+    ('Orientation', ovrQuatf),
+    ('Position', ovrVector3f),
 ]
 
-pose = struct_ovrPosef_ # OVR_CAPI.h: 88
+ovrPosef = struct_ovrPosef_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 120
 
-# OVR_CAPI.h: 99
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 131
 class struct_ovrPoseStatef_(Structure):
     pass
 
 struct_ovrPoseStatef_.__slots__ = [
-    'Pose',
+    'ThePose',
     'AngularVelocity',
     'LinearVelocity',
     'AngularAcceleration',
@@ -771,17 +745,17 @@ struct_ovrPoseStatef_.__slots__ = [
     'TimeInSeconds',
 ]
 struct_ovrPoseStatef_._fields_ = [
-    ('Pose', pose),
-    ('AngularVelocity', vec3),
-    ('LinearVelocity', vec3),
-    ('AngularAcceleration', vec3),
-    ('LinearAcceleration', vec3),
+    ('ThePose', ovrPosef),
+    ('AngularVelocity', ovrVector3f),
+    ('LinearVelocity', ovrVector3f),
+    ('AngularAcceleration', ovrVector3f),
+    ('LinearAcceleration', ovrVector3f),
     ('TimeInSeconds', c_double),
 ]
 
-pose_state = struct_ovrPoseStatef_ # OVR_CAPI.h: 99
+ovrPoseStatef = struct_ovrPoseStatef_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 131
 
-# OVR_CAPI.h: 110
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 146
 class struct_ovrFovPort_(Structure):
     pass
 
@@ -798,83 +772,95 @@ struct_ovrFovPort_._fields_ = [
     ('RightTan', c_float),
 ]
 
-fov_port = struct_ovrFovPort_ # OVR_CAPI.h: 110
+ovrFovPort = struct_ovrFovPort_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 146
 
-enum_anon_1 = c_int # OVR_CAPI.h: 125
+enum_anon_1 = c_int # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 160
 
-ovrHmd_None = 0 # OVR_CAPI.h: 125
+ovrHmd_None = 0 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 160
 
-ovrHmd_DK1 = 3 # OVR_CAPI.h: 125
+ovrHmd_DK1 = 3 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 160
 
-ovrHmd_DKHD = 4 # OVR_CAPI.h: 125
+ovrHmd_DKHD = 4 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 160
 
-ovrHmd_CrystalCoveProto = 5 # OVR_CAPI.h: 125
+ovrHmd_DK2 = 6 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 160
 
-ovrHmd_DK2 = 6 # OVR_CAPI.h: 125
+ovrHmd_Other = (ovrHmd_DK2 + 1) # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 160
 
-ovrHmd_Other = (ovrHmd_DK2 + 1) # OVR_CAPI.h: 125
+ovrHmdType = enum_anon_1 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 160
 
-ovrHmdType = enum_anon_1 # OVR_CAPI.h: 125
+enum_anon_2 = c_int # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 188
 
-enum_anon_2 = c_int # OVR_CAPI.h: 155
+ovrHmdCap_Present = 1 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 188
 
-ovrHmdCap_Present = 1 # OVR_CAPI.h: 155
+ovrHmdCap_Available = 2 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 188
 
-ovrHmdCap_Available = 2 # OVR_CAPI.h: 155
+ovrHmdCap_Captured = 4 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 188
 
-ovrHmdCap_LowPersistence = 128 # OVR_CAPI.h: 155
+ovrHmdCap_ExtendDesktop = 8 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 188
 
-ovrHmdCap_LatencyTest = 256 # OVR_CAPI.h: 155
+ovrHmdCap_NoMirrorToWindow = 8192 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 188
 
-ovrHmdCap_DynamicPrediction = 512 # OVR_CAPI.h: 155
+ovrHmdCap_DisplayOff = 64 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 188
 
-ovrHmdCap_NoVSync = 4096 # OVR_CAPI.h: 155
+ovrHmdCap_LowPersistence = 128 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 188
 
-ovrHmdCap_NoRestore = 16384 # OVR_CAPI.h: 155
+ovrHmdCap_DynamicPrediction = 512 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 188
 
-ovrHmdCap_Writable_Mask = 4992 # OVR_CAPI.h: 155
+ovrHmdCap_NoVSync = 4096 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 188
 
-ovrHmdCaps = enum_anon_2 # OVR_CAPI.h: 155
+ovrHmdCap_Writable_Mask = 13296 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 188
 
-enum_anon_3 = c_int # OVR_CAPI.h: 166
+ovrHmdCap_Service_Mask = 9200 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 188
 
-ovrSensorCap_Orientation = 16 # OVR_CAPI.h: 166
+ovrHmdCaps = enum_anon_2 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 188
 
-ovrSensorCap_YawCorrection = 32 # OVR_CAPI.h: 166
+enum_anon_3 = c_int # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 202
 
-ovrSensorCap_Position = 64 # OVR_CAPI.h: 166
+ovrTrackingCap_Orientation = 16 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 202
 
-ovrSensorCaps = enum_anon_3 # OVR_CAPI.h: 166
+ovrTrackingCap_MagYawCorrection = 32 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 202
 
-enum_anon_4 = c_int # OVR_CAPI.h: 175
+ovrTrackingCap_Position = 64 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 202
 
-ovrDistortionCap_Chromatic = 1 # OVR_CAPI.h: 175
+ovrTrackingCap_Idle = 256 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 202
 
-ovrDistortionCap_TimeWarp = 2 # OVR_CAPI.h: 175
+ovrTrackingCaps = enum_anon_3 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 202
 
-ovrDistortionCap_NoSwapBuffers = 4 # OVR_CAPI.h: 175
+enum_anon_4 = c_int # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 217
 
-ovrDistortionCap_Vignette = 8 # OVR_CAPI.h: 175
+ovrDistortionCap_Chromatic = 1 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 217
 
-ovrDistortionCaps = enum_anon_4 # OVR_CAPI.h: 175
+ovrDistortionCap_TimeWarp = 2 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 217
 
-enum_anon_5 = c_int # OVR_CAPI.h: 186
+ovrDistortionCap_Vignette = 8 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 217
 
-ovrEye_Left = 0 # OVR_CAPI.h: 186
+ovrDistortionCap_NoRestore = 16 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 217
 
-ovrEye_Right = 1 # OVR_CAPI.h: 186
+ovrDistortionCap_FlipInput = 32 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 217
 
-ovrEye_Count = 2 # OVR_CAPI.h: 186
+ovrDistortionCap_SRGB = 64 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 217
 
-ovrEyeType = enum_anon_5 # OVR_CAPI.h: 186
+ovrDistortionCap_Overdrive = 128 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 217
 
-# OVR_CAPI.h: 190
+ovrDistortionCap_ProfileNoTimewarpSpinWaits = 65536 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 217
+
+ovrDistortionCaps = enum_anon_4 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 217
+
+enum_anon_5 = c_int # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 228
+
+ovrEye_Left = 0 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 228
+
+ovrEye_Right = 1 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 228
+
+ovrEye_Count = 2 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 228
+
+ovrEyeType = enum_anon_5 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 228
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 236
 class struct_ovrHmdStruct(Structure):
     pass
 
-hmd = POINTER(struct_ovrHmdStruct) # OVR_CAPI.h: 190
-
-# OVR_CAPI.h: 232
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 289
 class struct_ovrHmdDesc_(Structure):
     pass
 
@@ -883,85 +869,113 @@ struct_ovrHmdDesc_.__slots__ = [
     'Type',
     'ProductName',
     'Manufacturer',
+    'VendorId',
+    'ProductId',
+    'SerialNumber',
+    'FirmwareMajor',
+    'FirmwareMinor',
+    'CameraFrustumHFovInRadians',
+    'CameraFrustumVFovInRadians',
+    'CameraFrustumNearZInMeters',
+    'CameraFrustumFarZInMeters',
     'HmdCaps',
-    'SensorCaps',
+    'TrackingCaps',
     'DistortionCaps',
-    'Resolution',
-    'WindowsPos',
     'DefaultEyeFov',
     'MaxEyeFov',
     'EyeRenderOrder',
+    'Resolution',
+    'WindowsPos',
     'DisplayDeviceName',
     'DisplayId',
 ]
 struct_ovrHmdDesc_._fields_ = [
-    ('Handle', hmd),
+    ('Handle', POINTER(struct_ovrHmdStruct)),
     ('Type', ovrHmdType),
     ('ProductName', String),
     ('Manufacturer', String),
+    ('VendorId', c_short),
+    ('ProductId', c_short),
+    ('SerialNumber', c_char * 24),
+    ('FirmwareMajor', c_short),
+    ('FirmwareMinor', c_short),
+    ('CameraFrustumHFovInRadians', c_float),
+    ('CameraFrustumVFovInRadians', c_float),
+    ('CameraFrustumNearZInMeters', c_float),
+    ('CameraFrustumFarZInMeters', c_float),
     ('HmdCaps', c_uint),
-    ('SensorCaps', c_uint),
+    ('TrackingCaps', c_uint),
     ('DistortionCaps', c_uint),
-    ('Resolution', sizei),
-    ('WindowsPos', vector2i),
-    ('DefaultEyeFov', fov_port * ovrEye_Count),
-    ('MaxEyeFov', fov_port * ovrEye_Count),
+    ('DefaultEyeFov', ovrFovPort * ovrEye_Count),
+    ('MaxEyeFov', ovrFovPort * ovrEye_Count),
     ('EyeRenderOrder', ovrEyeType * ovrEye_Count),
+    ('Resolution', ovrSizei),
+    ('WindowsPos', ovrVector2i),
     ('DisplayDeviceName', String),
     ('DisplayId', c_int),
 ]
 
-hmd_desc = struct_ovrHmdDesc_ # OVR_CAPI.h: 232
+ovrHmdDesc = struct_ovrHmdDesc_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 289
 
-enum_anon_6 = c_int # OVR_CAPI.h: 252
+ovrHmd = POINTER(ovrHmdDesc) # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 293
 
-ovrStatus_OrientationTracked = 1 # OVR_CAPI.h: 252
+enum_anon_6 = c_int # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 305
 
-ovrStatus_PositionTracked = 2 # OVR_CAPI.h: 252
+ovrStatus_OrientationTracked = 1 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 305
 
-ovrStatus_PositionConnected = 32 # OVR_CAPI.h: 252
+ovrStatus_PositionTracked = 2 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 305
 
-ovrStatus_HmdConnected = 128 # OVR_CAPI.h: 252
+ovrStatus_CameraPoseTracked = 4 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 305
 
-ovrStatusBits = enum_anon_6 # OVR_CAPI.h: 252
+ovrStatus_PositionConnected = 32 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 305
 
-# OVR_CAPI.h: 270
-class struct_ovrSensorState_(Structure):
+ovrStatus_HmdConnected = 128 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 305
+
+ovrStatusBits = enum_anon_6 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 305
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 315
+class struct_ovrSensorData_(Structure):
     pass
 
-struct_ovrSensorState_.__slots__ = [
-    'Predicted',
-    'Recorded',
+struct_ovrSensorData_.__slots__ = [
+    'Accelerometer',
+    'Gyro',
+    'Magnetometer',
     'Temperature',
+    'TimeInSeconds',
+]
+struct_ovrSensorData_._fields_ = [
+    ('Accelerometer', ovrVector3f),
+    ('Gyro', ovrVector3f),
+    ('Magnetometer', ovrVector3f),
+    ('Temperature', c_float),
+    ('TimeInSeconds', c_float),
+]
+
+ovrSensorData = struct_ovrSensorData_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 315
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 341
+class struct_ovrTrackingState_(Structure):
+    pass
+
+struct_ovrTrackingState_.__slots__ = [
+    'HeadPose',
+    'CameraPose',
+    'LeveledCameraPose',
+    'RawSensorData',
     'StatusFlags',
 ]
-struct_ovrSensorState_._fields_ = [
-    ('Predicted', pose_state),
-    ('Recorded', pose_state),
-    ('Temperature', c_float),
+struct_ovrTrackingState_._fields_ = [
+    ('HeadPose', ovrPoseStatef),
+    ('CameraPose', ovrPosef),
+    ('LeveledCameraPose', ovrPosef),
+    ('RawSensorData', ovrSensorData),
     ('StatusFlags', c_uint),
 ]
 
-sensor_state = struct_ovrSensorState_ # OVR_CAPI.h: 270
+ovrTrackingState = struct_ovrTrackingState_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 341
 
-# OVR_CAPI.h: 281
-class struct_ovrSensorDesc_(Structure):
-    pass
-
-struct_ovrSensorDesc_.__slots__ = [
-    'VendorId',
-    'ProductId',
-    'SerialNumber',
-]
-struct_ovrSensorDesc_._fields_ = [
-    ('VendorId', c_short),
-    ('ProductId', c_short),
-    ('SerialNumber', c_char * 24),
-]
-
-sensor_desc = struct_ovrSensorDesc_ # OVR_CAPI.h: 281
-
-# OVR_CAPI.h: 313
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 371
 class struct_ovrFrameTiming_(Structure):
     pass
 
@@ -982,9 +996,9 @@ struct_ovrFrameTiming_._fields_ = [
     ('EyeScanoutSeconds', c_double * 2),
 ]
 
-frame_timing = struct_ovrFrameTiming_ # OVR_CAPI.h: 313
+ovrFrameTiming = struct_ovrFrameTiming_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 371
 
-# OVR_CAPI.h: 330
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 387
 class struct_ovrEyeRenderDesc_(Structure):
     pass
 
@@ -997,96 +1011,317 @@ struct_ovrEyeRenderDesc_.__slots__ = [
 ]
 struct_ovrEyeRenderDesc_._fields_ = [
     ('Eye', ovrEyeType),
-    ('Fov', fov_port),
-    ('DistortedViewport', recti),
-    ('PixelsPerTanAngleAtCenter', vec2),
-    ('ViewAdjust', vec3),
+    ('Fov', ovrFovPort),
+    ('DistortedViewport', ovrRecti),
+    ('PixelsPerTanAngleAtCenter', ovrVector2f),
+    ('ViewAdjust', ovrVector3f),
 ]
 
-eye_render_desc = struct_ovrEyeRenderDesc_ # OVR_CAPI.h: 330
+ovrEyeRenderDesc = struct_ovrEyeRenderDesc_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 387
 
-enum_anon_7 = c_int # OVR_CAPI.h: 354
+enum_anon_7 = c_int # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 410
 
-ovrRenderAPI_None = 0 # OVR_CAPI.h: 354
+ovrRenderAPI_None = 0 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 410
 
-ovrRenderAPI_OpenGL = (ovrRenderAPI_None + 1) # OVR_CAPI.h: 354
+ovrRenderAPI_OpenGL = (ovrRenderAPI_None + 1) # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 410
 
-ovrRenderAPI_Android_GLES = (ovrRenderAPI_OpenGL + 1) # OVR_CAPI.h: 354
+ovrRenderAPI_Android_GLES = (ovrRenderAPI_OpenGL + 1) # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 410
 
-ovrRenderAPI_D3D9 = (ovrRenderAPI_Android_GLES + 1) # OVR_CAPI.h: 354
+ovrRenderAPI_D3D9 = (ovrRenderAPI_Android_GLES + 1) # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 410
 
-ovrRenderAPI_D3D10 = (ovrRenderAPI_D3D9 + 1) # OVR_CAPI.h: 354
+ovrRenderAPI_D3D10 = (ovrRenderAPI_D3D9 + 1) # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 410
 
-ovrRenderAPI_D3D11 = (ovrRenderAPI_D3D10 + 1) # OVR_CAPI.h: 354
+ovrRenderAPI_D3D11 = (ovrRenderAPI_D3D10 + 1) # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 410
 
-ovrRenderAPI_Count = (ovrRenderAPI_D3D11 + 1) # OVR_CAPI.h: 354
+ovrRenderAPI_Count = (ovrRenderAPI_D3D11 + 1) # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 410
 
-ovrRenderAPIType = enum_anon_7 # OVR_CAPI.h: 354
+ovrRenderAPIType = enum_anon_7 # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 410
 
-# OVR_CAPI.h: 369
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 419
+class struct_ovrRenderAPIConfigHeader_(Structure):
+    pass
+
+struct_ovrRenderAPIConfigHeader_.__slots__ = [
+    'API',
+    'RTSize',
+    'Multisample',
+]
+struct_ovrRenderAPIConfigHeader_._fields_ = [
+    ('API', ovrRenderAPIType),
+    ('RTSize', ovrSizei),
+    ('Multisample', c_int),
+]
+
+ovrRenderAPIConfigHeader = struct_ovrRenderAPIConfigHeader_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 419
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 426
 class struct_ovrRenderAPIConfig_(Structure):
     pass
 
 struct_ovrRenderAPIConfig_.__slots__ = [
-    'API',
-    'RTSize',
-    'Multisample',
+    'Header',
     'PlatformData',
 ]
 struct_ovrRenderAPIConfig_._fields_ = [
-    ('API', ovrRenderAPIType),
-    ('RTSize', sizei),
-    ('Multisample', c_int),
-    ('PlatformData', uintptr_t * 8),
+    ('Header', ovrRenderAPIConfigHeader),
+    ('PlatformData', c_uint32 * 16),
 ]
 
-ovrRenderAPIConfig = struct_ovrRenderAPIConfig_ # OVR_CAPI.h: 369
+ovrRenderAPIConfig = struct_ovrRenderAPIConfig_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 426
 
-# OVR_CAPI.h: 385
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 436
+class struct_ovrTextureHeader_(Structure):
+    pass
+
+struct_ovrTextureHeader_.__slots__ = [
+    'API',
+    'TextureSize',
+    'RenderViewport',
+]
+struct_ovrTextureHeader_._fields_ = [
+    ('API', ovrRenderAPIType),
+    ('TextureSize', ovrSizei),
+    ('RenderViewport', ovrRecti),
+]
+
+ovrTextureHeader = struct_ovrTextureHeader_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 436
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 443
 class struct_ovrTexture_(Structure):
     pass
 
 struct_ovrTexture_.__slots__ = [
-    'API',
-    'TextureSize',
-    'RenderViewport',
-    'TexId',
+    'Header',
     'PlatformData',
 ]
 struct_ovrTexture_._fields_ = [
-    ('API', ovrRenderAPIType),
-    ('TextureSize', sizei),
-    ('RenderViewport', recti),
-    ('TexId', uintptr_t),
-    ('PlatformData', uintptr_t * 7),
+    ('Header', ovrTextureHeader),
+    ('PlatformData', c_uint32 * 16),
 ]
 
-texture = struct_ovrTexture_ # OVR_CAPI.h: 385
+ovrTexture = struct_ovrTexture_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 443
 
-# OVR_CAPI.h: 622
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 487
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovr_InitializeRenderingShim'):
+        continue
+    ovr_InitializeRenderingShim = _lib.ovr_InitializeRenderingShim
+    ovr_InitializeRenderingShim.argtypes = []
+    ovr_InitializeRenderingShim.restype = None
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 493
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovr_Initialize'):
+        continue
+    ovr_Initialize = _lib.ovr_Initialize
+    ovr_Initialize.argtypes = []
+    ovr_Initialize.restype = ovrBool
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 495
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovr_Shutdown'):
+        continue
+    ovr_Shutdown = _lib.ovr_Shutdown
+    ovr_Shutdown.argtypes = []
+    ovr_Shutdown.restype = None
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 499
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovr_GetVersionString'):
+        continue
+    ovr_GetVersionString = _lib.ovr_GetVersionString
+    ovr_GetVersionString.argtypes = []
+    if sizeof(c_int) == sizeof(c_void_p):
+        ovr_GetVersionString.restype = ReturnString
+    else:
+        ovr_GetVersionString.restype = String
+        ovr_GetVersionString.errcheck = ReturnString
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 505
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_Detect'):
+        continue
+    ovrHmd_Detect = _lib.ovrHmd_Detect
+    ovrHmd_Detect.argtypes = []
+    ovrHmd_Detect.restype = c_int
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 511
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_Create'):
+        continue
+    ovrHmd_Create = _lib.ovrHmd_Create
+    ovrHmd_Create.argtypes = [c_int]
+    ovrHmd_Create.restype = ovrHmd
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 512
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_Destroy'):
+        continue
+    ovrHmd_Destroy = _lib.ovrHmd_Destroy
+    ovrHmd_Destroy.argtypes = [ovrHmd]
+    ovrHmd_Destroy.restype = None
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 516
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_CreateDebug'):
+        continue
+    ovrHmd_CreateDebug = _lib.ovrHmd_CreateDebug
+    ovrHmd_CreateDebug.argtypes = [ovrHmdType]
+    ovrHmd_CreateDebug.restype = ovrHmd
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 522
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetLastError'):
+        continue
+    ovrHmd_GetLastError = _lib.ovrHmd_GetLastError
+    ovrHmd_GetLastError.argtypes = [ovrHmd]
+    if sizeof(c_int) == sizeof(c_void_p):
+        ovrHmd_GetLastError.restype = ReturnString
+    else:
+        ovrHmd_GetLastError.restype = String
+        ovrHmd_GetLastError.errcheck = ReturnString
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 531
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_AttachToWindow'):
+        continue
+    ovrHmd_AttachToWindow = _lib.ovrHmd_AttachToWindow
+    ovrHmd_AttachToWindow.argtypes = [ovrHmd, POINTER(None), POINTER(ovrRecti), POINTER(ovrRecti)]
+    ovrHmd_AttachToWindow.restype = ovrBool
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 540
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetEnabledCaps'):
+        continue
+    ovrHmd_GetEnabledCaps = _lib.ovrHmd_GetEnabledCaps
+    ovrHmd_GetEnabledCaps.argtypes = [ovrHmd]
+    ovrHmd_GetEnabledCaps.restype = c_uint
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 544
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_SetEnabledCaps'):
+        continue
+    ovrHmd_SetEnabledCaps = _lib.ovrHmd_SetEnabledCaps
+    ovrHmd_SetEnabledCaps.argtypes = [ovrHmd, c_uint]
+    ovrHmd_SetEnabledCaps.restype = None
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 562
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_ConfigureTracking'):
+        continue
+    ovrHmd_ConfigureTracking = _lib.ovrHmd_ConfigureTracking
+    ovrHmd_ConfigureTracking.argtypes = [ovrHmd, c_uint, c_uint]
+    ovrHmd_ConfigureTracking.restype = ovrBool
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 568
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_RecenterPose'):
+        continue
+    ovrHmd_RecenterPose = _lib.ovrHmd_RecenterPose
+    ovrHmd_RecenterPose.argtypes = [ovrHmd]
+    ovrHmd_RecenterPose.restype = None
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 575
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetTrackingState'):
+        continue
+    ovrHmd_GetTrackingState = _lib.ovrHmd_GetTrackingState
+    ovrHmd_GetTrackingState.argtypes = [ovrHmd, c_double]
+    ovrHmd_GetTrackingState.restype = ovrTrackingState
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 588
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetFovTextureSize'):
+        continue
+    ovrHmd_GetFovTextureSize = _lib.ovrHmd_GetFovTextureSize
+    ovrHmd_GetFovTextureSize.argtypes = [ovrHmd, ovrEyeType, ovrFovPort, c_float]
+    ovrHmd_GetFovTextureSize.restype = ovrSizei
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 627
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_ConfigureRendering'):
+        continue
+    ovrHmd_ConfigureRendering = _lib.ovrHmd_ConfigureRendering
+    ovrHmd_ConfigureRendering.argtypes = [ovrHmd, POINTER(ovrRenderAPIConfig), c_uint, ovrFovPort * 2, ovrEyeRenderDesc * 2]
+    ovrHmd_ConfigureRendering.restype = ovrBool
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 637
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_BeginFrame'):
+        continue
+    ovrHmd_BeginFrame = _lib.ovrHmd_BeginFrame
+    ovrHmd_BeginFrame.argtypes = [ovrHmd, c_uint]
+    ovrHmd_BeginFrame.restype = ovrFrameTiming
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 647
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_EndFrame'):
+        continue
+    ovrHmd_EndFrame = _lib.ovrHmd_EndFrame
+    ovrHmd_EndFrame.argtypes = [ovrHmd, ovrPosef * 2, ovrTexture * 2]
+    ovrHmd_EndFrame.restype = None
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 655
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetEyePose'):
+        continue
+    ovrHmd_GetEyePose = _lib.ovrHmd_GetEyePose
+    ovrHmd_GetEyePose.argtypes = [ovrHmd, ovrEyeType]
+    ovrHmd_GetEyePose.restype = ovrPosef
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 681
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetRenderDesc'):
+        continue
+    ovrHmd_GetRenderDesc = _lib.ovrHmd_GetRenderDesc
+    ovrHmd_GetRenderDesc.argtypes = [ovrHmd, ovrEyeType, ovrFovPort]
+    ovrHmd_GetRenderDesc.restype = ovrEyeRenderDesc
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 697
 class struct_ovrDistortionVertex_(Structure):
     pass
 
 struct_ovrDistortionVertex_.__slots__ = [
-    'Pos',
+    'ScreenPosNDC',
     'TimeWarpFactor',
     'VignetteFactor',
-    'TexR',
-    'TexG',
-    'TexB',
+    'TanEyeAnglesR',
+    'TanEyeAnglesG',
+    'TanEyeAnglesB',
 ]
 struct_ovrDistortionVertex_._fields_ = [
-    ('Pos', vec2),
+    ('ScreenPosNDC', ovrVector2f),
     ('TimeWarpFactor', c_float),
     ('VignetteFactor', c_float),
-    ('TexR', vec2),
-    ('TexG', vec2),
-    ('TexB', vec2),
+    ('TanEyeAnglesR', ovrVector2f),
+    ('TanEyeAnglesG', ovrVector2f),
+    ('TanEyeAnglesB', ovrVector2f),
 ]
 
-ovrDistortionVertex = struct_ovrDistortionVertex_ # OVR_CAPI.h: 622
+ovrDistortionVertex = struct_ovrDistortionVertex_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 697
 
-# OVR_CAPI.h: 632
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 707
 class struct_ovrDistortionMesh_(Structure):
     pass
 
@@ -1103,220 +1338,18 @@ struct_ovrDistortionMesh_._fields_ = [
     ('IndexCount', c_uint),
 ]
 
-ovrDistortionMesh = struct_ovrDistortionMesh_ # OVR_CAPI.h: 632
+ovrDistortionMesh = struct_ovrDistortionMesh_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 707
 
-# OVR_CAPI.h: 421
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovr_Initialize'):
-        continue
-    ovr_Initialize = _lib.ovr_Initialize
-    ovr_Initialize.argtypes = []
-    ovr_Initialize.restype = ovrBool
-    break
-
-# OVR_CAPI.h: 422
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovr_Shutdown'):
-        continue
-    ovr_Shutdown = _lib.ovr_Shutdown
-    ovr_Shutdown.argtypes = []
-    ovr_Shutdown.restype = None
-    break
-
-# OVR_CAPI.h: 427
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_Detect'):
-        continue
-    ovrHmd_Detect = _lib.ovrHmd_Detect
-    ovrHmd_Detect.argtypes = []
-    ovrHmd_Detect.restype = c_int
-    break
-
-# OVR_CAPI.h: 433
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_Create'):
-        continue
-    ovrHmd_Create = _lib.ovrHmd_Create
-    ovrHmd_Create.argtypes = [c_int]
-    ovrHmd_Create.restype = hmd
-    break
-
-# OVR_CAPI.h: 434
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_Destroy'):
-        continue
-    ovrHmd_Destroy = _lib.ovrHmd_Destroy
-    ovrHmd_Destroy.argtypes = [hmd]
-    ovrHmd_Destroy.restype = None
-    break
-
-# OVR_CAPI.h: 438
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_CreateDebug'):
-        continue
-    ovrHmd_CreateDebug = _lib.ovrHmd_CreateDebug
-    ovrHmd_CreateDebug.argtypes = [ovrHmdType]
-    ovrHmd_CreateDebug.restype = hmd
-    break
-
-# OVR_CAPI.h: 444
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_GetLastError'):
-        continue
-    ovrHmd_GetLastError = _lib.ovrHmd_GetLastError
-    ovrHmd_GetLastError.argtypes = [hmd]
-    if sizeof(c_int) == sizeof(c_void_p):
-        ovrHmd_GetLastError.restype = ReturnString
-    else:
-        ovrHmd_GetLastError.restype = String
-        ovrHmd_GetLastError.errcheck = ReturnString
-    break
-
-# OVR_CAPI.h: 452
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_GetEnabledCaps'):
-        continue
-    ovrHmd_GetEnabledCaps = _lib.ovrHmd_GetEnabledCaps
-    ovrHmd_GetEnabledCaps.argtypes = [hmd]
-    ovrHmd_GetEnabledCaps.restype = c_uint
-    break
-
-# OVR_CAPI.h: 456
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_SetEnabledCaps'):
-        continue
-    ovrHmd_SetEnabledCaps = _lib.ovrHmd_SetEnabledCaps
-    ovrHmd_SetEnabledCaps.argtypes = [hmd, c_uint]
-    ovrHmd_SetEnabledCaps.restype = None
-    break
-
-# OVR_CAPI.h: 472
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_StartSensor'):
-        continue
-    ovrHmd_StartSensor = _lib.ovrHmd_StartSensor
-    ovrHmd_StartSensor.argtypes = [hmd, c_uint, c_uint]
-    ovrHmd_StartSensor.restype = ovrBool
-    break
-
-# OVR_CAPI.h: 475
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_StopSensor'):
-        continue
-    ovrHmd_StopSensor = _lib.ovrHmd_StopSensor
-    ovrHmd_StopSensor.argtypes = [hmd]
-    ovrHmd_StopSensor.restype = None
-    break
-
-# OVR_CAPI.h: 477
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_ResetSensor'):
-        continue
-    ovrHmd_ResetSensor = _lib.ovrHmd_ResetSensor
-    ovrHmd_ResetSensor.argtypes = [hmd]
-    ovrHmd_ResetSensor.restype = None
-    break
-
-# OVR_CAPI.h: 484
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_GetSensorState'):
-        continue
-    ovrHmd_GetSensorState = _lib.ovrHmd_GetSensorState
-    ovrHmd_GetSensorState.argtypes = [hmd, c_double]
-    ovrHmd_GetSensorState.restype = sensor_state
-    break
-
-# OVR_CAPI.h: 488
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_GetSensorDesc'):
-        continue
-    ovrHmd_GetSensorDesc = _lib.ovrHmd_GetSensorDesc
-    ovrHmd_GetSensorDesc.argtypes = [hmd, POINTER(sensor_desc)]
-    ovrHmd_GetSensorDesc.restype = ovrBool
-    break
-
-# OVR_CAPI.h: 495
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_GetDesc'):
-        continue
-    ovrHmd_GetDesc = _lib.ovrHmd_GetDesc
-    ovrHmd_GetDesc.argtypes = [hmd, POINTER(hmd_desc)]
-    ovrHmd_GetDesc.restype = None
-    break
-
-# OVR_CAPI.h: 502
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_GetFovTextureSize'):
-        continue
-    ovrHmd_GetFovTextureSize = _lib.ovrHmd_GetFovTextureSize
-    ovrHmd_GetFovTextureSize.argtypes = [hmd, ovrEyeType, fov_port, c_float]
-    ovrHmd_GetFovTextureSize.restype = sizei
-    break
-
-# OVR_CAPI.h: 544
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_ConfigureRendering'):
-        continue
-    ovrHmd_ConfigureRendering = _lib.ovrHmd_ConfigureRendering
-    ovrHmd_ConfigureRendering.argtypes = [hmd, POINTER(ovrRenderAPIConfig), c_uint, fov_port * 2, eye_render_desc * 2]
-    ovrHmd_ConfigureRendering.restype = ovrBool
-    break
-
-# OVR_CAPI.h: 555
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_BeginFrame'):
-        continue
-    ovrHmd_BeginFrame = _lib.ovrHmd_BeginFrame
-    ovrHmd_BeginFrame.argtypes = [hmd, c_uint]
-    ovrHmd_BeginFrame.restype = frame_timing
-    break
-
-# OVR_CAPI.h: 561
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_EndFrame'):
-        continue
-    ovrHmd_EndFrame = _lib.ovrHmd_EndFrame
-    ovrHmd_EndFrame.argtypes = [hmd]
-    ovrHmd_EndFrame.restype = None
-    break
-
-# OVR_CAPI.h: 571
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_BeginEyeRender'):
-        continue
-    ovrHmd_BeginEyeRender = _lib.ovrHmd_BeginEyeRender
-    ovrHmd_BeginEyeRender.argtypes = [hmd, ovrEyeType]
-    ovrHmd_BeginEyeRender.restype = pose
-    break
-
-# OVR_CAPI.h: 579
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_EndEyeRender'):
-        continue
-    ovrHmd_EndEyeRender = _lib.ovrHmd_EndEyeRender
-    ovrHmd_EndEyeRender.argtypes = [hmd, ovrEyeType, pose, POINTER(texture)]
-    ovrHmd_EndEyeRender.restype = None
-    break
-
-# OVR_CAPI.h: 606
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_GetRenderDesc'):
-        continue
-    ovrHmd_GetRenderDesc = _lib.ovrHmd_GetRenderDesc
-    ovrHmd_GetRenderDesc.argtypes = [hmd, ovrEyeType, fov_port]
-    ovrHmd_GetRenderDesc.restype = eye_render_desc
-    break
-
-# OVR_CAPI.h: 642
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 719
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_CreateDistortionMesh'):
         continue
     ovrHmd_CreateDistortionMesh = _lib.ovrHmd_CreateDistortionMesh
-    ovrHmd_CreateDistortionMesh.argtypes = [hmd, ovrEyeType, fov_port, c_uint, POINTER(ovrDistortionMesh)]
+    ovrHmd_CreateDistortionMesh.argtypes = [ovrHmd, ovrEyeType, ovrFovPort, c_uint, POINTER(ovrDistortionMesh)]
     ovrHmd_CreateDistortionMesh.restype = ovrBool
     break
 
-# OVR_CAPI.h: 649
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 726
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_DestroyDistortionMesh'):
         continue
@@ -1325,88 +1358,79 @@ for _lib in _libs.itervalues():
     ovrHmd_DestroyDistortionMesh.restype = None
     break
 
-# OVR_CAPI.h: 653
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 730
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetRenderScaleAndOffset'):
         continue
     ovrHmd_GetRenderScaleAndOffset = _lib.ovrHmd_GetRenderScaleAndOffset
-    ovrHmd_GetRenderScaleAndOffset.argtypes = [fov_port, sizei, recti, vec2 * 2]
+    ovrHmd_GetRenderScaleAndOffset.argtypes = [ovrFovPort, ovrSizei, ovrRecti, ovrVector2f * 2]
     ovrHmd_GetRenderScaleAndOffset.restype = None
     break
 
-# OVR_CAPI.h: 660
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 738
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetFrameTiming'):
         continue
     ovrHmd_GetFrameTiming = _lib.ovrHmd_GetFrameTiming
-    ovrHmd_GetFrameTiming.argtypes = [hmd, c_uint]
-    ovrHmd_GetFrameTiming.restype = frame_timing
+    ovrHmd_GetFrameTiming.argtypes = [ovrHmd, c_uint]
+    ovrHmd_GetFrameTiming.restype = ovrFrameTiming
     break
 
-# OVR_CAPI.h: 665
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 743
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_BeginFrameTiming'):
         continue
     ovrHmd_BeginFrameTiming = _lib.ovrHmd_BeginFrameTiming
-    ovrHmd_BeginFrameTiming.argtypes = [hmd, c_uint]
-    ovrHmd_BeginFrameTiming.restype = frame_timing
+    ovrHmd_BeginFrameTiming.argtypes = [ovrHmd, c_uint]
+    ovrHmd_BeginFrameTiming.restype = ovrFrameTiming
     break
 
-# OVR_CAPI.h: 670
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 748
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_EndFrameTiming'):
         continue
     ovrHmd_EndFrameTiming = _lib.ovrHmd_EndFrameTiming
-    ovrHmd_EndFrameTiming.argtypes = [hmd]
+    ovrHmd_EndFrameTiming.argtypes = [ovrHmd]
     ovrHmd_EndFrameTiming.restype = None
     break
 
-# OVR_CAPI.h: 675
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 753
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_ResetFrameTiming'):
         continue
     ovrHmd_ResetFrameTiming = _lib.ovrHmd_ResetFrameTiming
-    ovrHmd_ResetFrameTiming.argtypes = [hmd, c_uint]
+    ovrHmd_ResetFrameTiming.argtypes = [ovrHmd, c_uint]
     ovrHmd_ResetFrameTiming.restype = None
     break
 
-# OVR_CAPI.h: 680
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_GetEyePose'):
-        continue
-    ovrHmd_GetEyePose = _lib.ovrHmd_GetEyePose
-    ovrHmd_GetEyePose.argtypes = [hmd, ovrEyeType]
-    ovrHmd_GetEyePose.restype = pose
-    break
-
-# OVR_CAPI.h: 687
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 761
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetEyeTimewarpMatrices'):
         continue
     ovrHmd_GetEyeTimewarpMatrices = _lib.ovrHmd_GetEyeTimewarpMatrices
-    ovrHmd_GetEyeTimewarpMatrices.argtypes = [hmd, ovrEyeType, pose, mat4 * 2]
+    ovrHmd_GetEyeTimewarpMatrices.argtypes = [ovrHmd, ovrEyeType, ovrPosef, ovrMatrix4f * 2]
     ovrHmd_GetEyeTimewarpMatrices.restype = None
     break
 
-# OVR_CAPI.h: 696
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 769
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrMatrix4f_Projection'):
         continue
     ovrMatrix4f_Projection = _lib.ovrMatrix4f_Projection
-    ovrMatrix4f_Projection.argtypes = [fov_port, c_float, c_float, ovrBool]
-    ovrMatrix4f_Projection.restype = mat4
+    ovrMatrix4f_Projection.argtypes = [ovrFovPort, c_float, c_float, ovrBool]
+    ovrMatrix4f_Projection.restype = ovrMatrix4f
     break
 
-# OVR_CAPI.h: 702
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 775
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrMatrix4f_OrthoSubProjection'):
         continue
     ovrMatrix4f_OrthoSubProjection = _lib.ovrMatrix4f_OrthoSubProjection
-    ovrMatrix4f_OrthoSubProjection.argtypes = [mat4, vec2, c_float, c_float]
-    ovrMatrix4f_OrthoSubProjection.restype = mat4
+    ovrMatrix4f_OrthoSubProjection.argtypes = [ovrMatrix4f, ovrVector2f, c_float, c_float]
+    ovrMatrix4f_OrthoSubProjection.restype = ovrMatrix4f
     break
 
-# OVR_CAPI.h: 707
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 780
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovr_GetTimeInSeconds'):
         continue
@@ -1415,7 +1439,7 @@ for _lib in _libs.itervalues():
     ovr_GetTimeInSeconds.restype = c_double
     break
 
-# OVR_CAPI.h: 710
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 783
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovr_WaitTillTime'):
         continue
@@ -1424,21 +1448,21 @@ for _lib in _libs.itervalues():
     ovr_WaitTillTime.restype = c_double
     break
 
-# OVR_CAPI.h: 719
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 792
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_ProcessLatencyTest'):
         continue
     ovrHmd_ProcessLatencyTest = _lib.ovrHmd_ProcessLatencyTest
-    ovrHmd_ProcessLatencyTest.argtypes = [hmd, c_ubyte * 3]
+    ovrHmd_ProcessLatencyTest.argtypes = [ovrHmd, c_ubyte * 3]
     ovrHmd_ProcessLatencyTest.restype = ovrBool
     break
 
-# OVR_CAPI.h: 723
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 796
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetLatencyTestResult'):
         continue
     ovrHmd_GetLatencyTestResult = _lib.ovrHmd_GetLatencyTestResult
-    ovrHmd_GetLatencyTestResult.argtypes = [hmd]
+    ovrHmd_GetLatencyTestResult.argtypes = [ovrHmd]
     if sizeof(c_int) == sizeof(c_void_p):
         ovrHmd_GetLatencyTestResult.restype = ReturnString
     else:
@@ -1446,57 +1470,128 @@ for _lib in _libs.itervalues():
         ovrHmd_GetLatencyTestResult.errcheck = ReturnString
     break
 
-# OVR_CAPI.h: 727
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 813
+class struct_ovrHSWDisplayState_(Structure):
+    pass
+
+struct_ovrHSWDisplayState_.__slots__ = [
+    'Displayed',
+    'StartTime',
+    'DismissibleTime',
+]
+struct_ovrHSWDisplayState_._fields_ = [
+    ('Displayed', ovrBool),
+    ('StartTime', c_double),
+    ('DismissibleTime', c_double),
+]
+
+ovrHSWDisplayState = struct_ovrHSWDisplayState_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 813
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 832
 for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_GetMeasuredLatencyTest2'):
+    if not hasattr(_lib, 'ovrHmd_GetHSWDisplayState'):
         continue
-    ovrHmd_GetMeasuredLatencyTest2 = _lib.ovrHmd_GetMeasuredLatencyTest2
-    ovrHmd_GetMeasuredLatencyTest2.argtypes = [hmd]
-    ovrHmd_GetMeasuredLatencyTest2.restype = c_double
+    ovrHmd_GetHSWDisplayState = _lib.ovrHmd_GetHSWDisplayState
+    ovrHmd_GetHSWDisplayState.argtypes = [ovrHmd, POINTER(ovrHSWDisplayState)]
+    ovrHmd_GetHSWDisplayState.restype = None
     break
 
-# OVR_CAPI.h: 763
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 852
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_DismissHSWDisplay'):
+        continue
+    ovrHmd_DismissHSWDisplay = _lib.ovrHmd_DismissHSWDisplay
+    ovrHmd_DismissHSWDisplay.argtypes = [ovrHmd]
+    ovrHmd_DismissHSWDisplay.restype = ovrBool
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 860
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrhmd_EnableHSWDisplaySDKRender'):
+        continue
+    ovrhmd_EnableHSWDisplaySDKRender = _lib.ovrhmd_EnableHSWDisplaySDKRender
+    ovrhmd_EnableHSWDisplaySDKRender.argtypes = [ovrHmd, ovrBool]
+    ovrhmd_EnableHSWDisplaySDKRender.restype = None
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 903
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetBool'):
+        continue
+    ovrHmd_GetBool = _lib.ovrHmd_GetBool
+    ovrHmd_GetBool.argtypes = [ovrHmd, String, ovrBool]
+    ovrHmd_GetBool.restype = ovrBool
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 906
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_SetBool'):
+        continue
+    ovrHmd_SetBool = _lib.ovrHmd_SetBool
+    ovrHmd_SetBool.argtypes = [ovrHmd, String, ovrBool]
+    ovrHmd_SetBool.restype = ovrBool
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 910
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetInt'):
+        continue
+    ovrHmd_GetInt = _lib.ovrHmd_GetInt
+    ovrHmd_GetInt.argtypes = [ovrHmd, String, c_int]
+    ovrHmd_GetInt.restype = c_int
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 913
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_SetInt'):
+        continue
+    ovrHmd_SetInt = _lib.ovrHmd_SetInt
+    ovrHmd_SetInt.argtypes = [ovrHmd, String, c_int]
+    ovrHmd_SetInt.restype = ovrBool
+    break
+
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 917
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetFloat'):
         continue
     ovrHmd_GetFloat = _lib.ovrHmd_GetFloat
-    ovrHmd_GetFloat.argtypes = [hmd, String, c_float]
+    ovrHmd_GetFloat.argtypes = [ovrHmd, String, c_float]
     ovrHmd_GetFloat.restype = c_float
     break
 
-# OVR_CAPI.h: 766
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 920
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_SetFloat'):
         continue
     ovrHmd_SetFloat = _lib.ovrHmd_SetFloat
-    ovrHmd_SetFloat.argtypes = [hmd, String, c_float]
+    ovrHmd_SetFloat.argtypes = [ovrHmd, String, c_float]
     ovrHmd_SetFloat.restype = ovrBool
     break
 
-# OVR_CAPI.h: 771
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 924
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetFloatArray'):
         continue
     ovrHmd_GetFloatArray = _lib.ovrHmd_GetFloatArray
-    ovrHmd_GetFloatArray.argtypes = [hmd, String, POINTER(c_float), c_uint]
+    ovrHmd_GetFloatArray.argtypes = [ovrHmd, String, POINTER(c_float), c_uint]
     ovrHmd_GetFloatArray.restype = c_uint
     break
 
-# OVR_CAPI.h: 775
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 928
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_SetFloatArray'):
         continue
     ovrHmd_SetFloatArray = _lib.ovrHmd_SetFloatArray
-    ovrHmd_SetFloatArray.argtypes = [hmd, String, POINTER(c_float), c_uint]
+    ovrHmd_SetFloatArray.argtypes = [ovrHmd, String, POINTER(c_float), c_uint]
     ovrHmd_SetFloatArray.restype = ovrBool
     break
 
-# OVR_CAPI.h: 781
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 934
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetString'):
         continue
     ovrHmd_GetString = _lib.ovrHmd_GetString
-    ovrHmd_GetString.argtypes = [hmd, String, String]
+    ovrHmd_GetString.argtypes = [ovrHmd, String, String]
     if sizeof(c_int) == sizeof(c_void_p):
         ovrHmd_GetString.restype = ReturnString
     else:
@@ -1504,266 +1599,144 @@ for _lib in _libs.itervalues():
         ovrHmd_GetString.errcheck = ReturnString
     break
 
-# OVR_CAPI.h: 786
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 938
 for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_GetArraySize'):
+    if not hasattr(_lib, 'ovrHmd_SetString'):
         continue
-    ovrHmd_GetArraySize = _lib.ovrHmd_GetArraySize
-    ovrHmd_GetArraySize.argtypes = [hmd, String]
-    ovrHmd_GetArraySize.restype = c_uint
+    ovrHmd_SetString = _lib.ovrHmd_SetString
+    ovrHmd_SetString.argtypes = [ovrHmd, String, String]
+    ovrHmd_SetString.restype = ovrBool
     break
 
-
-# OVR_CAPI.h: 743
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 878
 try:
     OVR_KEY_USER = 'User'
-    OVR_KEY_NAME = 'Name'
-    OVR_KEY_GENDER = 'Gender'
-    OVR_KEY_PLAYER_HEIGHT = 'PlayerHeight'
-    OVR_KEY_EYE_HEIGHT = 'EyeHeight'
-    OVR_KEY_IPD = 'IPD'
-    OVR_KEY_NECK_TO_EYE_HORIZONTAL = 'NeckEyeHori'
-    OVR_KEY_NECK_TO_EYE_VERTICAL = 'NeckEyeVert'
-    OVR_DEFAULT_GENDER = 'Male'
-    OVR_DEFAULT_PLAYER_HEIGHT = 1.778
-    OVR_DEFAULT_EYE_HEIGHT = 1.675
-    OVR_DEFAULT_IPD = 0.064
-    OVR_DEFAULT_NECK_TO_EYE_HORIZONTAL = 0.12
-    OVR_DEFAULT_NECK_TO_EYE_VERTICAL = 0.12
 except:
     pass
 
-class Hmd():
-    @staticmethod
-    def initialize():
-        if (0 == ovr_Initialize()):
-            raise SystemError("Unable to initialize the Oculus SDK")
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 879
+try:
+    OVR_KEY_NAME = 'Name'
+except:
+    pass
 
-    @staticmethod
-    def shutdown():
-        ovr_Shutdown()
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 880
+try:
+    OVR_KEY_GENDER = 'Gender'
+except:
+    pass
 
-    @staticmethod
-    def detect():
-        return ovrHmd_Detect()
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 881
+try:
+    OVR_KEY_PLAYER_HEIGHT = 'PlayerHeight'
+except:
+    pass
 
-    def __init__(self, index = 0, debug = False):
-        if (debug != False):
-            self.hmd = ovrHmd_CreateDebug(debug)
-        else:
-            self.hmd = ovrHmd_Create(index)
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 882
+try:
+    OVR_KEY_EYE_HEIGHT = 'EyeHeight'
+except:
+    pass
 
-    def destroy(self):
-        ovrHmd_Destroy(self.hmd)
-        self.hmd = None
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 883
+try:
+    OVR_KEY_IPD = 'IPD'
+except:
+    pass
 
-    def get_last_error(self):
-        return ovrHmd_GetLastError(self.hmd);
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 884
+try:
+    OVR_KEY_NECK_TO_EYE_DISTANCE = 'NeckEyeDistance'
+except:
+    pass
 
-    def get_enabled_caps(self):
-        return ovrHmd_GetEnabledCaps(self.hmd);
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 892
+try:
+    OVR_DEFAULT_GENDER = 'Unknown'
+except:
+    pass
 
-    def set_enabled_caps(self, caps):
-        return ovrHmd_SetEnabledCaps(self.hmd, caps);
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 893
+try:
+    OVR_DEFAULT_PLAYER_HEIGHT = 1.778
+except:
+    pass
 
-    def start_sensor(self, supported_caps = 
-                     ovrSensorCap_Orientation |
-                     ovrSensorCap_YawCorrection |
-                     ovrSensorCap_Position, 
-                     required_caps = 0):
-        if (0 == ovrHmd_StartSensor(self.hmd, supported_caps, required_caps)):
-            raise SystemError("Unable to start the sensor")
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 894
+try:
+    OVR_DEFAULT_EYE_HEIGHT = 1.675
+except:
+    pass
 
-    def stop_sensor(self):
-        return ovrHmd_StopSensor(self.hmd)
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 895
+try:
+    OVR_DEFAULT_IPD = 0.064
+except:
+    pass
 
-    def reset_sensor(self):
-        return ovrHmd_ResetSensor(self.hmd)
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 896
+try:
+    OVR_DEFAULT_NECK_TO_EYE_HORIZONTAL = 0.0805
+except:
+    pass
 
-    def get_sensor_state(self, absTime = 0):
-        return ovrHmd_GetSensorState(self.hmd, absTime)
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 897
+try:
+    OVR_DEFAULT_NECK_TO_EYE_VERTICAL = 0.075
+except:
+    pass
 
-    def get_sensor_desc(self):
-        result = sensor_desc()
-        if (0 == ovrHmd_GetSensorDesc(self.hmd, result)):
-            raise SystemError("Unable to fetch the sensor description")
-        return result
+# /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 898
+try:
+    OVR_DEFAULT_EYE_RELIEF_DIAL = 3
+except:
+    pass
 
-    def get_desc(self):
-        result = hmd_desc()
-        if (0 == ovrHmd_GetDesc(self.hmd, byref(result))):
-            raise SystemError("Unable to fetch the hmd description")
-        return result
+ovrVector2i_ = struct_ovrVector2i_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 81
 
-    def get_fov_texture_size(self, eye, fov_port, pixels_per_display_pixel = 1.0):
-        return ovrHmd_GetFovTextureSize(self.hmd, eye, fov_port, pixels_per_display_pixel);
+ovrSizei_ = struct_ovrSizei_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 86
 
-    def configure_rendering(self, config, fovPorts, 
-                            distortion_caps = 
-                            ovrDistortionCap_Chromatic |
-                            ovrDistortionCap_TimeWarp |
-                            ovrDistortionCap_NoSwapBuffers |
-                            ovrDistortionCap_Vignette):
-        result = [ eye_render_desc(), eye_render_desc() ]
-        out_arr  = (eye_render_desc * 2)(*result)
-        in_arr = (fov_port * 2)(*fovPorts)
+ovrRecti_ = struct_ovrRecti_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 93
 
-        if (0 == ovrHmd_ConfigureRendering(self.hmd, byref(config), distortion_caps, in_arr, out_arr)):
-            raise SystemError("Unable to configure rendering")
-        return out_arr
+ovrQuatf_ = struct_ovrQuatf_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 99
 
-    def begin_frame(self, frame_index = 0):
-        return ovrHmd_BeginFrame(self.hmd, frame_index)
+ovrVector2f_ = struct_ovrVector2f_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 104
 
-    def end_frame(self):
-        return ovrHmd_EndFrame(self.hmd)
+ovrVector3f_ = struct_ovrVector3f_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 109
 
-    def begin_eye_render(self, eye):
-        self.pose = ovrHmd_BeginEyeRender(self.hmd, eye); 
-        return self.pose
+ovrMatrix4f_ = struct_ovrMatrix4f_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 114
 
-    def end_eye_render(self, eye, texture, pose = None):
-        if (None == pose):
-            pose = self.pose
-        ovrHmd_EndEyeRender(self.hmd, eye, pose, byref(texture))
+ovrPosef_ = struct_ovrPosef_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 120
 
-    def get_render_desc(self, eye, fov):
-        return ovrHmd_GetRenderDesc(self.hmd, eye, fov)
+ovrPoseStatef_ = struct_ovrPoseStatef_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 131
 
-    @staticmethod
-    def get_perspective(fov, near, far, right_handed):
-        return ovrMatrix4f_Projection(fov, near, far, '\x01' if right_handed else '\x00')
+ovrFovPort_ = struct_ovrFovPort_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 146
 
-    @staticmethod
-    def get_orthographic(perspective, scale, distance, eye_x_offset):
-        return ovrMatrix4f_Projection(perspective, scale, distance, eye_x_offset)
+ovrHmdStruct = struct_ovrHmdStruct # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 236
 
-    @staticmethod
-    def get_time_in_seconds():
-        return ovr_GetTimeInSeconds()
+ovrHmdDesc_ = struct_ovrHmdDesc_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 289
 
-    @staticmethod
-    def wait_till_time(time_in_seconds):
-        return ovr_WaitTillTime(time_in_seconds)
+ovrSensorData_ = struct_ovrSensorData_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 315
 
-    def get_float(self, name, default):
-        return ovrHmd_GetFloat(self.hmd, name, default)
+ovrTrackingState_ = struct_ovrTrackingState_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 341
 
-    def get_string(self, name, default):
-        return ovrHmd_GetString(self.hmd, name, default)
-    
-# TODO finish writing wrapper functionality for the functions used in 
-# client-side distortion
-#
-# # OVR_CAPI.h: 642
-# for _lib in _libs.itervalues():
-#     if not hasattr(_lib, 'ovrHmd_CreateDistortionMesh'):
-#         continue
-#     ovrHmd_CreateDistortionMesh = _lib.ovrHmd_CreateDistortionMesh
-#     ovrHmd_CreateDistortionMesh.argtypes = [hmd, ovrEyeType, fov_port, c_uint, POINTER(ovrDistortionMesh)]
-#     ovrHmd_CreateDistortionMesh.restype = ovrBool
-#     break
-# 
-# # OVR_CAPI.h: 649
-# for _lib in _libs.itervalues():
-#     if not hasattr(_lib, 'ovrHmd_DestroyDistortionMesh'):
-#         continue
-#     ovrHmd_DestroyDistortionMesh = _lib.ovrHmd_DestroyDistortionMesh
-#     ovrHmd_DestroyDistortionMesh.argtypes = [POINTER(ovrDistortionMesh)]
-#     ovrHmd_DestroyDistortionMesh.restype = None
-#     break
-# 
-# # OVR_CAPI.h: 653
-# for _lib in _libs.itervalues():
-#     if not hasattr(_lib, 'ovrHmd_GetRenderScaleAndOffset'):
-#         continue
-#     ovrHmd_GetRenderScaleAndOffset = _lib.ovrHmd_GetRenderScaleAndOffset
-#     ovrHmd_GetRenderScaleAndOffset.argtypes = [fov_port, sizei, recti, vec2 * 2]
-#     ovrHmd_GetRenderScaleAndOffset.restype = None
-#     break
-# 
-# # OVR_CAPI.h: 660
-# for _lib in _libs.itervalues():
-#     if not hasattr(_lib, 'ovrHmd_GetFrameTiming'):
-#         continue
-#     ovrHmd_GetFrameTiming = _lib.ovrHmd_GetFrameTiming
-#     ovrHmd_GetFrameTiming.argtypes = [hmd, c_uint]
-#     ovrHmd_GetFrameTiming.restype = frame_timing
-#     break
-# 
-# # OVR_CAPI.h: 665
-# for _lib in _libs.itervalues():
-#     if not hasattr(_lib, 'ovrHmd_BeginFrameTiming'):
-#         continue
-#     ovrHmd_BeginFrameTiming = _lib.ovrHmd_BeginFrameTiming
-#     ovrHmd_BeginFrameTiming.argtypes = [hmd, c_uint]
-#     ovrHmd_BeginFrameTiming.restype = frame_timing
-#     break
-# 
-# # OVR_CAPI.h: 670
-# for _lib in _libs.itervalues():
-#     if not hasattr(_lib, 'ovrHmd_EndFrameTiming'):
-#         continue
-#     ovrHmd_EndFrameTiming = _lib.ovrHmd_EndFrameTiming
-#     ovrHmd_EndFrameTiming.argtypes = [hmd]
-#     ovrHmd_EndFrameTiming.restype = None
-#     break
-# 
-# # OVR_CAPI.h: 675
-# for _lib in _libs.itervalues():
-#     if not hasattr(_lib, 'ovrHmd_ResetFrameTiming'):
-#         continue
-#     ovrHmd_ResetFrameTiming = _lib.ovrHmd_ResetFrameTiming
-#     ovrHmd_ResetFrameTiming.argtypes = [hmd, c_uint]
-#     ovrHmd_ResetFrameTiming.restype = None
-#     break
-# 
-# # OVR_CAPI.h: 680
-# for _lib in _libs.itervalues():
-#     if not hasattr(_lib, 'ovrHmd_GetEyePose'):
-#         continue
-#     ovrHmd_GetEyePose = _lib.ovrHmd_GetEyePose
-#     ovrHmd_GetEyePose.argtypes = [hmd, ovrEyeType]
-#     ovrHmd_GetEyePose.restype = pose
-#     break
-# 
-# # OVR_CAPI.h: 687
-# for _lib in _libs.itervalues():
-#     if not hasattr(_lib, 'ovrHmd_GetEyeTimewarpMatrices'):
-#         continue
-#     ovrHmd_GetEyeTimewarpMatrices = _lib.ovrHmd_GetEyeTimewarpMatrices
-#     ovrHmd_GetEyeTimewarpMatrices.argtypes = [hmd, ovrEyeType, pose, mat4 * 2]
-#     ovrHmd_GetEyeTimewarpMatrices.restype = None
-#     break
+ovrFrameTiming_ = struct_ovrFrameTiming_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 371
 
-# # OVR_CAPI.h: 719
-# for _lib in _libs.itervalues():
-#     if not hasattr(_lib, 'ovrHmd_ProcessLatencyTest'):
-#         continue
-#     ovrHmd_ProcessLatencyTest = _lib.ovrHmd_ProcessLatencyTest
-#     ovrHmd_ProcessLatencyTest.argtypes = [hmd, c_ubyte * 3]
-#     ovrHmd_ProcessLatencyTest.restype = ovrBool
-#     break
-# 
-# # OVR_CAPI.h: 723
-# for _lib in _libs.itervalues():
-#     if not hasattr(_lib, 'ovrHmd_GetLatencyTestResult'):
-#         continue
-#     ovrHmd_GetLatencyTestResult = _lib.ovrHmd_GetLatencyTestResult
-#     ovrHmd_GetLatencyTestResult.argtypes = [hmd]
-#     if sizeof(c_int) == sizeof(c_void_p):
-#         ovrHmd_GetLatencyTestResult.restype = ReturnString
-#     else:
-#         ovrHmd_GetLatencyTestResult.restype = String
-#         ovrHmd_GetLatencyTestResult.errcheck = ReturnString
-#     break
-# 
-# # OVR_CAPI.h: 727
-# for _lib in _libs.itervalues():
-#     if not hasattr(_lib, 'ovrHmd_GetMeasuredLatencyTest2'):
-#         continue
-#     ovrHmd_GetMeasuredLatencyTest2 = _lib.ovrHmd_GetMeasuredLatencyTest2
-#     ovrHmd_GetMeasuredLatencyTest2.argtypes = [hmd]
-#     ovrHmd_GetMeasuredLatencyTest2.restype = c_double
-#     break
-# 
+ovrEyeRenderDesc_ = struct_ovrEyeRenderDesc_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 387
+
+ovrRenderAPIConfigHeader_ = struct_ovrRenderAPIConfigHeader_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 419
+
+ovrRenderAPIConfig_ = struct_ovrRenderAPIConfig_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 426
+
+ovrTextureHeader_ = struct_ovrTextureHeader_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 436
+
+ovrTexture_ = struct_ovrTexture_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 443
+
+ovrDistortionVertex_ = struct_ovrDistortionVertex_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 697
+
+ovrDistortionMesh_ = struct_ovrDistortionMesh_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 707
+
+ovrHSWDisplayState_ = struct_ovrHSWDisplayState_ # /home/bdavis/ctypesgen-read-only/OVR_CAPI.h: 813
+
+# No inserted files
+
