@@ -854,6 +854,8 @@ ovrDistortionCap_SRGB = 64
 
 ovrDistortionCap_Overdrive = 128
 
+ovrDistortionCap_HqDistortion = 0x100
+
 ovrDistortionCap_ProfileNoTimewarpSpinWaits = 65536
 
 ovrDistortionCaps = enum_anon_4
