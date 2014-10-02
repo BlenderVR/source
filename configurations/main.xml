@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<blenderVR>
+  <!-- Documentation can be found on blenderVR web site: http://blendervr.limsi.fr/doku.php?id=doc:config -->
+
+  <starter>
+    <config name='dual'>console, console bis</config>
+    <config name='console'>console</config>
+  </starter>
+
+  <users>
+    <user name="user A"/>
+  </users>
+
+  <computers>
+    <system>
+    </system>
+    <computer name='Any' hostname='*' />
+  </computers>
+
+  <screens>
+    <screen name="console" computer="Any">
+      <display options="-w 400 400">
+	<environment>DISPLAY=:0.0</environment>
+	<graphic_buffer buffer="alone" user='user A' eye="middle"/>
+      </display>
+      <wall>
+	<corner name="topRightCorner">1.0, 1.0, -1.0</corner>
+	<corner name="topLeftCorner">-1.0, 1.0, -1.0</corner>
+	<corner name="bottomRightCorner">1.0, -1.0, -1.0</corner>
+      </wall>
+    </screen>
+
+    <screen name="console bis" computer="Any">
+      <display options="-w 400 400">
+	<environment>DISPLAY=:0.0</environment>
+	<graphic_buffer user='user A'/>
+      </display>
+      <wall>
+	<corner name="topRightCorner">1.0, 1.0, -1.0</corner>
+	<corner name="topLeftCorner">-1.0, 1.0, -1.0</corner>
+	<corner name="bottomRightCorner">1.0, -1.0, -1.0</corner>
+      </wall>
+    </screen>
+
+  </screens>
+
+  <plugins>
+    <vrpn>
+      <floor x='0.0'/>
+      <tracker device="GTK" host="localhost">
+	<transformation>
+	  <post_translation z="-1.6"/>
+	  <post_rotation x="1.0" y="1.0" z="1.0" angle="`-2*math.pi/3`"/>
+	  <pre_rotation x="1.0" y="1.0" z="1.0" angle="`2*math.pi/3`"/>
+	</transformation>
+	<sensor id="0" processor_method='tracker_1'/>
+	<sensor id="1" processor_method='tracker_3'/>
+	<sensor id="2" processor_method='user_position' users='user A'/>
+	<sensor id="3" processor_method='tracker_2'/>
+      </tracker>
+      <analog device="GTK" host="localhost" processor_method="movements"/>
+      <button device="GTK" host="localhost" processor_method="buttons"/>
+    </vrpn>
+    <osc host='194.57.41.131' port='3819' configuration='ambisonic EVE'>
+      <user listener='binaural 1' viewer='user A' />
+      <user listener='Ambisonic' />
+      <room warmth='32' />
+    </osc>
+  </plugins>
+</blenderVR>

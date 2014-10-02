@@ -1,0 +1,568 @@
+diff -ruN -x .depend -x python -x vrpn_GTK -x pc_linux64 vrpn_7.30/CMakeLists.txt current/CMakeLists.txt
+--- vrpn_7.30/CMakeLists.txt	2012-03-17 20:45:20.000000000 +0100
++++ current/CMakeLists.txt	2012-06-20 09:45:47.758643026 +0200
+@@ -591,6 +591,7 @@
+ 	vrpn_Button_NI_DIO24.C
+ 	vrpn_Button_USB.cpp
+ 	vrpn_CerealBox.C
++	vrpn_DevInput.C
+ 	vrpn_DirectXFFJoystick.C
+ 	vrpn_DirectXRumblePad.C
+ 	vrpn_DreamCheeky.C
+@@ -671,6 +672,7 @@
+ 	vrpn_Button_NI_DIO24.h
+ 	vrpn_Button_USB.h
+ 	vrpn_CerealBox.h
++	vrpn_DevInput.h
+ 	vrpn_DirectXFFJoystick.h
+ 	vrpn_DirectXRumblePad.h
+ 	vrpn_DreamCheeky.h
+diff -ruN -x .depend -x python -x vrpn_GTK -x pc_linux64 vrpn_7.30/Makefile current/Makefile
+--- vrpn_7.30/Makefile	2012-03-17 20:45:20.000000000 +0100
++++ current/Makefile	2012-06-20 09:48:50.174645213 +0200
+@@ -294,12 +294,12 @@
+ 
+ ifeq ($(HW_OS),pc_linux)
+ 	# The following is for the InterSense and Freespace libraries.
+-	SYS_INCLUDE := -DUNIX -DLINUX -I../libfreespace/include -I./submodules/hidapi/hidapi -I/usr/include/libusb-1.0
++	SYS_INCLUDE := -DUNIX -DLINUX -I../libfreespace/include -I./submodules/hidapi/hidapi -I/usr/include/libusb-1.0 -DHAVE_DEV_INPUT
+ endif
+ 
+ ifeq ($(HW_OS),pc_linux64)
+ 	# The following is for the InterSense and Freespace libraries.
+-	SYS_INCLUDE := -DUNIX -DLINUX -I../libfreespace/include -I./submodules/hidapi/hidapi -I/usr/include/libusb-1.0
++	SYS_INCLUDE := -DUNIX -DLINUX -I../libfreespace/include -I./submodules/hidapi/hidapi -I/usr/include/libusb-1.0 -DHAVE_DEV_INPUT
+ endif
+ 
+ ifeq ($(HW_OS),pc_linux_arm)
+@@ -723,6 +723,15 @@
+ 	vrpn_Xkeys.h \
+ 	vrpn_Zaber.h
+ 
++ifeq ($(HW_OS), pc_linux64)
++	SLIB_FILES += vrpn_DevInput.C
++	SLIB_INCLUDES += vrpn_DevInput.h
++endif
++ifeq ($(HW_OS), pc_linux)
++	SLIB_FILES += vrpn_DevInput.C
++	SLIB_INCLUDES += vrpn_DevInput.h
++endif
++
+ $(SLIB_OBJECTS):
+ $(OBJECT_DIR)/libvrpnserver.a: $(MAKEFILE) $(SLIB_OBJECTS)
+ 	$(AR) $(OBJECT_DIR)/libvrpnserver.a $(SLIB_OBJECTS)
+diff -ruN -x .depend -x python -x vrpn_GTK -x pc_linux64 vrpn_7.30/server_src/Makefile current/server_src/Makefile
+--- vrpn_7.30/server_src/Makefile	2012-03-17 20:45:21.000000000 +0100
++++ current/server_src/Makefile	2012-06-20 09:51:19.022647013 +0200
+@@ -246,6 +246,15 @@
+ override LFLAGS += $(PHASESPACE) $(EXTRAOPTS)
+ endif
+ 
++ifeq ($(HW_OS),pc_linux64)
++	override CFLAGS += -DHAVE_DEV_INPUT
++	override CXXFLAGS += -DHAVE_DEV_INPUT
++endif
++ifeq ($(HW_OS),pc_linux)
++	override CFLAGS += -DHAVE_DEV_INPUT
++	override CXXFLAGS += -DHAVE_DEV_INPUT
++endif
++
+ .SUFFIXES: .cpp
+ 
+ .C.o:
+diff -ruN -x .depend -x python -x vrpn_GTK -x pc_linux64 vrpn_7.30/server_src/vrpn.cfg current/server_src/vrpn.cfg
+--- vrpn_7.30/server_src/vrpn.cfg	2012-03-17 20:45:21.000000000 +0100
++++ current/server_src/vrpn.cfg	2012-06-20 10:19:59.614667496 +0200
+@@ -1542,6 +1542,30 @@
+ #vrpn_Keyboard	Keyboard0
+ 
+ ################################################################################
++# WARNING : LINUX ONLY !
++# Open the /dev/input devices and treat them as mouse events
++# There is as many as available channel (kernel 2.6.38 : 10 channels)
++#
++# There is three argument:
++#	char	name_of_this_device[] 
++#	char	"name of the hardware device"
++#	char	type of the device (must be one of "keyboard", "absolute" and "relative"
++#	int	in case of keyboard : the total number of keys ; in case of absolute mouse : size of the window (ie. to normalize the result)
++# The "name of the hardware device" is the Name entry of the device
++# from /proc/bus/input/devices
++# Due to hardware access through /dev/input/*, there is no notion of window.
++# Thus, you must specify the window size. If '-1' is provided, then, this device
++# only provide relative displacement of the channel
++#
++# Keyboard are standard keyboard (ie : the one on which you type elements
++# Absolute are pointing devices such as touchpad : the position of the pointer is absolute regarding the size of the touch pad
++# Relative are pointing devices such as mouse : the position of the pointer is a relative displacement regarding previous position
++#
++# BEWARE that you must have read access to the wanted device
++
++#vrpn_DevInput           Input0          "AT Translated keyboard" keyboard 255
++
++################################################################################
+ # MotionNode inertial tracking system.
+ #
+ # There are four arguments:
+diff -ruN -x .depend -x python -x vrpn_GTK -x pc_linux64 vrpn_7.30/server_src/vrpn_Generic_server_object.C current/server_src/vrpn_Generic_server_object.C
+--- vrpn_7.30/server_src/vrpn_Generic_server_object.C	2012-03-17 20:45:21.000000000 +0100
++++ current/server_src/vrpn_Generic_server_object.C	2012-06-20 10:12:31.474662157 +0200
+@@ -2215,6 +2215,53 @@
+ 
+ }
+ 
++#ifdef HAVE_DEV_INPUT
++//================================
++int vrpn_Generic_Server_Object::setup_DevInput (char * & pch, char * line, FILE * config_file) {
++  char s2 [LINESIZE], s3 [LINESIZE] , s4 [LINESIZE];
++    int int_param = 0;
++    vrpn_DevInput * dev_input;
++    next();
++
++
++    // Get the arguments (class, dev_input_name)
++    if (sscanf(pch,"%511s \"%[^\"]\" %s %d",s2, s3, s4, &int_param) != 4) {
++        if (sscanf(pch,"%511s \"%[^\"]\" %s",s2, s3, s4) != 3) {
++            fprintf(stderr,"Bad vrpn_DevInput line: %s\n",line);
++	    return -1;
++	}
++    }
++
++    // Make sure there's room for a new dev_input
++    if (num_dev_inputs >= VRPN_GSO_MAX_DEV_INPUTS) {
++        fprintf(stderr,"Too many dev_inputs (mice) in config file");
++        return -1;
++    }
++
++    // Open the box
++    if (verbose)
++        printf("Opening vrpn_DevInput: %s\n",s2);
++
++    try {
++      dev_input = new vrpn_DevInput(s2, connection, s3, s4, int_param);
++    }
++    catch (char *&error) {
++        fprintf( stderr, "could not create vrpn_DevInput : %s\n", error );
++	return -1;
++    }
++    catch (...) {
++	fprintf( stderr, "could not create vrpn_DevInput\n" );
++	return -1;
++    }
++    if (NULL == dev_input) {
++        fprintf(stderr,"Can't create new vrpn_DevInput\n");
++        return -1;
++    }
++    dev_inputs[num_dev_inputs++] = dev_input;
++    return 0;
++}
++#endif
++
+ //================================
+ int vrpn_Generic_Server_Object::setup_Joylin (char * & pch, char * line, FILE * config_file)
+ {
+@@ -4768,6 +4815,9 @@
+   num_analogouts (0),
+   num_DTracks (0),
+   num_posers (0),
++#ifdef HAVE_DEV_INPUT
++  num_dev_inputs(0),
++#endif
+   num_mouses (0)
+   , num_inertiamouses (0)
+   , num_Keyboards (0)
+@@ -4925,6 +4975,10 @@
+         CHECK (setup_Wanda);
+       } else if (isit ("vrpn_Mouse")) {
+         CHECK (setup_Mouse);
++#ifdef HAVE_DEV_INPUT
++      } else if (isit("vrpn_DevInput")) {
++	CHECK(setup_DevInput);
++#endif
+       } else if (isit ("vrpn_Tng3")) {
+         CHECK (setup_Tng3);
+       } else if (isit ("vrpn_TimeCode_Generator")) {
+@@ -5200,6 +5254,13 @@
+     mouses[i]->mainloop();
+   }
+ 
++#ifdef HAVE_DEV_INPUT
++  // Let all the dev input devices do their thing
++  for (i=0; i< num_dev_inputs; i++) {
++    dev_inputs[i]->mainloop();
++  }
++#endif
++
+   // Let all the Loggers do their thing
+   for (i = 0; i < num_loggers; i++) {
+     loggers[i]->mainloop();
+diff -ruN -x .depend -x python -x vrpn_GTK -x pc_linux64 vrpn_7.30/server_src/vrpn_Generic_server_object.h current/server_src/vrpn_Generic_server_object.h
+--- vrpn_7.30/server_src/vrpn_Generic_server_object.h	2012-03-17 20:45:21.000000000 +0100
++++ current/server_src/vrpn_Generic_server_object.h	2012-06-20 10:41:45.154683028 +0200
+@@ -63,6 +63,9 @@
+ #include "vrpn_nikon_controls.h"
+ #include "vrpn_Poser_Tek4662.h"
+ #include "vrpn_Mouse.h"
++#ifdef HAVE_DEV_INPUT
++#include "vrpn_DevInput.h"
++#endif
+ #include "vrpn_Tracker_Crossbow.h"
+ #include "vrpn_3DMicroscribe.h"
+ #include "vrpn_5DT16.h"
+@@ -138,6 +141,9 @@
+ const int VRPN_GSO_MAX_DTRACKS =              5;
+ const int VRPN_GSO_MAX_POSER =	              8;
+ const int VRPN_GSO_MAX_MOUSES =	              8;
++#ifdef HAVE_DEV_INPUT
++const int VRPN_GSO_MAX_DEV_INPUTS =           16;
++#endif
+ const int VRPN_GSO_MAX_KEYBOARD =             1;
+ const int VRPN_GSO_MAX_LOGGER =               10;
+ const int VRPN_GSO_MAX_IMAGE_STREAM =         10;
+@@ -226,6 +232,10 @@
+     int		num_posers;
+     vrpn_Mouse	* mouses [VRPN_GSO_MAX_MOUSES];
+     int		num_mouses;
++#ifdef HAVE_DEV_INPUT
++    vrpn_DevInput       * dev_inputs [VRPN_GSO_MAX_DEV_INPUTS];
++    int		num_dev_inputs;
++#endif
+     vrpn_Keyboard * Keyboards [VRPN_GSO_MAX_KEYBOARD];
+     int		num_Keyboards;
+     vrpn_Auxiliary_Logger_Server_Generic * loggers [VRPN_GSO_MAX_LOGGER];
+@@ -300,6 +310,9 @@
+     int setup_JoyFly (char * & pch, char * line, FILE * config_file);
+     int setup_Tracker_3DMouse (char * & pch, char * line, FILE * config_file);
+     int setup_Mouse (char * & pch, char * line, FILE * config_file);
++#ifdef HAVE_DEV_INPUT
++    int setup_DevInput (char * & pch, char * line, FILE * config_file);
++#endif
+     int setup_Tracker_Crossbow (char * & pch, char * line, FILE * config_file);
+     int setup_3DMicroscribe (char * & pch, char * line, FILE * config_file);
+     int setup_5dt16 (char * & pch, char * line, FILE * config_file);
+diff -ruN -x .depend -x python -x vrpn_GTK -x pc_linux64 vrpn_7.30/vrpn_DevInput.C current/vrpn_DevInput.C
+--- vrpn_7.30/vrpn_DevInput.C	1970-01-01 01:00:00.000000000 +0100
++++ current/vrpn_DevInput.C	2012-06-20 09:46:07.542643296 +0200
+@@ -0,0 +1,226 @@
++/* file:	vrpn_DevInput.cpp
++ * author:	Mike Weiblen mew@mew.cx 2004-01-14
++ * copyright:	(C) 2003,2004 Michael Weiblen
++ * license:	Released to the Public Domain.
++ * depends:	gpm 1.19.6, VRPN 06_04
++ * tested on:	Linux w/ gcc 2.95.4
++ * references:  http://mew.cx/ http://vrpn.org/
++ *              http://linux.schottelius.org/gpm/
++*/
++
++#include "vrpn_DevInput.h"
++
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <fcntl.h>
++#include <linux/input.h>
++#include <string.h>
++#include <errno.h>
++#include <sys/ioctl.h>
++
++#include <iostream>
++#include <map>
++#include <string>
++#include <sstream>
++
++static const std::string &getDeviceNodes(const std::string &device_name) {
++  static std::map<std::string, std::string> s_devicesNodes;
++  static bool s_initialized = false;
++
++  static std::string default_node="unknown";
++
++  if (!s_initialized) {
++    bool permission_missing = false;
++    unsigned int id = 0;
++    while (1) {
++      std::ostringstream oss;
++      oss << "/dev/input/event" << id;
++
++      int fd = open(oss.str().c_str(), O_RDONLY);
++      if(fd >= 0){
++	char name[512];
++	if(ioctl(fd, EVIOCGNAME(sizeof(name)), name) >= 0) {
++	  s_devicesNodes[name] = oss.str();
++	}
++
++	close(fd);
++      } else {
++	if (errno == ENOENT) break;
++	if (errno == EACCES) permission_missing = true;
++      }
++      errno = 0;
++      id++;
++    }
++    s_initialized = true;
++    if (permission_missing) {
++      std::cout << "vrpn_DevInput device scan warning : permission denied for some nodes !" << std::endl;
++    }
++  }
++
++  std::map<std::string, std::string>::iterator node_name = s_devicesNodes.find(device_name);
++  if (node_name != s_devicesNodes.end()) {
++    return node_name->second;
++  }
++
++
++  throw (std::string("Cannot find the device: ") + device_name).c_str();
++}
++
++///////////////////////////////////////////////////////////////////////////
++
++vrpn_DevInput::vrpn_DevInput( const char* name, vrpn_Connection * cxn, const char *device_name, const char * type, int int_param ) :
++  vrpn_Analog( name, cxn ),
++  vrpn_Button_Filter( name, cxn )
++{
++  int i;
++
++  if (strcmp(type, "keyboard") == 0) {
++    d_type = DEVICE_KEYBOARD;
++  } else if (strcmp(type, "absolute") == 0) {
++    d_type = DEVICE_MOUSE_ABSOLUTE;
++  } else if (strcmp(type, "relative") == 0) {
++    d_type = DEVICE_MOUSE_RELATIVE;
++  } else {
++    throw (char *)"Third parameter must be keyboard, absolute or relative";
++  }
++
++  vrpn_Button_Filter::num_buttons = 0;
++  vrpn_Analog::num_channel        = 0;
++
++  switch (d_type) {
++  case DEVICE_KEYBOARD:
++    if ((int_param < 1) || (int_param >= vrpn_BUTTON_MAX_BUTTONS)) {
++      throw (char *)"In case of keyboard, the value must be between 1 and 256";
++    }
++    vrpn_Button_Filter::num_buttons = int_param;
++    break;
++  case DEVICE_MOUSE_ABSOLUTE:
++    vrpn_Analog::num_channel = REL_MAX;
++    vrpn_Button_Filter::num_buttons = 0x50;
++    d_absolute_min = 0;
++    d_absolute_range = int_param;
++    break;
++  case DEVICE_MOUSE_RELATIVE:
++    vrpn_Analog::num_channel = ABS_MAX;
++    vrpn_Button_Filter::num_buttons = 0x50;
++    break;
++  };
++
++  // initialize the vrpn_Analog
++  for( i = 0; i < vrpn_Analog::num_channel; i++) {
++    vrpn_Analog::channel[i] = vrpn_Analog::last[i] = 0;
++  }
++
++  // initialize the vrpn_Button_Filter
++  for( i = 0; i < vrpn_Button_Filter::num_buttons; i++) {
++    vrpn_Button_Filter::buttons[i] = vrpn_Button_Filter::lastbuttons[i] = 0;
++  }
++
++  std::string node = getDeviceNodes(device_name);
++
++  d_fileDescriptor = open(node.c_str(), O_RDONLY);
++  if(d_fileDescriptor < 0){
++    throw (std::string("Cannot open the device: ") + device_name + std::string(strerror(errno))).c_str();
++  }
++}
++
++///////////////////////////////////////////////////////////////////////////
++
++vrpn_DevInput::~vrpn_DevInput()
++{
++  if (d_fileDescriptor >= 0) {
++    close(d_fileDescriptor);
++  }
++  d_fileDescriptor = -1;
++}
++
++///////////////////////////////////////////////////////////////////////////
++
++void vrpn_DevInput::mainloop()
++{
++  get_report();
++
++  server_mainloop();
++
++  report_changes();
++}
++
++///////////////////////////////////////////////////////////////////////////
++
++int vrpn_DevInput::get_report()
++{
++  fd_set readset;
++
++  if (d_fileDescriptor < 0) {
++    return 0;
++  }
++
++  FD_ZERO( &readset );
++  FD_SET( d_fileDescriptor, &readset );
++  struct timeval timeout = { 0, 0 };
++  select( d_fileDescriptor+1, &readset, NULL, NULL, &timeout );
++
++  gettimeofday( &timestamp, NULL );
++
++  if( ! FD_ISSET( d_fileDescriptor, &readset ) )
++    return 0;
++
++  struct input_event event;
++  if (read(d_fileDescriptor, &event, sizeof(event)) < sizeof(event)) {
++    return 0;
++  }
++
++  switch (event.type) {
++  case EV_KEY: {
++    int button_number = event.code;
++    if ((d_type == DEVICE_MOUSE_RELATIVE) || (d_type == DEVICE_MOUSE_ABSOLUTE)) {
++      button_number -= BTN_MOUSE;
++    }
++    if ((button_number >= 0) && (button_number < vrpn_Button_Filter::num_buttons)) {
++      buttons[button_number] = event.value;
++    }
++  } break;
++  case EV_REL: {
++    int channel_number = event.code;
++    if ((channel_number >= 0) && (channel_number < vrpn_Analog::num_channel)) {
++      for (unsigned int i = 0 ; i < vrpn_Analog::num_channel ; i++) {
++	vrpn_Analog::last[i] = 0;
++      }
++      vrpn_Analog::channel[channel_number] = (vrpn_float64)event.value;
++    }
++  } break;
++  case EV_ABS:
++    int channel_number = event.code;
++    if ((channel_number >= 0) && (channel_number < vrpn_Analog::num_channel)) {
++      vrpn_float64 value = ((vrpn_float64)event.value - d_absolute_min) / d_absolute_range;
++      vrpn_Analog::channel[channel_number] = value;
++    }
++    break;
++  };
++
++  return 1;
++}
++
++///////////////////////////////////////////////////////////////////////////
++
++void vrpn_DevInput::report_changes( vrpn_uint32 class_of_service )
++{
++  vrpn_Analog::timestamp = timestamp;
++  vrpn_Button_Filter::timestamp = timestamp;
++
++  vrpn_Analog::report_changes( class_of_service );
++  vrpn_Button_Filter::report_changes();
++}
++
++///////////////////////////////////////////////////////////////////////////
++
++void vrpn_DevInput::report( vrpn_uint32 class_of_service )
++{
++  vrpn_Analog::timestamp = timestamp;
++  vrpn_Button_Filter::timestamp = timestamp;
++
++  vrpn_Analog::report( class_of_service );
++  vrpn_Button_Filter::report_changes();
++}
++
++/*EOF*/
+diff -ruN -x .depend -x python -x vrpn_GTK -x pc_linux64 vrpn_7.30/vrpn_DevInput.h current/vrpn_DevInput.h
+--- vrpn_7.30/vrpn_DevInput.h	1970-01-01 01:00:00.000000000 +0100
++++ current/vrpn_DevInput.h	2012-06-20 09:46:07.546643301 +0200
+@@ -0,0 +1,92 @@
++#ifndef VRPN_DEV_INPUT_H
++#define VRPN_DEV_INPUT_H
++
++///////////////////////////////////////////////////////////////////////////
++// This file contains a distillation of the various DevInput classes that had
++// been spread throughout VRPN.  The interfaces have been rationalized, so
++// that they are the same between operating systems and are factored into
++// independent interfaces.
++///////////////////////////////////////////////////////////////////////////
++
++/* file:	vrpn_DevInput.h
++ * author:	Mike Weiblen mew@mew.cx 2004-01-14
++ * copyright:	(C) 2003,2004 Michael Weiblen
++ * license:	Released to the Public Domain.
++ * depends:	gpm 1.19.6, VRPN 06_04
++ * tested on:	Linux w/ gcc 2.95.4
++ * references:  http://mew.cx/ http://vrpn.org/
++ *              http://linux.schottelius.org/gpm/
++*/
++
++///////////////////////////////////////////////////////////////////////////
++// vrpn_DevInput is a VRPN server class to publish events from the PC's input.
++// It provides a 2-channel vrpn_Analog for X & Y input motion, and a
++// 3-channel vrpn_Button for the input buttons.
++//
++// vrpn_DevInput makes it easy to use the diverse array of commodity input
++// devices that masquerade as a input, such as PS/2 trackballs, gyroscopic
++// free-space pointers, and force-sensing touchpads.
++//
++// This version includes a Linux-specific implementation that leverages the Linux GPM
++// (General Purpose DevInput) server to handle the low-level hardware interfaces
++// and device protocols.  GPM is commonly included in Linux distributions.
++// The GPM homepage is http://linux.schottelius.org/gpm/
++//
++// It also includes a Windows interface to the input.
++//
++// The interface reports input position in fraction of the screen.
++// The previous version of the Windows implementation had reported them
++// in pixels, but this has been changed to match on both platforms.
++// 
++// vrpn_DevInput must be run on a Linux console, not an xterm.  Rationale:
++// 1) Since the console environment doesn't presume the existance of a input,
++//    it avoids issues about mapping input events to window focus, etc.
++// 2) With the input movement controlled by a different user, it's really
++//    not possible to also use a input-based user interface anyway.
++// 3) My VRPN server machine is headless, and doesn't even have an X server.
++///////////////////////////////////////////////////////////////////////////
++
++#include "vrpn_Analog.h"
++#include "vrpn_Button.h"
++#include "linux/input.h"
++
++class VRPN_API vrpn_DevInput :
++	public vrpn_Analog,
++	public vrpn_Button_Filter
++{
++    enum DEVICE_TYPE { DEVICE_KEYBOARD, DEVICE_MOUSE_RELATIVE, DEVICE_MOUSE_ABSOLUTE } d_type;
++
++public:
++    vrpn_DevInput( const char* name, vrpn_Connection* cxn, const char *device, const char *type, int mouse_length );
++    virtual ~vrpn_DevInput();
++
++    virtual void mainloop();
++
++protected:  // methods
++    /// Try to read reports from the device.
++    /// Returns 1 if msg received, or 0 if none received.
++    virtual int get_report();
++
++    /// send report iff changed
++    virtual void report_changes( vrpn_uint32 class_of_service
++		    = vrpn_CONNECTION_LOW_LATENCY );
++
++    /// send report whether or not changed
++    virtual void report( vrpn_uint32 class_of_service
++		    = vrpn_CONNECTION_LOW_LATENCY );
++
++protected:  // data
++    struct timeval timestamp;	///< time of last report from device
++
++private:  // disable unwanted default methods
++    vrpn_DevInput();
++    vrpn_DevInput(const vrpn_DevInput&);
++    const vrpn_DevInput& operator=(const vrpn_DevInput&);
++
++ private:
++    int d_fileDescriptor;
++    vrpn_float64 d_absolute_min;
++    vrpn_float64 d_absolute_range;
++};
++
++#endif

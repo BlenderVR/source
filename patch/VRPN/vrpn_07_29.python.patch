@@ -1,0 +1,3059 @@
+diff -ruN -x .depend vrpn_07_29/CMakeLists.txt current/CMakeLists.txt
+--- vrpn_07_29/CMakeLists.txt	2011-05-23 18:32:15.000000000 +0200
++++ current/CMakeLists.txt	2012-02-24 14:57:29.388107423 +0100
+@@ -499,6 +499,7 @@
+ 	vrpn_HumanInterface.C
+ 	vrpn_Imager_Stream_Buffer.C
+ 	vrpn_ImmersionBox.C
++	vrpn_DevInput.C
+ 	vrpn_inertiamouse.C
+ 	vrpn_JoyFly.C
+ 	vrpn_Joylin.C
+@@ -575,6 +576,7 @@
+ 	vrpn_HumanInterface.h
+ 	vrpn_Imager_Stream_Buffer.h
+ 	vrpn_ImmersionBox.h
++	vrpn_DevInput.h
+ 	vrpn_inertiamouse.h
+ 	vrpn_JoyFly.h
+ 	vrpn_Joylin.h
+diff -ruN -x .depend vrpn_07_29/Makefile current/Makefile
+--- vrpn_07_29/Makefile	2011-05-23 18:32:15.000000000 +0200
++++ current/Makefile	2012-02-28 12:31:09.989421749 +0100
+@@ -285,12 +285,12 @@
+ 
+ ifeq ($(HW_OS),pc_linux)
+ 	# The following is for the InterSense and Freespace libraries.
+-	SYS_INCLUDE := -DUNIX -DLINUX -I../libfreespace/include -I./submodules/hidapi/hidapi -I/usr/include/libusb-1.0
++	SYS_INCLUDE := -DUNIX -DLINUX -I../libfreespace/include -I./submodules/hidapi/hidapi -I/usr/include/libusb-1.0 -DHAVE_DEV_INPUT
+ endif
+ 
+ ifeq ($(HW_OS),pc_linux64)
+ 	# The following is for the InterSense and Freespace libraries.
+-	SYS_INCLUDE := -DUNIX -DLINUX -I../libfreespace/include -I./submodules/hidapi/hidapi -I/usr/include/libusb-1.0
++	SYS_INCLUDE := -DUNIX -DLINUX -I../libfreespace/include -I./submodules/hidapi/hidapi -I/usr/include/libusb-1.0 -DHAVE_DEV_INPUT
+ endif
+ 
+ ifeq ($(HW_OS),pc_linux_arm)
+@@ -697,6 +697,15 @@
+ 	vrpn_Xkeys.h \
+ 	vrpn_Zaber.h
+ 
++ifeq ($(HW_OS), pc_linux64)
++	SLIB_FILES += vrpn_DevInput.C
++	SLIB_INCLUDES += vrpn_DevInput.h
++endif
++ifeq ($(HW_OS), pc_linux)
++	SLIB_FILES += vrpn_DevInput.C
++	SLIB_INCLUDES += vrpn_DevInput.h
++endif
++
+ $(SLIB_OBJECTS):
+ $(OBJECT_DIR)/libvrpnserver.a: $(MAKEFILE) $(SLIB_OBJECTS)
+ 	$(AR) $(OBJECT_DIR)/libvrpnserver.a $(SLIB_OBJECTS)
+diff -ruN -x .depend vrpn_07_29/python/Base.cpp current/python/Base.cpp
+--- vrpn_07_29/python/Base.cpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/Base.cpp	2012-02-28 10:01:04.329423627 +0100
+@@ -0,0 +1,15 @@
++#include "include/Base.hpp"
++#include "include/Connection.hpp"
++#include <iostream>
++
++namespace vrpn_python {
++  BaseException::BaseException(const std::string &reason) : d_reason(reason) {
++  }
++
++  void BaseException::launch(const std::string &reason) {
++    throw BaseException(reason);
++  }
++
++  Base::Base(PyObject *error) : d_error(error) {
++  }
++}
+diff -ruN -x .depend vrpn_07_29/python/callback.cpp current/python/callback.cpp
+--- vrpn_07_29/python/callback.cpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/callback.cpp	2012-02-28 10:01:04.329423627 +0100
+@@ -0,0 +1,116 @@
++#include "include/callback.hpp"
++#include "include/Device.hpp"
++#include <map>
++#include <vrpn_Tracker.h>
++
++namespace vrpn_python {
++
++  class callbackEntry {
++    PyObject *d_userdata;
++    PyObject *d_callback;
++    int d_counterReference;
++
++  public:
++    callbackEntry(PyObject *userdata, PyObject *callback);
++    callbackEntry(const callbackEntry &other);
++    ~callbackEntry();
++
++    bool operator == (const callbackEntry &other) const;
++    bool operator < (const callbackEntry &other) const;
++    bool operator > (const callbackEntry &other) const;
++
++    PyObject *getUserData() { return d_userdata ; }
++    PyObject *getCallback() { return d_callback ; }
++
++    void incrementReference() { d_counterReference ++ ; }
++    void decrementReference() { d_counterReference -- ; }
++    int getCounterReference() const { return d_counterReference ; }
++  };
++
++  static std::map<callbackEntry, callbackEntry *> s_callbacks;
++
++  callbackEntry::callbackEntry(PyObject *data, PyObject *callback) :
++    d_userdata(data), d_callback(callback), d_counterReference(0) {
++  }
++
++  callbackEntry::callbackEntry(const callbackEntry &other) :
++    d_userdata(other.d_userdata), d_callback(other.d_callback), d_counterReference(0) {
++  }
++
++  callbackEntry::~callbackEntry() {
++  }
++
++  bool callbackEntry::operator == (const callbackEntry &other) const {
++    return ((other.d_userdata == d_userdata) && (other.d_callback == d_callback));
++  }
++
++  bool callbackEntry::operator < (const callbackEntry &other) const {
++    if (d_userdata < other.d_userdata) return true;
++    if (d_userdata > other.d_userdata) return false;
++    return (d_callback < other.d_callback);
++  }
++
++  bool callbackEntry::operator > (const callbackEntry &other) const {
++    if (d_userdata > other.d_userdata) return true;
++    if (d_userdata < other.d_userdata) return false;
++    return (d_callback > other.d_callback);
++  }
++
++  Callback::Callback(PyObject *userdata, PyObject *callback) : d_userdata(userdata), d_callback(callback) {
++    Py_INCREF(d_userdata);
++    Py_INCREF(d_callback);
++
++    callbackEntry entry(d_userdata, d_callback);
++
++    std::map<callbackEntry, callbackEntry *>::iterator position = s_callbacks.find(entry);
++
++    if (position != s_callbacks.end()) {
++      d_entry = position->second;
++    } else {
++      d_entry = new callbackEntry(entry);
++    }
++  }
++
++  Callback::Callback(void *data) {
++    d_entry = (callbackEntry *)data;
++    d_userdata = d_entry->getUserData();
++    d_callback = d_entry->getCallback();
++
++    Py_INCREF(d_userdata);
++    Py_INCREF(d_callback);
++  }
++
++  Callback::~Callback() {
++    std::map<callbackEntry, callbackEntry *>::iterator position = s_callbacks.find(*d_entry);
++    if (d_entry->getCounterReference() < 1) {
++      if (position != s_callbacks.end()) {
++	s_callbacks.erase(position);
++	Py_DECREF(d_userdata);
++	Py_DECREF(d_callback);
++      }
++      delete d_entry;
++    } else {
++      if (position == s_callbacks.end()) {
++	Py_INCREF(d_userdata);
++	Py_INCREF(d_callback);
++	s_callbacks[*d_entry] = d_entry;
++      }
++    }
++    Py_DECREF(d_userdata);
++    Py_DECREF(d_callback);
++  }
++    
++  void Callback::increment() {
++    d_entry->incrementReference();
++  }
++
++  void Callback::decrement() {
++    d_entry->decrementReference();
++  }
++
++  void Callback::get(void *pointer, PyObject *&userdata, PyObject *&callback) {
++    callbackEntry* entry = (callbackEntry*)pointer; 
++    userdata = entry->getUserData();
++    callback = entry->getCallback();
++  }
++}
+diff -ruN -x .depend vrpn_07_29/python/Connection.cpp current/python/Connection.cpp
+--- vrpn_07_29/python/Connection.cpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/Connection.cpp	2012-02-28 10:01:04.289423627 +0100
+@@ -0,0 +1,13 @@
++#include "include/Connection.hpp"
++#include <iostream>
++
++namespace vrpn_python {
++
++  bool Connection::check(const PyObject *other) {
++    return (strcmp(other->ob_type->tp_name, "vrpn.Connection") == 0);
++  }
++
++  bool Connection_IP::check(const PyObject *other) {
++    return (strcmp(other->ob_type->tp_name, "vrpn.Connection_IP") == 0);
++  }
++}
+diff -ruN -x .depend vrpn_07_29/python/Device.cpp current/python/Device.cpp
+--- vrpn_07_29/python/Device.cpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/Device.cpp	2012-02-28 11:05:25.819422822 +0100
+@@ -0,0 +1,116 @@
++#include "include/Device.hpp"
++#include "include/Connection.hpp"
++#include "include/tools.hpp"
++#include "include/callback.hpp"
++#include <datetime.h>
++#include <iostream>
++
++namespace vrpn_python {
++
++  PyObject *Device::s_error = NULL;
++
++  DeviceException::DeviceException(const std::string &reason) : BaseException(reason) {
++  }
++
++  void DeviceException::launch(const std::string &reason) {
++    throw DeviceException(reason);
++  }
++
++  Device::Device(PyObject *error, PyObject * args) : Base(error), d_connection(NULL) {
++    if (args) {
++      char *deviceName = NULL;
++      PyObject *connection = NULL;
++      if (!PyArg_ParseTuple(args,"s|O",&deviceName, &connection)) {
++	std::string error = "Invalid call : ";
++	error +=
++#if PY_MAJOR_VERSION >= 3
++	  ob_base.
++#endif
++	  ob_type->tp_name;
++	error += "(name, connection = NULL) !";
++	DeviceException::launch(error);
++	return;
++      }
++
++      d_deviceName = deviceName;
++
++      if (connection) {
++	if (!Connection::check(connection)) {
++	  std::string error = "Invalid call : ";
++	  error += 
++#if PY_MAJOR_VERSION >= 3
++	    ob_base.
++#endif
++	    ob_type->tp_name;
++	  error += "(name, connection = NULL): second argument must be a connexion !";
++	  DeviceException::launch(error);
++	  return;
++	}
++	d_connection = (Connection *)connection;
++      }
++    }
++  }
++
++  Device::~Device() {
++    while (d_callbacks.size() > 0) {
++      Callback cb(d_callbacks.back());
++      cb.decrement();
++      d_callbacks.pop_back();
++    }
++  }
++
++  void Device::addCallback(void *callback) {
++    d_callbacks.push_back(callback);
++  }
++
++  void Device::removeCallback(void *callback) {
++    std::vector<void *>::iterator it = d_callbacks.begin();
++    while (it != d_callbacks.end()) {
++      if (*it == callback) {
++	break;
++      }
++      it++;
++    }
++    if (it != d_callbacks.end()) {
++      d_callbacks.erase(it);
++    }
++  }
++
++  bool Device::init_device_common_objects(PyObject* vrpn_module) {
++    s_error = PyErr_NewException("vrpn.error", NULL, NULL);
++    if (!s_error) {
++      return false;
++    }
++    Py_INCREF(s_error);
++    PyModule_AddObject(vrpn_module, "error", s_error);
++
++    PyDateTime_IMPORT;
++    return true;
++  }
++
++  PyObject *Device::getDateTimeFromTimeval(const struct timeval &time) {
++    const time_t seconds = time.tv_sec;
++    struct tm* t = gmtime ( &seconds );
++    if (t) {
++      return PyDateTime_FromDateAndTime(t->tm_year+1900, t->tm_mon+1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, time.tv_usec);
++    }
++    return NULL;
++  }
++
++  bool Device::getTimevalFromDateTime(PyObject *py_time, struct timeval &tv_time) {
++    if ((!py_time) || (!PyDateTime_Check(py_time))) {
++      return false;
++    }
++    struct tm t;
++    t.tm_year = PyDateTime_GET_YEAR(py_time) - 1900;
++    t.tm_mon  = PyDateTime_GET_MONTH(py_time) - 1;
++    t.tm_mday = PyDateTime_GET_DAY(py_time);
++    t.tm_hour = PyDateTime_DATE_GET_HOUR(py_time);
++    t.tm_min  = PyDateTime_DATE_GET_MINUTE(py_time);
++    t.tm_sec  = PyDateTime_DATE_GET_SECOND(py_time);
++
++    tv_time.tv_sec  = mktime(&t);
++    tv_time.tv_usec = PyDateTime_DATE_GET_MICROSECOND(py_time);
++    return true;
++  }
++}
+diff -ruN -x .depend vrpn_07_29/python/essai_2_7.py current/python/essai_2_7.py
+--- vrpn_07_29/python/essai_2_7.py	1970-01-01 01:00:00.000000000 +0100
++++ current/python/essai_2_7.py	2012-02-28 12:54:21.559421459 +0100
+@@ -0,0 +1,20 @@
++#!/usr/bin/python2.7
++
++import vrpn
++
++def callback(userdata, data):
++    print(type(userdata), userdata, " => ", data);
++    print(toto)
++
++tracker=vrpn.receiver.Tracker("Tracker0@localhost")
++tracker.register_change_handler("workspace", callback, "workspace")
++tracker.register_change_handler("position", callback, "position")
++
++analog=vrpn.receiver.Analog("Input0@localhost")
++analog.register_change_handler("dev input", callback)
++
++while 1:
++    tracker.mainloop()
++    analog.mainloop()
++
++#del(essai)
+diff -ruN -x .depend vrpn_07_29/python/essai_3_2.py current/python/essai_3_2.py
+--- vrpn_07_29/python/essai_3_2.py	1970-01-01 01:00:00.000000000 +0100
++++ current/python/essai_3_2.py	2012-03-27 16:02:59.557845899 +0200
+@@ -0,0 +1,23 @@
++#!/usr/bin/python3.2
++
++import vrpn
++
++def callback(userdata, data):
++    print(type(userdata), userdata, " => ", data);
++    try:
++        print(vrpn.quaternion.to_col_matrix(data['quaternion']))
++    except:
++        pass
++
++tracker=vrpn.receiver.Tracker("Tracker0@localhost")
++tracker.register_change_handler("workspace", callback, "workspace")
++tracker.register_change_handler("position", callback, "position")
++
++analog=vrpn.receiver.Analog("Input0@localhost")
++analog.register_change_handler("dev input", callback)
++
++while 1:
++    tracker.mainloop()
++    analog.mainloop()
++
++#del(essai)
+diff -ruN -x .depend vrpn_07_29/python/GNUmakefile current/python/GNUmakefile
+--- vrpn_07_29/python/GNUmakefile	1970-01-01 01:00:00.000000000 +0100
++++ current/python/GNUmakefile	2012-03-27 15:32:22.087846822 +0200
+@@ -0,0 +1,74 @@
++
++##########################
++# common definitions. For non-UNC sites, uncomment one of the lines
++# that defines hw_os for the machine you are on in the section just
++# below. Then, the code should compile in your environment.
++#
++#HW_OS := sgi_irix
++#HW_OS := pc_linux
++#HW_OS := pc_linux64
++#HW_OS := pc_linux_ia64
++# Try this to cross-compile on a Linux PC for an ARM embedded controller.
++#HW_OS := pc_linux_arm
++# Try this to cross-compile on a Cygwin PC for an ARM embedded controller.
++#HW_OS := pc_cygwin_arm
++#HW_OS := pc_cygwin
++#HW_OS := pc_FreeBSD
++#HW_OS := sparc_solaris
++#HW_OS := sparc_solaris_64
++#HW_OS := powerpc_aix
++#HW_OS := powerpc_macosx
++#HW_OS := universal_macosx
++##########################
++
++##########################
++# Mac OS X-specific options. If HW_OS is powerpc_macosx or universal_macosx,
++# uncomment one line below to choose the minimum targeted OS X version and
++# corresponding SDK. If none of the lines below is commented out, 10.5 will
++# be the minimum version.
++##########################
++#MAC_OS_MIN_VERSION := 10.4
++#MAC_OS_MIN_VERSION := 10.5
++#MAC_OS_MIN_VERSION := 10.6
++
++#PYTHON_VERSION := 2.7
++#PYTHON_VERSION := 3.2
++PYTHON_CONFIG := python$(PYTHON_VERSION)-config
++PYTHON_MODULE_DIR := $(shell $(PYTHON_CONFIG) --exec-prefix)/lib/python$(PYTHON_VERSION)/lib-dynload
++
++CXXFLAGS := $(shell $(PYTHON_CONFIG) --includes) -I ./ -I ../  -fPIC -DCALLBACK_CALL=
++LD_FLAGS := $(shell $(PYTHON_CONFIG) --ldflags) -L ../$(HW_OS) -L ../quat/$(HW_OS)
++LIBSUP   := $(shell $(PYTHON_CONFIG) --libs) -lvrpn -lquat -fPIC
++
++COMPILE_DIR=$(HW_OS)
++
++SRCS=interface.cpp callback.cpp tools.cpp Base.cpp Device.cpp Connection.cpp
++SRCS+=receiver/receiver.cpp receiver/Tracker.cpp receiver/Analog.cpp receiver/Button.cpp receiver/Dial.cpp receiver/Text_Receiver.cpp
++SRCS+=sender/sender.cpp sender/Poser.cpp sender/Text_Sender.cpp
++SRCS+=quaternion/quaternion.cpp
++OBJS=$(SRCS:%.cpp=$(COMPILE_DIR)/%.o)
++
++MODULE = $(COMPILE_DIR)/vrpn.so
++
++all: $(MODULE)
++
++$(MODULE): $(OBJS)
++	$(CXX) -shared $(LD_FLAGS) -o $@ $^ $(LIBSUP)
++
++$(COMPILE_DIR)/%.o: %.cpp
++	$(CXX) $(CXXFLAGS) -o $@ -c $<
++
++%.C: %.cpp
++	$(CXX) $(CXXFLAGS) -o $@ -E $<
++
++clean:
++	rm -f $(COMPILE_DIR)/*.o $(COMPILE_DIR)/sender/*.o $(COMPILE_DIR)/receiver/*.o $(COMPILE_DIR)/quaternion/*.o $(MODULE)
++	find . -name "*~" -delete
++
++depend:
++	@makedepend -- $(CXXFLAGS) $(SRCS) 2> /dev/null
++
++install: $(MODULE)
++	-mkdir -p $(PYTHON_MODULE_DIR)
++	( cd $(PYTHON_MODULE_DIR) ; rm -f vrpn.so )
++	( cd $(COMPILE_DIR) ; cp vrpn.so $(PYTHON_MODULE_DIR) )
+diff -ruN -x .depend vrpn_07_29/python/include/Base.hpp current/python/include/Base.hpp
+--- vrpn_07_29/python/include/Base.hpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/include/Base.hpp	2012-02-28 10:01:04.189423627 +0100
+@@ -0,0 +1,18 @@
++#ifndef __VRPN_PYTHON_BASE_HPP__
++#define __VRPN_PYTHON_BASE_HPP__
++
++#include <Python.h>
++#include <string>
++#include "exceptions.hpp"
++
++namespace vrpn_python {
++  class Base {
++  protected:
++    PyObject_HEAD
++    PyObject *d_error;
++    Base(PyObject *error);
++
++  };
++}
++
++#endif // defined(__VRPN_PYTHON_BASE_H__)
+diff -ruN -x .depend vrpn_07_29/python/include/callback.hpp current/python/include/callback.hpp
+--- vrpn_07_29/python/include/callback.hpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/include/callback.hpp	2012-02-28 10:01:04.159423627 +0100
+@@ -0,0 +1,29 @@
++#ifndef __VRPN_PYTHON_CALLBACK_HPP__
++#define __VRPN_PYTHON_CALLBACK_HPP__
++
++#include <Python.h>
++#include <iostream>
++
++namespace vrpn_python {
++
++  class callbackEntry;
++
++  class Callback {
++    callbackEntry *d_entry;
++    PyObject *d_userdata;
++    PyObject *d_callback;
++  public:
++    Callback(PyObject *userdata, PyObject *callback);
++    Callback(void *data);
++    ~Callback();
++
++    void *getData() { return (void*)d_entry ; }
++
++    void increment();
++    void decrement();
++
++    static void get(void *, PyObject *&userdata, PyObject *&callback);
++  };
++}
++
++#endif // defined(__VRPN_PYTHON_CALLBACK_H__)
+diff -ruN -x .depend vrpn_07_29/python/include/Connection.hpp current/python/include/Connection.hpp
+--- vrpn_07_29/python/include/Connection.hpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/include/Connection.hpp	2012-02-28 10:01:04.159423627 +0100
+@@ -0,0 +1,26 @@
++#ifndef __VRPN_PYTHON_CONNECTION_HPP__
++#define __VRPN_PYTHON_CONNECTION_HPP__
++
++#include <vrpn_Tracker.h>
++#include "Base.hpp"
++
++namespace vrpn_python {
++  class Connection : public Base {
++    vrpn_Connection *d_connection;
++
++  public:
++    static bool check(const PyObject *other);
++
++    vrpn_Connection *getConnection() { return d_connection ; }
++  };
++
++  class Connection_IP : public Connection {
++
++  public:
++    static bool check(const PyObject *other);
++  };
++
++
++}
++
++#endif // defined(__VRPN_PYTHON_CONNECTION_REMOTE_H__)
+diff -ruN -x .depend vrpn_07_29/python/include/definition.hpp current/python/include/definition.hpp
+--- vrpn_07_29/python/include/definition.hpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/include/definition.hpp	2012-02-28 11:13:06.489422726 +0100
+@@ -0,0 +1,129 @@
++#ifndef __VRPN_PYTHON_DEFINITION_HPP__
++#define __VRPN_PYTHON_DEFINITION_HPP__
++
++#include "Connection.hpp"
++#include "Device.hpp"
++#include <iostream>
++
++namespace vrpn_python {
++
++  template <class device_type> class definition {
++
++    typedef typename device_type::vrpn_type vrpn_type;
++
++  public:
++    static bool check(const PyObject *obj) {
++      if (!obj) {
++	return false;
++      }
++      if (PyType_IsSubtype(obj->ob_type, &device_type::getType())) {
++	return true;
++      }
++      return (device_type::getName() == device_type::getName());
++    }
++
++    static device_type *get(PyObject *obj) {
++      if (!obj) {
++	std::string error = "Invalid object mapping from 'NULL' to '";
++	error += device_type::getName();
++	error += "' !";
++	DeviceException::launch(error);
++      }
++      if (!check(obj)) {
++	std::string error = "Invalid object mapping from '";
++	error += obj->ob_type->tp_name;
++	error += "' to '";
++	error += device_type::getName();
++	error += "' !";
++	DeviceException::launch(error);
++      }
++      return (device_type*)obj;
++    }
++
++    static int init(PyObject *obj, PyObject *args, PyObject *kwds) {
++      try {
++	get(obj);
++	device_type *self = new(obj) device_type(device_type::s_error, args);
++	Connection *Py_Connection = self->getConnection();
++	vrpn_Connection *connection = NULL;
++	if (Py_Connection != NULL) {
++	  connection = Py_Connection->getConnection();
++	}
++	self->d_device = new vrpn_type(self->getDeviceName().c_str(), connection);
++	if (self->d_device) {
++	  return 0;
++	}
++      } catch (DeviceException &exception) {
++	PyErr_SetString(device_type::s_error, exception.getReason().c_str());
++      }
++      return -1;
++    }
++
++    static void dealloc(PyObject* obj) {
++      try {
++	device_type *self = get(obj);
++	self->~device_type();
++	if (self->d_device) {
++	  delete self->d_device;
++	  self->d_device = NULL;
++	}
++      } catch (DeviceException &exception) {
++	PyErr_SetString(device_type::s_error, exception.getReason().c_str());
++      }
++      Py_TYPE(obj)->tp_free(obj);
++    }
++
++    static PyObject *mainloop(PyObject *obj) {
++      try {
++	device_type *self = get(obj);
++	self->d_device->mainloop();
++	Py_RETURN_TRUE;
++      } catch (DeviceException &exception) {
++	PyErr_SetString(device_type::s_error, exception.getReason().c_str());
++	Py_RETURN_FALSE;
++      } catch (CallbackException) {
++	return NULL;
++      }
++    }
++
++    static bool init_type() {
++      PyTypeObject &device_object_type = device_type::getType();
++      device_object_type.tp_new        = PyType_GenericNew; 
++      device_object_type.tp_dealloc    = dealloc;
++      device_object_type.tp_init       = init;
++      device_object_type.tp_flags      = Py_TPFLAGS_DEFAULT;
++      std::string doc = device_type::getName() + " VRPN objects";
++      device_object_type.tp_doc        = doc.c_str();
++      device_object_type.tp_methods    = device_type::getMethods();
++
++      if (PyType_Ready(&device_object_type) < 0)
++	return false;
++      return true;
++    }
++
++    static void add_type(PyObject *module) {
++      PyTypeObject &device_object_type = device_type::getType();
++      Py_INCREF(&device_object_type);
++      PyModule_AddObject(module, device_type::getName().c_str(), (PyObject *)&device_object_type);
++
++      std::string error_name = device_type::getName() + ".error";
++      char *exception_name = new char [strlen(error_name.c_str()) + 1];
++      strcpy(exception_name, error_name.c_str());
++      device_type::s_error = PyErr_NewException(exception_name, NULL, NULL);
++      delete [] exception_name;
++      Py_INCREF(device_type::s_error);
++      PyModule_AddObject(module, error_name.c_str(), device_type::s_error);
++    }
++
++    static PyObject *register_change_handler(PyObject *obj, PyObject *args) {
++      return device_type::work_on_change_handler(true, obj, args) ;
++    }
++
++    static PyObject *unregister_change_handler(PyObject *obj, PyObject *args) {
++      return device_type::work_on_change_handler(false, obj, args) ;
++    }
++
++  };
++}
++
++#endif // defined(__VRPN_PYTHON_DEFINITION_H__)
+diff -ruN -x .depend vrpn_07_29/python/include/Device.hpp current/python/include/Device.hpp
+--- vrpn_07_29/python/include/Device.hpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/include/Device.hpp	2012-02-28 10:01:04.189423627 +0100
+@@ -0,0 +1,39 @@
++#ifndef __VRPN_PYTHON_DEVICE_HPP__
++#define __VRPN_PYTHON_DEVICE_HPP__
++
++#include "Base.hpp"
++#include "Connection.hpp"
++#include <string>
++#include <vector>
++
++namespace vrpn_python {
++  class Device;
++
++  class Device : public Base {
++
++    std::string d_deviceName;
++    Connection *d_connection;
++
++    std::vector<void *> d_callbacks;
++
++  protected:
++    static PyObject *s_error;
++
++    Device(PyObject *error, PyObject * args = NULL);
++    ~Device();
++
++    const std::string &getDeviceName() const { return d_deviceName ; }
++    Connection *getConnection() { return d_connection ; }
++
++  public:
++    void addCallback(void *);
++    void removeCallback(void *);
++
++    static bool init_device_common_objects(PyObject* vrpn_module);
++
++    static PyObject *getDateTimeFromTimeval(const struct timeval &time);
++    static bool getTimevalFromDateTime(PyObject *py_time, struct timeval &tv_time);
++  };
++}
++
++#endif // defined(__VRPN_PYTHON_DEVICE_H__)
+diff -ruN -x .depend vrpn_07_29/python/include/exceptions.hpp current/python/include/exceptions.hpp
+--- vrpn_07_29/python/include/exceptions.hpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/include/exceptions.hpp	2012-02-28 10:01:04.179423627 +0100
+@@ -0,0 +1,33 @@
++#ifndef __VRPN_PYTHON_EXCEPTIONS_HPP__
++#define __VRPN_PYTHON_EXCEPTIONS_HPP__
++
++#include <string>
++
++namespace vrpn_python {
++
++  class BaseException {
++    std::string d_reason;
++
++  protected:
++    BaseException(const std::string &reason);
++
++  public:
++    static void launch(const std::string &reason);
++
++    const std::string &getReason() const { return d_reason ; }
++  };
++
++  class DeviceException : public BaseException {
++  public:
++    DeviceException(const std::string &reason);
++
++  public:
++    static void launch(const std::string &reason);
++  };
++
++  class CallbackException {
++  };
++
++}
++
++#endif // defined(__VRPN_PYTHON_EXCEPTIONS_HPP__)
+diff -ruN -x .depend vrpn_07_29/python/include/handlers.hpp current/python/include/handlers.hpp
+--- vrpn_07_29/python/include/handlers.hpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/include/handlers.hpp	2012-02-28 10:01:04.179423627 +0100
+@@ -0,0 +1,66 @@
++#ifndef __VRPN_PYTHON_HANDLERS_HPP__
++#define __VRPN_PYTHON_HANDLERS_HPP__
++
++#include "callback.hpp"
++#include "exceptions.hpp"
++#include <iostream>
++
++namespace vrpn_python {
++  class Device;
++
++  namespace handlers {
++    template <typename vrpn_info_type> PyObject *CALLBACK_CALL createPyObjectFromVRPN_Type(const vrpn_info_type &info);
++
++    template <typename vrpn_info_type> void CALLBACK_CALL change_handler(void *data, const vrpn_info_type info) {
++      PyObject *userdata;
++      PyObject *callback;
++
++      Callback::get(data, userdata, callback);
++
++      PyObject *value = createPyObjectFromVRPN_Type<vrpn_info_type>(info);
++      PyObject *arglist = Py_BuildValue("OO", userdata, value);
++      Py_DECREF(value); // Destroy entity created by createPyObjectFromVRPN_Type<>(info)
++
++      PyObject *result = PyEval_CallObject(callback,arglist);
++      Py_DECREF(arglist); // Destroy entities created by Py_BuildValue("OO", userdata, value)
++
++      if (result != NULL) {
++	Py_DECREF(result); // Destroy the evaluation !
++      } else {
++	throw CallbackException();
++      }
++    }
++
++    template <class device_type, typename vrpn_info_type> void register_handler(device_type *self, bool add, Callback &cb, int sensor, const std::string &error) {
++      if (add) {
++	if (self->getDevice()->register_change_handler(cb.getData(), change_handler<vrpn_info_type>, sensor) >= 0) {
++	  cb.increment();
++	  return;
++	}
++      } else {
++	if (self->getDevice()->unregister_change_handler(cb.getData(), change_handler<vrpn_info_type>, sensor) >= 0) {
++	  cb.decrement();
++	  return;
++	}
++      }
++      DeviceException::launch(error);
++    }
++
++    template <class device_type, typename vrpn_info_type> void register_handler(device_type *self, bool add, Callback &cb, const std::string &error) {
++      if (add) {
++	if (self->getDevice()->register_change_handler(cb.getData(), change_handler<vrpn_info_type>) >= 0) {
++	  cb.increment();
++	  return;
++	}
++      } else {
++	if (self->getDevice()->unregister_change_handler(cb.getData(), change_handler<vrpn_info_type>) >= 0) {
++	  cb.decrement();
++	  return;
++	}
++      }
++      DeviceException::launch(error);
++    }
++  }
++}
++
++#endif // defined(__VRPN_PYTHON_HANDLERS_H__)
+diff -ruN -x .depend vrpn_07_29/python/include/interface.hpp current/python/include/interface.hpp
+--- vrpn_07_29/python/include/interface.hpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/include/interface.hpp	2012-03-27 15:27:37.957846965 +0200
+@@ -0,0 +1,23 @@
++#ifndef __VRPN_PYTHON_INTERFACE_HPP__
++#define __VRPN_PYTHON_INTERFACE_HPP__
++
++#include <Python.h>
++
++namespace vrpn_python {
++  namespace receiver {
++    bool init_types();
++    void add_types(PyObject* module);
++  }
++
++  namespace sender {
++    bool init_types();
++    void add_types(PyObject* module);
++  }
++
++  namespace quaternion {
++    bool init_types();
++    void add_types(PyObject* module);
++  }
++}
++
++#endif // defined(__VRPN_PYTHON_INTERFACE_H__)
+diff -ruN -x .depend vrpn_07_29/python/include/tools.hpp current/python/include/tools.hpp
+--- vrpn_07_29/python/include/tools.hpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/include/tools.hpp	2012-02-28 10:01:04.159423627 +0100
+@@ -0,0 +1,14 @@
++#ifndef __VRPN_PYTHON_TOOLS_HPP__
++#define __VRPN_PYTHON_TOOLS_HPP__
++
++#include <Python.h>
++#include <string>
++
++namespace vrpn_python {
++  namespace tools {
++    bool getStringFromPyObject(PyObject *, std::string &);
++    bool getIntegerFromPyObject(PyObject *py_int, int &_int);
++  }
++}
++
++#endif // defined(__VRPN_PYTHON_BASE_H__)
+diff -ruN -x .depend vrpn_07_29/python/interface.cpp current/python/interface.cpp
+--- vrpn_07_29/python/interface.cpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/interface.cpp	2012-03-27 15:28:04.697846951 +0200
+@@ -0,0 +1,69 @@
++#include "include/interface.hpp"
++#include "include/definition.hpp"
++#include "include/Device.hpp"
++
++#ifdef DEFINE_REFCOUNT
++static PyObject *refCount(PyObject *self, PyObject *args) {
++  PyObject *real_object;
++
++  if (!PyArg_ParseTuple(args, "O", &real_object))
++    return NULL;
++
++  return PyLong_FromLong(real_object->ob_refcnt);
++}
++
++static PyMethodDef vrpnMethods[] = {
++  {"refCount",  refCount, METH_VARARGS, "Execute a shell command."},
++  {NULL, NULL, 0, NULL}
++};
++#endif
++
++#if PY_MAJOR_VERSION >= 3
++static PyModuleDef module_definition = {
++  PyModuleDef_HEAD_INIT,
++  "vrpn",
++  "VRPN wrapper classes.",
++  -1,
++#   ifdef DEFINE_REFCOUNT
++  vrpnMethods
++#   else
++  NULL
++#   endif
++};
++
++#define INIT_FUNCTION_RETURN_VALUE(VALUE) return VALUE
++PyMODINIT_FUNC PyInit_vrpn(void)  {
++
++#else // if PY_MAJOR_VERSION < 3
++#define INIT_FUNCTION_RETURN_VALUE(VALUE) return
++PyMODINIT_FUNC initvrpn(void)  {
++
++#endif
++
++  if (!vrpn_python::receiver::init_types()) INIT_FUNCTION_RETURN_VALUE (NULL);
++  if (!vrpn_python::sender::init_types()) INIT_FUNCTION_RETURN_VALUE (NULL);
++  if (!vrpn_python::quaternion::init_types()) INIT_FUNCTION_RETURN_VALUE (NULL);
++
++  PyObject* vrpn_module = 
++#if PY_MAJOR_VERSION >= 3 and PY_MINOR_VERSION >= 2
++    PyModule_Create(&module_definition);
++#else
++#   ifdef DEFINE_REFCOUNT
++    Py_InitModule("vrpn", vrpnMethods);
++#   else
++    Py_InitModule("vrpn", NULL);
++#   endif
++#endif
++
++  if (vrpn_module == NULL) INIT_FUNCTION_RETURN_VALUE (NULL);
++
++  if (!vrpn_python::Device::init_device_common_objects(vrpn_module)) {
++    INIT_FUNCTION_RETURN_VALUE (NULL);
++  }
++
++  vrpn_python::receiver::add_types(vrpn_module);
++  vrpn_python::sender::add_types(vrpn_module);
++  vrpn_python::quaternion::add_types(vrpn_module);
++
++  INIT_FUNCTION_RETURN_VALUE (vrpn_module);
++}
+diff -ruN -x .depend vrpn_07_29/python/quaternion/quaternion.cpp current/python/quaternion/quaternion.cpp
+--- vrpn_07_29/python/quaternion/quaternion.cpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/quaternion/quaternion.cpp	2012-03-31 15:54:13.568596704 +0200
+@@ -0,0 +1,73 @@
++#include <include/interface.hpp>
++#include <quat/quat.h>
++#include <iostream>
++
++namespace vrpn_python {
++  namespace quaternion {
++
++    static PyObject *to_col_matrix(PyObject *self, PyObject *args) {
++      q_type quaternion; 
++
++      if (!PyArg_ParseTuple(args, "(dddd)", &quaternion[0], &quaternion[1], &quaternion[2], &quaternion[3]))
++	return NULL;
++
++      q_matrix_type matrix;
++
++      q_to_col_matrix(matrix, quaternion);
++
++      return Py_BuildValue("((ddd)(ddd)(ddd))",
++			   matrix[0][0], matrix[0][1], matrix[0][2],
++			   matrix[1][0], matrix[1][1], matrix[1][2],
++			   matrix[2][0], matrix[2][1], matrix[2][2]);
++    }
++
++    static PyObject *to_row_matrix(PyObject *self, PyObject *args) {
++      q_type quaternion; 
++
++      if (!PyArg_ParseTuple(args, "(dddd)", &quaternion[0], &quaternion[1], &quaternion[2], &quaternion[3]))
++	return NULL;
++
++      q_matrix_type matrix;
++
++      q_to_row_matrix(matrix, quaternion);
++
++      return Py_BuildValue("((ddd)(ddd)(ddd))",
++			   matrix[0][0], matrix[0][1], matrix[0][2],
++			   matrix[1][0], matrix[1][1], matrix[1][2],
++			   matrix[2][0], matrix[2][1], matrix[2][2]);
++    }
++
++    static PyMethodDef vrpnMethods[] = {
++      {"to_col_matrix",  to_col_matrix, METH_VARARGS, "Convert quaternion to 4x4 column-major rotation matrix.\nQuaternion need not be unit magnitude."},
++      {"to_row_matrix",  to_row_matrix, METH_VARARGS, "Convert quaternion to 4x4 row-major rotation matrix.\nQuaternion need not be unit magnitude."},
++      {NULL, NULL, 0, NULL}
++    };
++
++#if PY_MAJOR_VERSION >= 3
++    static PyModuleDef module_definition = {
++      PyModuleDef_HEAD_INIT,
++      "quaternion",
++      "VRPN quaternion methods.",
++      -1,
++      vrpnMethods,
++      NULL
++    };
++#endif
++
++    bool init_types() {
++
++      return true;
++    }
++
++    void add_types(PyObject* vrpn_module) {
++      PyObject* quaternion_module = 
++#if PY_MAJOR_VERSION >= 3
++	PyModule_Create(&module_definition);
++#else
++      Py_InitModule("quaternion", vrpnMethods);
++#endif
++
++      PyModule_AddObject(vrpn_module, "quaternion", quaternion_module);
++    }
++  }
++}
+diff -ruN -x .depend vrpn_07_29/python/receiver/Analog.cpp current/python/receiver/Analog.cpp
+--- vrpn_07_29/python/receiver/Analog.cpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/receiver/Analog.cpp	2012-03-06 12:34:10.990826649 +0100
+@@ -0,0 +1,74 @@
++#include "include/Analog.hpp"
++#include "include/callback.hpp"
++#include "include/definition.hpp"
++#include "include/handlers.hpp"
++#include <iostream>
++
++namespace vrpn_python {
++
++  static PyTypeObject Analog_Type = {
++    PyVarObject_HEAD_INIT(NULL, 0)
++    "Analog",   // tp_name
++    sizeof(Analog),      // tp_basicsize
++  };
++
++  static PyMethodDef Analog_methods[] = {
++    {"mainloop", (PyCFunction)Analog::_definition::mainloop, METH_NOARGS, "Run the mainloop" },
++    {"register_change_handler", (PyCFunction)Analog::_definition::register_change_handler, METH_VARARGS, "Register a callback handler to handle a position change" },
++    {"unregister_change_handler", (PyCFunction)Analog::_definition::unregister_change_handler, METH_VARARGS, "Unregister a callback handler to handle a position change" },
++    {NULL}  /* Sentinel */
++  };
++
++  PyTypeObject &Analog::getType() {
++    return Analog_Type;
++  }
++
++  PyMethodDef* Analog::getMethods() {
++    return (PyMethodDef*)Analog_methods;
++  }
++
++  const std::string &Analog::getName() {
++    static const std::string name = "Analog";
++    return name;
++  }
++
++
++  Analog::Analog(PyObject *error, PyObject * args) : Device(error, args), d_device(NULL) {
++  }
++
++  PyObject * Analog::work_on_change_handler(bool add, PyObject *obj, PyObject *args) {
++    try {
++      Analog *self = _definition::get(obj);
++
++      static std::string defaultCall("invalid call : register_change_handler(userdata, callback)");
++
++      PyObject *callback;
++      PyObject *userdata;
++      if ((!args) || (!PyArg_ParseTuple(args,"OO",&userdata, &callback))) {
++	DeviceException::launch(defaultCall);
++      }
++
++      Callback cb(userdata, callback);
++
++      handlers::register_handler<Analog, vrpn_ANALOGCB>(self, add, cb, defaultCall);
++      Py_RETURN_TRUE;
++
++    } catch (DeviceException &exception) {
++      PyErr_SetString(Device::s_error, exception.getReason().c_str());
++    }
++    return NULL;
++  }
++
++  namespace handlers {
++    template<> PyObject *CALLBACK_CALL createPyObjectFromVRPN_Type(const vrpn_ANALOGCB &info) {
++      PyObject *channel = PyTuple_New(info.num_channel);
++      for (int i = 0 ; i < info.num_channel ; i++) {
++	PyTuple_SetItem(channel, i, Py_BuildValue("f", info.channel[i]));
++      }
++      PyObject *result = Py_BuildValue("{sOsO}",
++				       "time", Device::getDateTimeFromTimeval(info.msg_time),
++				       "channel", channel);
++      return result;
++    }
++  }
++}
+diff -ruN -x .depend vrpn_07_29/python/receiver/Button.cpp current/python/receiver/Button.cpp
+--- vrpn_07_29/python/receiver/Button.cpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/receiver/Button.cpp	2012-02-28 10:01:04.269423627 +0100
+@@ -0,0 +1,70 @@
++#include "include/Button.hpp"
++#include "include/callback.hpp"
++#include "include/definition.hpp"
++#include "include/handlers.hpp"
++#include <iostream>
++
++namespace vrpn_python {
++
++  static PyTypeObject Button_Type = {
++    PyVarObject_HEAD_INIT(NULL, 0)
++    "Button",   // tp_name
++    sizeof(Button),      // tp_basicsize
++  };
++
++  static PyMethodDef Button_methods[] = {
++    {"mainloop", (PyCFunction)Button::_definition::mainloop, METH_NOARGS, "Run the mainloop" },
++    {"register_change_handler", (PyCFunction)Button::_definition::register_change_handler, METH_VARARGS, "Register a callback handler to handle a position change" },
++    {"unregister_change_handler", (PyCFunction)Button::_definition::unregister_change_handler, METH_VARARGS, "Unregister a callback handler to handle a position change" },
++    {NULL}  /* Sentinel */
++  };
++
++  PyTypeObject &Button::getType() {
++    return Button_Type;
++  }
++
++  PyMethodDef* Button::getMethods() {
++    return (PyMethodDef*)Button_methods;
++  }
++
++  const std::string &Button::getName() {
++    static const std::string name = "Button";
++    return name;
++  }
++
++
++  Button::Button(PyObject *error, PyObject * args) : Device(error, args), d_device(NULL) {
++  }
++
++  PyObject * Button::work_on_change_handler(bool add, PyObject *obj, PyObject *args) {
++    try {
++      Button *self = _definition::get(obj);
++
++      static std::string defaultCall("invalid call : register_change_handler(userdata, callback)");
++
++      PyObject *callback;
++      PyObject *userdata;
++      if ((!args) || (!PyArg_ParseTuple(args,"OO",&userdata, &callback))) {
++	DeviceException::launch(defaultCall);
++      }
++
++      Callback cb(userdata, callback);
++
++      handlers::register_handler<Button, vrpn_BUTTONCB>(self, add, cb, defaultCall);
++      Py_RETURN_TRUE;
++
++    } catch (DeviceException &exception) {
++      PyErr_SetString(Button::s_error, exception.getReason().c_str());
++    }
++    return NULL;
++  }
++
++  namespace handlers {
++    template<> PyObject *CALLBACK_CALL createPyObjectFromVRPN_Type(const vrpn_BUTTONCB &info) {
++      return Py_BuildValue("{sOsisi}",
++			   "time", Device::getDateTimeFromTimeval(info.msg_time),
++			   "button", info.button,
++			   "state", info.state);
++    }
++  }
++}
+diff -ruN -x .depend vrpn_07_29/python/receiver/Dial.cpp current/python/receiver/Dial.cpp
+--- vrpn_07_29/python/receiver/Dial.cpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/receiver/Dial.cpp	2012-02-28 10:01:04.269423627 +0100
+@@ -0,0 +1,70 @@
++#include "include/Dial.hpp"
++#include "include/callback.hpp"
++#include "include/definition.hpp"
++#include "include/handlers.hpp"
++#include <iostream>
++
++namespace vrpn_python {
++
++  static PyTypeObject Dial_Type = {
++    PyVarObject_HEAD_INIT(NULL, 0)
++    "Dial",            // tp_name
++    sizeof(Dial),      // tp_basicsize
++  };
++
++  static PyMethodDef Dial_methods[] = {
++    {"mainloop", (PyCFunction)Dial::_definition::mainloop, METH_NOARGS, "Run the mainloop" },
++    {"register_change_handler", (PyCFunction)Dial::_definition::register_change_handler, METH_VARARGS, "Register a callback handler to handle a position change" },
++    {"unregister_change_handler", (PyCFunction)Dial::_definition::unregister_change_handler, METH_VARARGS, "Unregister a callback handler to handle a position change" },
++    {NULL}  /* Sentinel */
++  };
++
++  PyTypeObject &Dial::getType() {
++    return Dial_Type;
++  }
++
++  PyMethodDef* Dial::getMethods() {
++    return (PyMethodDef*)Dial_methods;
++  }
++
++  const std::string &Dial::getName() {
++    static const std::string name = "Dial";
++    return name;
++  }
++
++
++  Dial::Dial(PyObject *error, PyObject * args) : Device(error, args), d_device(NULL) {
++  }
++
++  PyObject * Dial::work_on_change_handler(bool add, PyObject *obj, PyObject *args) {
++    try {
++      Dial *self = _definition::get(obj);
++
++      static std::string defaultCall("invalid call : register_change_handler(userdata, callback)");
++
++      PyObject *callback;
++      PyObject *userdata;
++      if ((!args) || (!PyArg_ParseTuple(args,"OO",&userdata, &callback))) {
++	DeviceException::launch(defaultCall);
++      }
++
++      Callback cb(userdata, callback);
++
++      handlers::register_handler<Dial, vrpn_DIALCB>(self, add, cb, defaultCall);
++      Py_RETURN_TRUE;
++
++    } catch (DeviceException &exception) {
++      PyErr_SetString(Device::s_error, exception.getReason().c_str());
++    }
++    return NULL;
++  }
++
++  namespace handlers {
++    template<> PyObject *CALLBACK_CALL createPyObjectFromVRPN_Type(const vrpn_DIALCB &info) {
++      return Py_BuildValue("{sOsisd}",
++			   "time", Device::getDateTimeFromTimeval(info.msg_time),
++			   "dial", info.dial,
++			   "change", info.change);
++    }
++  }
++}
+diff -ruN -x .depend vrpn_07_29/python/receiver/include/Analog.hpp current/python/receiver/include/Analog.hpp
+--- vrpn_07_29/python/receiver/include/Analog.hpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/receiver/include/Analog.hpp	2012-02-28 10:01:04.219423627 +0100
+@@ -0,0 +1,31 @@
++#ifndef __VRPN_PYTHON_ANALOG_HPP__
++#define __VRPN_PYTHON_ANALOG_HPP__
++
++#include <vrpn_Analog.h>
++#include <include/Device.hpp>
++
++namespace vrpn_python {
++  template <class device_type> class definition;
++
++  class Analog : public Device {
++    typedef vrpn_Analog_Remote vrpn_type;
++    friend class definition<Analog>;
++
++    vrpn_type *d_device;
++
++    Analog(PyObject *error, PyObject * args);
++
++    static PyTypeObject &getType();
++    static PyMethodDef* getMethods();
++    static const std::string &getName();
++
++    static PyObject *work_on_change_handler(bool add, PyObject *obj, PyObject *args);
++
++  public:
++    vrpn_type *getDevice() { return d_device ; }
++
++    typedef definition<Analog> _definition;
++  };
++}
++
++#endif // defined(__VRPN_PYTHON_ANALOG_REMOTE_H__)
+diff -ruN -x .depend vrpn_07_29/python/receiver/include/Button.hpp current/python/receiver/include/Button.hpp
+--- vrpn_07_29/python/receiver/include/Button.hpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/receiver/include/Button.hpp	2012-02-28 10:01:04.219423627 +0100
+@@ -0,0 +1,31 @@
++#ifndef __VRPN_PYTHON_BUTTON_HPP__
++#define __VRPN_PYTHON_BUTTON_HPP__
++
++#include <vrpn_Button.h>
++#include <include/Device.hpp>
++
++namespace vrpn_python {
++  template <class device_type> class definition;
++
++  class Button : public Device {
++    typedef vrpn_Button_Remote vrpn_type;
++    friend class definition<Button>;
++
++    vrpn_type *d_device;
++
++    Button(PyObject *error, PyObject * args);
++
++    static PyTypeObject &getType();
++    static PyMethodDef* getMethods();
++    static const std::string &getName();
++
++    static PyObject *work_on_change_handler(bool add, PyObject *obj, PyObject *args);
++
++  public:
++    vrpn_type *getDevice() { return d_device ; }
++
++    typedef definition<Button> _definition;
++  };
++}
++
++#endif // defined(__VRPN_PYTHON_BUTTON_REMOTE_H__)
+diff -ruN -x .depend vrpn_07_29/python/receiver/include/Dial.hpp current/python/receiver/include/Dial.hpp
+--- vrpn_07_29/python/receiver/include/Dial.hpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/receiver/include/Dial.hpp	2012-02-28 10:01:04.219423627 +0100
+@@ -0,0 +1,31 @@
++#ifndef __VRPN_PYTHON_DIAL_HPP__
++#define __VRPN_PYTHON_DIAL_HPP__
++
++#include <vrpn_Dial.h>
++#include <include/Device.hpp>
++
++namespace vrpn_python {
++  template <class device_type> class definition;
++
++  class Dial : public Device {
++    typedef vrpn_Dial_Remote vrpn_type;
++    friend class definition<Dial>;
++
++    vrpn_type *d_device;
++
++    Dial(PyObject *error, PyObject * args);
++
++    static PyTypeObject &getType();
++    static PyMethodDef* getMethods();
++    static const std::string &getName();
++
++    static PyObject *work_on_change_handler(bool add, PyObject *obj, PyObject *args);
++
++  public:
++    vrpn_type *getDevice() { return d_device ; }
++
++    typedef definition<Dial> _definition;
++  };
++}
++
++#endif // defined(__VRPN_PYTHON_DIAL_REMOTE_H__)
+diff -ruN -x .depend vrpn_07_29/python/receiver/include/Text_Receiver.hpp current/python/receiver/include/Text_Receiver.hpp
+--- vrpn_07_29/python/receiver/include/Text_Receiver.hpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/receiver/include/Text_Receiver.hpp	2012-02-28 10:01:04.239423627 +0100
+@@ -0,0 +1,31 @@
++#ifndef __VRPN_PYTHON_TEXT_RECEIVER_HPP__
++#define __VRPN_PYTHON_TEXT_RECEIVER_HPP__
++
++#include <vrpn_Text.h>
++#include <include/Device.hpp>
++
++namespace vrpn_python {
++  template <class device_type> class definition;
++
++  class Text_Receiver : public Device {
++    typedef vrpn_Text_Receiver vrpn_type;
++    friend class definition<Text_Receiver>;
++
++    vrpn_type *d_device;
++
++    Text_Receiver(PyObject *error, PyObject * args);
++
++    static PyTypeObject &getType();
++    static PyMethodDef* getMethods();
++    static const std::string &getName();
++
++    static PyObject *work_on_change_handler(bool add, PyObject *obj, PyObject *args);
++
++  public:
++    vrpn_type *getDevice() { return d_device ; }
++
++    typedef definition<Text_Receiver> _definition;
++  };
++}
++
++#endif // defined(__VRPN_PYTHON_TEXT_RECEIVER_H__)
+diff -ruN -x .depend vrpn_07_29/python/receiver/include/Tracker.hpp current/python/receiver/include/Tracker.hpp
+--- vrpn_07_29/python/receiver/include/Tracker.hpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/receiver/include/Tracker.hpp	2012-02-28 10:01:04.219423627 +0100
+@@ -0,0 +1,35 @@
++#ifndef __VRPN_PYTHON_TRACKER_HPP__
++#define __VRPN_PYTHON_TRACKER_HPP__
++
++#include <vrpn_Tracker.h>
++#include <include/Device.hpp>
++
++namespace vrpn_python {
++  template <class device_type> class definition;
++
++  class Tracker : public Device {
++    typedef vrpn_Tracker_Remote vrpn_type;
++    friend class definition<Tracker>;
++    vrpn_type *d_device;
++
++    Tracker(PyObject *error, PyObject * args);
++
++    static PyTypeObject &getType();
++    static PyMethodDef* getMethods();
++    static const std::string &getName();
++
++    static PyObject *work_on_change_handler(bool add, PyObject *obj, PyObject *args);
++
++  public:
++    vrpn_type *getDevice() { return d_device ; }
++
++    static PyObject *request_t2r_xform(PyObject *obj);
++    static PyObject *request_u2s_xform(PyObject *obj);
++    static PyObject *request_workspace(PyObject *obj);
++    static PyObject *reset_origin(PyObject *obj);
++
++    typedef definition<Tracker> _definition;
++  };
++}
++
++#endif // defined(__VRPN_PYTHON_TRACKER_H__)
+diff -ruN -x .depend vrpn_07_29/python/receiver/receiver.cpp current/python/receiver/receiver.cpp
+--- vrpn_07_29/python/receiver/receiver.cpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/receiver/receiver.cpp	2012-02-28 11:14:00.309422714 +0100
+@@ -0,0 +1,49 @@
++#include <include/interface.hpp>
++#include "include/Tracker.hpp"
++#include "include/Analog.hpp"
++#include "include/Button.hpp"
++#include "include/Dial.hpp"
++#include "include/Text_Receiver.hpp"
++#include <include/definition.hpp>
++
++namespace vrpn_python {
++  namespace receiver {
++
++#if PY_MAJOR_VERSION >= 3
++    static PyModuleDef module_definition = {
++      PyModuleDef_HEAD_INIT,
++      "receiver",
++      "VRPN receiver classes.",
++      -1,
++      NULL
++    };
++#endif
++
++  bool init_types() {
++    if (!Tracker::_definition::init_type()) return false;
++    if (!Analog::_definition::init_type()) return false;
++    if (!Button::_definition::init_type()) return false;
++    if (!Dial::_definition::init_type()) return false;
++    if (!Text_Receiver::_definition::init_type()) return false;
++
++    return true;
++  }
++
++  void add_types(PyObject* vrpn_module) {
++    PyObject* receiver_module = 
++#if PY_MAJOR_VERSION >= 3
++      PyModule_Create(&module_definition);
++#else
++      Py_InitModule("receiver", NULL);
++#endif
++
++    PyModule_AddObject(vrpn_module, "receiver", receiver_module);
++
++    Tracker::_definition::add_type(receiver_module);
++    Analog::_definition::add_type(receiver_module);
++    Button::_definition::add_type(receiver_module);
++    Dial::_definition::add_type(receiver_module);
++    Text_Receiver::_definition::add_type(receiver_module);
++  }
++}
++}
+diff -ruN -x .depend vrpn_07_29/python/receiver/Text_Receiver.cpp current/python/receiver/Text_Receiver.cpp
+--- vrpn_07_29/python/receiver/Text_Receiver.cpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/receiver/Text_Receiver.cpp	2012-02-28 10:01:04.269423627 +0100
+@@ -0,0 +1,96 @@
++#include "include/Text_Receiver.hpp"
++#include "include/callback.hpp"
++#include "include/definition.hpp"
++#include "include/handlers.hpp"
++#include <iostream>
++
++namespace vrpn_python {
++
++  static PyTypeObject Text_Receiver_Type = {
++    PyVarObject_HEAD_INIT(NULL, 0)
++    "Text",            // tp_name
++    sizeof(Text_Receiver),      // tp_basicsize
++  };
++
++  static PyMethodDef Text_Receiver_methods[] = {
++    {"mainloop", (PyCFunction)Text_Receiver::_definition::mainloop, METH_NOARGS, "Run the mainloop" },
++    {"register_change_handler", (PyCFunction)Text_Receiver::_definition::register_change_handler, METH_VARARGS, "Register a callback handler to handle a position change" },
++    {"unregister_change_handler", (PyCFunction)Text_Receiver::_definition::unregister_change_handler, METH_VARARGS, "Unregister a callback handler to handle a position change" },
++    {NULL}  /* Sentinel */
++  };
++
++  PyTypeObject &Text_Receiver::getType() {
++    return Text_Receiver_Type;
++  }
++
++  PyMethodDef* Text_Receiver::getMethods() {
++    return (PyMethodDef*)Text_Receiver_methods;
++  }
++
++  const std::string &Text_Receiver::getName() {
++    static const std::string name = "Text";
++    return name;
++  }
++
++
++  Text_Receiver::Text_Receiver(PyObject *error, PyObject * args) : Device(error, args), d_device(NULL) {
++  }
++
++  PyObject * Text_Receiver::work_on_change_handler(bool add, PyObject *obj, PyObject *args) {
++    try {
++      Text_Receiver *self = _definition::get(obj);
++
++      static std::string defaultCall("invalid call : register_change_handler(userdata, callback)");
++
++      PyObject *callback;
++      PyObject *userdata;
++      if ((!args) || (!PyArg_ParseTuple(args,"OO",&userdata, &callback))) {
++	DeviceException::launch(defaultCall);
++      }
++
++      Callback cb(userdata, callback);
++
++      if (add) {
++	if (self->getDevice()->register_message_handler(cb.getData(), handlers::change_handler<vrpn_TEXTCB>) >= 0) {
++	  cb.increment();
++	  Py_RETURN_TRUE;
++	}
++      } else {
++	if (self->getDevice()->unregister_message_handler(cb.getData(), handlers::change_handler<vrpn_TEXTCB>) >= 0) {
++	  cb.decrement();
++	  Py_RETURN_TRUE;
++	}
++      }
++      DeviceException::launch(defaultCall);
++
++    } catch (DeviceException &exception) {
++      PyErr_SetString(Device::s_error, exception.getReason().c_str());
++    }
++    return NULL;
++  }
++
++  namespace handlers {
++    template<> PyObject *CALLBACK_CALL createPyObjectFromVRPN_Type(const vrpn_TEXTCB &info) {
++      const char *severity;
++      switch (info.type) {
++      case vrpn_TEXT_NORMAL:
++	severity = "normal";
++	break;
++      case vrpn_TEXT_WARNING:
++	severity = "warning";
++	break;
++      case vrpn_TEXT_ERROR:
++	severity = "error";
++	break;
++      default:
++	DeviceException::launch("Invalid severity : should be normal, warning or error");
++	return NULL;
++      };
++      return Py_BuildValue("{sOsssssi}",
++			   "time", Device::getDateTimeFromTimeval(info.msg_time),
++			   "message", info.message,
++			   "severity", severity,
++			   "level", info.level);
++    }
++  }
++}
+diff -ruN -x .depend vrpn_07_29/python/receiver/Tracker.cpp current/python/receiver/Tracker.cpp
+--- vrpn_07_29/python/receiver/Tracker.cpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/receiver/Tracker.cpp	2012-02-28 10:01:04.269423627 +0100
+@@ -0,0 +1,172 @@
++#include "include/Tracker.hpp"
++#include "include/definition.hpp"
++#include "include/callback.hpp"
++#include "include/handlers.hpp"
++#include <iostream>
++
++namespace vrpn_python {
++
++  static PyTypeObject Tracker_Type = {
++    PyVarObject_HEAD_INIT(NULL, 0)
++    "Tracker",            // tp_name
++    sizeof(Tracker),      // tp_basicsize
++  };
++
++#define WRAPPER_REQUEST(NAME, DOC) {#NAME, (PyCFunction)Tracker::NAME, METH_NOARGS, DOC }
++
++  static PyMethodDef Tracker_methods[] = {
++    {"mainloop", (PyCFunction)Tracker::_definition::mainloop, METH_NOARGS, "Run the mainloop" },
++    {"register_change_handler", (PyCFunction)Tracker::_definition::register_change_handler, METH_VARARGS, "Register a callback handler to handle a position change" },
++    {"unregister_change_handler", (PyCFunction)Tracker::_definition::unregister_change_handler, METH_VARARGS, "Unregister a callback handler to handle a position change" },
++    WRAPPER_REQUEST(request_t2r_xform, "request room from tracker xforms"),
++    WRAPPER_REQUEST(request_u2s_xform, "request all available sensor from unit xforms"),
++    WRAPPER_REQUEST(request_workspace, "request workspace bounding box"),
++    WRAPPER_REQUEST(reset_origin, "reset origin to current tracker location (e.g. - to reinitialize a PHANToM in its reset position)"),
++    {NULL}  /* Sentinel */
++  };
++#undef WRAPPER_REQUEST
++
++  PyTypeObject &Tracker::getType() {
++    return Tracker_Type;
++  }
++
++  PyMethodDef* Tracker::getMethods() {
++    return (PyMethodDef*)Tracker_methods;
++  }
++
++  const std::string &Tracker::getName() {
++    static const std::string name = "Tracker";
++    return name;
++  }
++
++  Tracker::Tracker(PyObject *error, PyObject * args) : Device(error, args), d_device(NULL) {
++  }
++
++  PyObject * Tracker::work_on_change_handler(bool add, PyObject *obj, PyObject *args) {
++    try {
++      Tracker *self = _definition::get(obj);
++
++      static std::string defaultCall("invalid call : register_change_handler(userdata, callback, type, sensor)");
++
++      PyObject *callback;
++      PyObject *userdata;
++      char *_type;
++      int sensor = vrpn_ALL_SENSORS;
++      if ((!args) || (!PyArg_ParseTuple(args,"OOs|i",&userdata, &callback, &_type, &sensor))) {
++	DeviceException::launch(defaultCall);
++      }
++
++      std::string thirdError("Third attribut must be 'position', 'velocity', 'acceleration', 'workspace', 'unit2sensor' or 'tracker2room' !");
++
++      std::string type(_type);
++
++      Callback cb(userdata, callback);
++
++      if (type == "position") {
++	handlers::register_handler<Tracker, vrpn_TRACKERCB>(self, add, cb, sensor, thirdError);
++	Py_RETURN_TRUE;
++      }
++
++      if (type == "velocity") {
++	handlers::register_handler<Tracker, vrpn_TRACKERVELCB>(self, add, cb, sensor, thirdError);
++	Py_RETURN_TRUE;
++      }
++
++      if (type == "acceleration") {
++	handlers::register_handler<Tracker, vrpn_TRACKERACCCB>(self, add, cb, sensor, thirdError);
++	Py_RETURN_TRUE;
++      }
++
++      if (type == "unit2sensor") {
++	handlers::register_handler<Tracker, vrpn_TRACKERUNIT2SENSORCB>(self, add, cb, sensor, thirdError);
++	Py_RETURN_TRUE;
++      }
++
++      if (type == "workspace") {
++	handlers::register_handler<Tracker, vrpn_TRACKERWORKSPACECB>(self, add, cb, thirdError);
++	Py_RETURN_TRUE;
++      }
++
++      if (type == "tracker2room") {
++	handlers::register_handler<Tracker, vrpn_TRACKERTRACKER2ROOMCB>(self, add, cb, thirdError);
++	Py_RETURN_TRUE;
++      }
++
++      DeviceException::launch(thirdError);
++
++    } catch (DeviceException &exception) {
++      PyErr_SetString(Device::s_error, exception.getReason().c_str());
++    }
++    return NULL;
++  }
++
++#define WRAPPER_REQUEST(NAME, ERROR_MSG)				\
++  PyObject *Tracker::NAME(PyObject *obj) {				\
++    try {								\
++      Tracker *self = _definition::get(obj);				\
++      if (self->d_device->NAME() < 1)					\
++	Py_RETURN_TRUE;							\
++      DeviceException::launch(ERROR_MSG);				\
++    } catch (DeviceException &exception) {				\
++      PyErr_SetString(Device::s_error, exception.getReason().c_str());	\
++    }									\
++    return NULL;							\
++  }
++
++  WRAPPER_REQUEST(request_t2r_xform, "Tracker : cannot request t2r xform")
++  WRAPPER_REQUEST(request_u2s_xform, "Tracker : cannot request u2s xform")
++  WRAPPER_REQUEST(request_workspace, "Tracker : cannot request workspace")
++  WRAPPER_REQUEST(reset_origin, "Tracker : cannot reset the origin")
++#undef WRAPPER_REQUEST
++
++  namespace handlers {
++    template<> PyObject *CALLBACK_CALL createPyObjectFromVRPN_Type(const vrpn_TRACKERCB &info) {
++      return Py_BuildValue("{sOsis(fff)s(ffff)}",
++			   "time", Device::getDateTimeFromTimeval(info.msg_time),
++			   "sensor", info.sensor,
++			   "position", info.pos[0],info.pos[1],info.pos[2],
++			   "quaternion", info.quat[0],info.quat[1],info.quat[2],info.quat[3]);
++    }
++
++    template<> PyObject *CALLBACK_CALL createPyObjectFromVRPN_Type(const vrpn_TRACKERVELCB &info) {
++      return Py_BuildValue("{sOsis(fff)s(ffff)si}",
++			   "time", Device::getDateTimeFromTimeval(info.msg_time),
++			   "sensor", info.sensor,
++			   "velocity", info.vel[0],info.vel[1],info.vel[2],
++			   "future quaternion", info.vel_quat[0],info.vel_quat[1],info.vel_quat[2],info.vel_quat[3],
++			   "future delta", info.vel_quat_dt);
++    }
++
++    template<> PyObject *CALLBACK_CALL createPyObjectFromVRPN_Type(const vrpn_TRACKERACCCB &info) {
++      return Py_BuildValue("{sOsis(fff)s(ffff)si}",
++			   "time", Device::getDateTimeFromTimeval(info.msg_time),
++			   "sensor", info.sensor,
++			   "acceleration", info.acc[0],info.acc[1],info.acc[2],
++			   "future acceleration ?", info.acc_quat[0],info.acc_quat[1],info.acc_quat[2],info.acc_quat[3],
++			   "future delta", info.acc_quat_dt);
++    }
++
++    template<> PyObject *CALLBACK_CALL createPyObjectFromVRPN_Type(const vrpn_TRACKERTRACKER2ROOMCB &info) {
++      return Py_BuildValue("{sOs(fff)s(ffff)}",
++			   "time", Device::getDateTimeFromTimeval(info.msg_time),
++			   "position offset", info.tracker2room[0],info.tracker2room[1],info.tracker2room[2],
++			   "quaternion offset", info.tracker2room_quat[0],info.tracker2room_quat[1],info.tracker2room_quat[2],info.tracker2room_quat[3]);
++    }
++
++    template<> PyObject *CALLBACK_CALL createPyObjectFromVRPN_Type(const vrpn_TRACKERUNIT2SENSORCB &info) {
++      return Py_BuildValue("{sOsis(fff)s(ffff)}",
++			   "time", Device::getDateTimeFromTimeval(info.msg_time),
++			   "sensor", info.sensor,
++			   "position offset", info.unit2sensor[0],info.unit2sensor[1],info.unit2sensor[2],
++			   "quaternion offset", info.unit2sensor_quat[0],info.unit2sensor_quat[1],info.unit2sensor_quat[2],info.unit2sensor_quat[3]);
++    }
++
++    template<> PyObject *CALLBACK_CALL createPyObjectFromVRPN_Type(const vrpn_TRACKERWORKSPACECB &info) {
++      return Py_BuildValue("{sOs(fff)s(fff)}",
++			   "time", Device::getDateTimeFromTimeval(info.msg_time),
++			   "minimum corner box", info.workspace_min[0],info.workspace_min[1],info.workspace_min[2],
++			   "maximum corner box", info.workspace_max[0],info.workspace_max[1],info.workspace_max[2]);
++    }
++
++  }
++}
+diff -ruN -x .depend vrpn_07_29/python/sender/include/Poser.hpp current/python/sender/include/Poser.hpp
+--- vrpn_07_29/python/sender/include/Poser.hpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/sender/include/Poser.hpp	2012-02-28 10:01:04.109423627 +0100
+@@ -0,0 +1,33 @@
++#ifndef __VRPN_PYTHON_POSER_HPP__
++#define __VRPN_PYTHON_POSER_HPP__
++
++#include <vrpn_Poser.h>
++#include <include/Device.hpp>
++
++namespace vrpn_python {
++  template <class device_type> class definition;
++
++  class Poser : public Device {
++    typedef vrpn_Poser_Remote vrpn_type;
++    friend class definition<Poser>;
++    vrpn_type *d_device;
++
++    Poser(PyObject *error, PyObject * args);
++
++    static PyTypeObject &getType();
++    static PyMethodDef* getMethods();
++    static const std::string &getName();
++
++  public:
++    vrpn_type *getDevice() { return d_device ; }
++
++    typedef definition<Poser> _definition;
++
++    static PyObject *request_pose(PyObject *obj, PyObject *args);
++    static PyObject *request_pose_relative(PyObject *obj, PyObject *args);
++    static PyObject *request_pose_velocity(PyObject *obj, PyObject *args);
++    static PyObject *request_pose_velocity_relative(PyObject *obj, PyObject *args);
++  };
++}
++
++#endif // defined(__VRPN_PYTHON_POSER_H__)
+diff -ruN -x .depend vrpn_07_29/python/sender/include/Text_Sender.hpp current/python/sender/include/Text_Sender.hpp
+--- vrpn_07_29/python/sender/include/Text_Sender.hpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/sender/include/Text_Sender.hpp	2012-02-28 10:01:04.109423627 +0100
+@@ -0,0 +1,30 @@
++#ifndef __VRPN_PYTHON_TEXT_SENDER_HPP__
++#define __VRPN_PYTHON_TEXT_SENDER_HPP__
++
++#include <vrpn_Text.h>
++#include <include/Device.hpp>
++
++namespace vrpn_python {
++  template <class device_type> class definition;
++
++  class Text_Sender : public Device {
++    typedef vrpn_Text_Sender vrpn_type;
++    friend class definition<Text_Sender>;
++    vrpn_type *d_device;
++
++    Text_Sender(PyObject *error, PyObject * args);
++
++    static PyTypeObject &getType();
++    static PyMethodDef* getMethods();
++    static const std::string &getName();
++
++  public:
++    vrpn_type *getDevice() { return d_device ; }
++
++    typedef definition<Text_Sender> _definition;
++
++    static PyObject *send_message(PyObject *obj, PyObject *args);
++  };
++}
++
++#endif // defined(__VRPN_PYTHON_TEXT_SENDER_H__)
+diff -ruN -x .depend vrpn_07_29/python/sender/Poser.cpp current/python/sender/Poser.cpp
+--- vrpn_07_29/python/sender/Poser.cpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/sender/Poser.cpp	2012-02-28 10:01:04.139423627 +0100
+@@ -0,0 +1,173 @@
++#include "include/Poser.hpp"
++#include "include/callback.hpp"
++#include "include/definition.hpp"
++#include <iostream>
++
++namespace vrpn_python {
++
++  static PyTypeObject Poser_Type = {
++    PyVarObject_HEAD_INIT(NULL, 0)
++    "Poser",     // tp_name
++    sizeof(Poser),      // tp_basicsize
++  };
++
++  static PyMethodDef Poser_methods[] = {
++    {"mainloop", (PyCFunction)Poser::_definition::mainloop, METH_NOARGS, "Run the mainloop" },
++    {"request_pose", (PyCFunction)Poser::request_pose, METH_VARARGS, "Set the pose of the poser" },
++    {"request_pose_relative", (PyCFunction)Poser::request_pose_relative, METH_VARARGS, "Set the relative pose of the poser" },
++    {"request_pose_velocity", (PyCFunction)Poser::request_pose_velocity, METH_VARARGS, "Set the velocity of the poser" },
++    {"request_pose_velocity", (PyCFunction)Poser::request_pose_velocity, METH_VARARGS, "Set the velocity of the poser" },
++    {NULL}  /* Sentinel */
++  };
++
++  PyTypeObject &Poser::getType() {
++    return Poser_Type;
++  }
++
++  PyMethodDef* Poser::getMethods() {
++    return (PyMethodDef*)Poser_methods;
++  }
++
++  const std::string &Poser::getName() {
++    static const std::string name = "Poser";
++    return name;
++  }
++
++  Poser::Poser(PyObject *error, PyObject * args) : Device(error, args), d_device(NULL) {
++  }
++
++  PyObject *Poser::request_pose(PyObject *obj, PyObject *args) {
++    try {
++      Poser *self = _definition::get(obj);
++
++      static std::string defaultCall("invalid call : request_pose(datetime, double position[3], double quaternion[4])");
++
++      PyObject *py_time;
++      double position[3];
++      double quaternion[4];
++
++      if ((!args) || (!PyArg_ParseTuple(args,"O(ddd)(dddd)", &py_time,
++					&position[0], &position[1], &position[2],
++					&quaternion[0], &quaternion[1], &quaternion[2], &quaternion[3]))) {
++	DeviceException::launch(defaultCall);
++      }
++
++      timeval time;
++      if (!Device::getTimevalFromDateTime(py_time, time)) {
++	DeviceException::launch("First argument must be a datetime object !");
++      }
++
++      if (!self->d_device->request_pose(time, position, quaternion)) {
++	DeviceException::launch("vrpn.Poser : request_pose failed");
++      }
++      Py_RETURN_TRUE;
++
++    } catch (DeviceException &exception) {
++      PyErr_SetString(Device::s_error, exception.getReason().c_str());
++    }
++    return NULL;
++  }
++
++  PyObject *Poser::request_pose_relative(PyObject *obj, PyObject *args) {
++    try {
++      Poser *self = _definition::get(obj);
++
++      static std::string defaultCall("invalid call : request_pose_relative(int time[2](second and microsecond), double position_delta[3], double quaternion[4])");
++
++      PyObject *py_time;
++      double position[3];
++      double quaternion[4];
++
++      if (!PyArg_ParseTuple(args,"O(ddd)(dddd)", &py_time,
++			    &position[0], &position[1], &position[2],
++			    &quaternion[0], &quaternion[1], &quaternion[2], &quaternion[3])) {
++	DeviceException::launch(defaultCall);
++      }
++
++      timeval time;
++      if (!Device::getTimevalFromDateTime(py_time, time)) {
++	DeviceException::launch("First argument must be a datetime object !");
++      }
++
++      if (!self->d_device->request_pose_relative(time, position, quaternion)) {
++	DeviceException::launch("vrpn.Poser : request_pose_relative failed");
++      }
++
++      Py_RETURN_TRUE;
++
++    } catch (DeviceException &exception) {
++      PyErr_SetString(Device::s_error, exception.getReason().c_str());
++    }
++    return NULL;
++  }
++
++  PyObject *Poser::request_pose_velocity(PyObject *obj, PyObject *args) {
++    try {
++      Poser *self = _definition::get(obj);
++
++      static std::string defaultCall("invalid call : request_pose_velocity(int time[2](second and microsecond), double velocity[3], double quaternion[4], double interval)");
++
++      PyObject *py_time;
++      double position[3];
++      double quaternion[4];
++      double interval;
++
++      if (!PyArg_ParseTuple(args,"O(ddd)(dddd)d", &py_time,
++			    &position[0], &position[1], &position[2],
++			    &quaternion[0], &quaternion[1], &quaternion[2], &quaternion[3],
++			    &interval)) {
++	DeviceException::launch(defaultCall);
++      }
++
++      timeval time;
++      if (!Device::getTimevalFromDateTime(py_time, time)) {
++	DeviceException::launch("First argument must be a datetime object !");
++      }
++
++      if (!self->d_device->request_pose_velocity(time, position, quaternion, interval)) {
++	DeviceException::launch("vrpn.Poser : request_pose_velocity failed");
++      }
++
++      Py_RETURN_TRUE;
++
++    } catch (DeviceException &exception) {
++      PyErr_SetString(Device::s_error, exception.getReason().c_str());
++    }
++    return NULL;
++  }
++
++  PyObject *Poser::request_pose_velocity_relative(PyObject *obj, PyObject *args) {
++    try {
++      Poser *self = _definition::get(obj);
++
++      static std::string defaultCall("invalid call : request_pose_velocity_relative(int time[2](second and microsecond), double velocity_delta[3], double quaternion[4], double interval)");
++
++      PyObject *py_time;
++      double position[3];
++      double quaternion[4];
++      double interval;
++
++      if (!PyArg_ParseTuple(args,"O(ddd)(dddd)d", &py_time,
++			    &position[0], &position[1], &position[2],
++			    &quaternion[0], &quaternion[1], &quaternion[2], &quaternion[3],
++			    &interval)) {
++	DeviceException::launch(defaultCall);
++      }
++
++      timeval time;
++      if (!Device::getTimevalFromDateTime(py_time, time)) {
++	DeviceException::launch("First argument must be a datetime object !");
++      }
++
++      if (!self->d_device->request_pose_velocity_relative(time, position, quaternion, interval)) {
++	DeviceException::launch("vrpn.Poser : request_pose_velocity_relative failed");
++      }
++
++      Py_RETURN_TRUE;
++
++    } catch (DeviceException &exception) {
++      PyErr_SetString(Device::s_error, exception.getReason().c_str());
++    }
++    return NULL;
++  }
++}
+diff -ruN -x .depend vrpn_07_29/python/sender/sender.cpp current/python/sender/sender.cpp
+--- vrpn_07_29/python/sender/sender.cpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/sender/sender.cpp	2012-02-28 11:14:07.549422711 +0100
+@@ -0,0 +1,39 @@
++#include <include/interface.hpp>
++#include "include/Poser.hpp"
++#include "include/Text_Sender.hpp"
++#include <include/definition.hpp>
++
++namespace vrpn_python {
++  namespace sender {
++#if PY_MAJOR_VERSION >= 3
++    static PyModuleDef module_definition = {
++      PyModuleDef_HEAD_INIT,
++      "sender",
++      "VRPN sender classes.",
++      -1,
++      NULL
++    };
++#endif
++
++    bool init_types() {
++      if (!vrpn_python::Poser::_definition::init_type()) return false;
++      if (!vrpn_python::Text_Sender::_definition::init_type()) return false;
++
++      return true;
++    }
++
++    void add_types(PyObject* vrpn_module) {
++      PyObject* sender_module = 
++#if PY_MAJOR_VERSION >= 3
++	PyModule_Create(&module_definition);
++#else
++        Py_InitModule("sender", NULL);
++#endif
++
++      PyModule_AddObject(vrpn_module, "sender", sender_module);
++
++      vrpn_python::Poser::_definition::add_type(sender_module);
++      vrpn_python::Text_Sender::_definition::add_type(sender_module);
++    }
++  }
++}
+diff -ruN -x .depend vrpn_07_29/python/sender/Text_Sender.cpp current/python/sender/Text_Sender.cpp
+--- vrpn_07_29/python/sender/Text_Sender.cpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/sender/Text_Sender.cpp	2012-02-28 10:01:04.129423627 +0100
+@@ -0,0 +1,81 @@
++#include "include/Text_Sender.hpp"
++#include "include/callback.hpp"
++#include "include/definition.hpp"
++#include <iostream>
++
++namespace vrpn_python {
++
++  static PyTypeObject Text_Sender_Type = {
++    PyVarObject_HEAD_INIT(NULL, 0)
++    "Text",     // tp_name
++    sizeof(Text_Sender),      // tp_basicsize
++  };
++
++  static PyMethodDef Text_Sender_methods[] = {
++    {"mainloop", (PyCFunction)Text_Sender::_definition::mainloop, METH_NOARGS, "Run the mainloop" },
++    {"send_message", (PyCFunction)Text_Sender::send_message, METH_VARARGS, "Send a text message" },
++    {NULL}  /* Sentinel */
++  };
++
++  PyTypeObject &Text_Sender::getType() {
++    return Text_Sender_Type;
++  }
++
++  PyMethodDef* Text_Sender::getMethods() {
++    return (PyMethodDef*)Text_Sender_methods;
++  }
++
++  const std::string &Text_Sender::getName() {
++    static const std::string name = "Text";
++    return name;
++  }
++
++  Text_Sender::Text_Sender(PyObject *error, PyObject * args) : Device(error, args), d_device(NULL) {
++  }
++
++  PyObject *Text_Sender::send_message(PyObject *obj, PyObject *args) {
++    try {
++      Text_Sender *self = _definition::get(obj);
++
++      static std::string defaultCall("invalid call : send_message(message, severity = normal, level = 0, datetime = NOW");
++
++      char *msg;
++      char *severity = (char *)"normal";
++      int level = 0;
++      PyObject *py_time = NULL;
++
++      if ((!args) || (!PyArg_ParseTuple(args,"s|siO", &msg, &severity, &level, &py_time))) {
++	DeviceException::launch(defaultCall);
++      }
++
++      timeval time = vrpn_TEXT_NOW;
++
++      if (py_time) {
++	if (!Device::getTimevalFromDateTime(py_time, time)) {
++	  DeviceException::launch("Last argument must be a datetime object !");
++	}
++      }
++
++      vrpn_TEXT_SEVERITY type = vrpn_TEXT_NORMAL;
++      if (strcmp(severity,"normal") == 0 ) {
++	type = vrpn_TEXT_NORMAL;
++      } else if (strcmp(severity,"warning") == 0 ) {
++	type = vrpn_TEXT_WARNING;
++      } else if (strcmp(severity,"error") == 0 ) {
++	type = vrpn_TEXT_ERROR;
++      } else {
++	DeviceException::launch("Severity must be normal, warning or error");
++      }
++
++      if (self->d_device->send_message(msg, type, level, time) != 0) {
++	DeviceException::launch("vrpn.sender.Text : send_message failed");
++      }
++
++      Py_RETURN_TRUE;
++
++    } catch (DeviceException &exception) {
++      PyErr_SetString(Device::s_error, exception.getReason().c_str());
++    }
++    return NULL;
++  }
++}
+diff -ruN -x .depend vrpn_07_29/python/tools.cpp current/python/tools.cpp
+--- vrpn_07_29/python/tools.cpp	1970-01-01 01:00:00.000000000 +0100
++++ current/python/tools.cpp	2012-02-28 10:01:04.289423627 +0100
+@@ -0,0 +1,35 @@
++#include "include/tools.hpp"
++#include <iostream>
++
++namespace vrpn_python {
++  namespace tools {
++    bool getStringFromPyObject(PyObject *py_str, std::string &std_str) {
++
++      if (!PyUnicode_Check(py_str)) {
++	return false;
++      }
++
++      PyObject *py_utf8 = PyUnicode_AsUTF8String(py_str);
++      char *chr_str; Py_ssize_t len;
++      if (PyBytes_AsStringAndSize(py_utf8, &chr_str, &len) < 0) {
++	return false;
++      }
++      Py_DECREF(py_utf8);
++
++      std_str = chr_str;
++
++      return true;
++    }
++
++    bool getIntegerFromPyObject(PyObject *py_int, int &_int) {
++
++      if (!PyNumber_Check(py_int)) {
++	return false;
++      }
++
++      _int = PyNumber_AsSsize_t(py_int, PyExc_OverflowError);
++
++      return true;
++    }
++  }
++}
+diff -ruN -x .depend vrpn_07_29/python/vrpn_python.sln current/python/vrpn_python.sln
+--- vrpn_07_29/python/vrpn_python.sln	1970-01-01 01:00:00.000000000 +0100
++++ current/python/vrpn_python.sln	2012-02-28 10:01:04.289423627 +0100
+@@ -0,0 +1,20 @@
++ï»¿
++Microsoft Visual Studio Solution File, Format Version 9.00
++# Visual Studio 2005
++Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vrpn_python", "windows\vrpn_python.vcproj", "{1820AEB6-6954-4A83-8CCA-4359862326AB}"
++EndProject
++Global
++	GlobalSection(SolutionConfigurationPlatforms) = preSolution
++		Debug|Win32 = Debug|Win32
++		Release|Win32 = Release|Win32
++	EndGlobalSection
++	GlobalSection(ProjectConfigurationPlatforms) = postSolution
++		{1820AEB6-6954-4A83-8CCA-4359862326AB}.Debug|Win32.ActiveCfg = Debug|Win32
++		{1820AEB6-6954-4A83-8CCA-4359862326AB}.Debug|Win32.Build.0 = Debug|Win32
++		{1820AEB6-6954-4A83-8CCA-4359862326AB}.Release|Win32.ActiveCfg = Release|Win32
++		{1820AEB6-6954-4A83-8CCA-4359862326AB}.Release|Win32.Build.0 = Release|Win32
++	EndGlobalSection
++	GlobalSection(SolutionProperties) = preSolution
++		HideSolutionNode = FALSE
++	EndGlobalSection
++EndGlobal
+diff -ruN -x .depend vrpn_07_29/python/windows/vrpn_python.vcproj current/python/windows/vrpn_python.vcproj
+--- vrpn_07_29/python/windows/vrpn_python.vcproj	1970-01-01 01:00:00.000000000 +0100
++++ current/python/windows/vrpn_python.vcproj	2012-02-28 10:01:04.289423627 +0100
+@@ -0,0 +1,337 @@
++<?xml version="1.0" encoding="Windows-1252"?>
++<VisualStudioProject
++	ProjectType="Visual C++"
++	Version="8,00"
++	Name="vrpn_python"
++	ProjectGUID="{1820AEB6-6954-4A83-8CCA-4359862326AB}"
++	RootNamespace="vrpn_python"
++	Keyword="Win32Proj"
++	>
++	<Platforms>
++		<Platform
++			Name="Win32"
++		/>
++	</Platforms>
++	<ToolFiles>
++	</ToolFiles>
++	<Configurations>
++		<Configuration
++			Name="Debug|Win32"
++			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
++			IntermediateDirectory="$(ConfigurationName)"
++			ConfigurationType="2"
++			CharacterSet="1"
++			>
++			<Tool
++				Name="VCPreBuildEventTool"
++			/>
++			<Tool
++				Name="VCCustomBuildTool"
++			/>
++			<Tool
++				Name="VCXMLDataGeneratorTool"
++			/>
++			<Tool
++				Name="VCWebServiceProxyGeneratorTool"
++			/>
++			<Tool
++				Name="VCMIDLTool"
++			/>
++			<Tool
++				Name="VCCLCompilerTool"
++				Optimization="0"
++				AdditionalIncludeDirectories="..;$(PYTHON_DIR)\include;$(VRPN_DIR)"
++				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;VRPN_PYTHON_EXPORTS;CALLBACK_CALL=__stdcall"
++				MinimalRebuild="true"
++				BasicRuntimeChecks="3"
++				RuntimeLibrary="3"
++				UsePrecompiledHeader="0"
++				WarningLevel="3"
++				Detect64BitPortabilityProblems="true"
++				DebugInformationFormat="4"
++			/>
++			<Tool
++				Name="VCManagedResourceCompilerTool"
++			/>
++			<Tool
++				Name="VCResourceCompilerTool"
++			/>
++			<Tool
++				Name="VCPreLinkEventTool"
++			/>
++			<Tool
++				Name="VCLinkerTool"
++				AdditionalDependencies="python32.lib"
++				OutputFile="$(OutDir)\vrpn.pyd"
++				LinkIncremental="2"
++				AdditionalLibraryDirectories="$(PYTHON_DIR)\libs"
++				GenerateDebugInformation="true"
++				SubSystem="2"
++				TargetMachine="1"
++			/>
++			<Tool
++				Name="VCALinkTool"
++			/>
++			<Tool
++				Name="VCManifestTool"
++			/>
++			<Tool
++				Name="VCXDCMakeTool"
++			/>
++			<Tool
++				Name="VCBscMakeTool"
++			/>
++			<Tool
++				Name="VCFxCopTool"
++			/>
++			<Tool
++				Name="VCAppVerifierTool"
++			/>
++			<Tool
++				Name="VCWebDeploymentTool"
++			/>
++			<Tool
++				Name="VCPostBuildEventTool"
++			/>
++		</Configuration>
++		<Configuration
++			Name="Release|Win32"
++			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
++			IntermediateDirectory="$(ConfigurationName)"
++			ConfigurationType="2"
++			CharacterSet="1"
++			WholeProgramOptimization="1"
++			>
++			<Tool
++				Name="VCPreBuildEventTool"
++			/>
++			<Tool
++				Name="VCCustomBuildTool"
++			/>
++			<Tool
++				Name="VCXMLDataGeneratorTool"
++			/>
++			<Tool
++				Name="VCWebServiceProxyGeneratorTool"
++			/>
++			<Tool
++				Name="VCMIDLTool"
++			/>
++			<Tool
++				Name="VCCLCompilerTool"
++				AdditionalIncludeDirectories="..;$(PYTHON_DIR)\include;$(VRPN_DIR)"
++				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;VRPN_PYTHON_EXPORTS;CALLBACK_CALL=__stdcall"
++				RuntimeLibrary="2"
++				UsePrecompiledHeader="0"
++				WarningLevel="3"
++				Detect64BitPortabilityProblems="true"
++				DebugInformationFormat="3"
++			/>
++			<Tool
++				Name="VCManagedResourceCompilerTool"
++			/>
++			<Tool
++				Name="VCResourceCompilerTool"
++			/>
++			<Tool
++				Name="VCPreLinkEventTool"
++			/>
++			<Tool
++				Name="VCLinkerTool"
++				AdditionalDependencies="vrpn.lib quat.lib"
++				OutputFile="$(OutDir)\vrpn.pyd"
++				LinkIncremental="1"
++				AdditionalLibraryDirectories="$(PYTHON_DIR)\libs;$(VRPN_DIR)\pc_win32\Debug;$(VRPN_DIR)\quat\pc_win32\Debug"
++				GenerateDebugInformation="true"
++				SubSystem="2"
++				OptimizeReferences="2"
++				EnableCOMDATFolding="2"
++				TargetMachine="1"
++			/>
++			<Tool
++				Name="VCALinkTool"
++			/>
++			<Tool
++				Name="VCManifestTool"
++			/>
++			<Tool
++				Name="VCXDCMakeTool"
++			/>
++			<Tool
++				Name="VCBscMakeTool"
++			/>
++			<Tool
++				Name="VCFxCopTool"
++			/>
++			<Tool
++				Name="VCAppVerifierTool"
++			/>
++			<Tool
++				Name="VCWebDeploymentTool"
++			/>
++			<Tool
++				Name="VCPostBuildEventTool"
++			/>
++		</Configuration>
++	</Configurations>
++	<References>
++	</References>
++	<Files>
++		<Filter
++			Name="Fichiers sources"
++			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
++			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
++			>
++			<File
++				RelativePath="..\Base.cpp"
++				>
++			</File>
++			<File
++				RelativePath="..\callback.cpp"
++				>
++			</File>
++			<File
++				RelativePath="..\Connection.cpp"
++				>
++			</File>
++			<File
++				RelativePath="..\Device.cpp"
++				>
++			</File>
++			<File
++				RelativePath="..\interface.cpp"
++				>
++			</File>
++			<File
++				RelativePath="..\tools.cpp"
++				>
++			</File>
++			<Filter
++				Name="sender"
++				>
++				<File
++					RelativePath="..\sender\Poser.cpp"
++					>
++				</File>
++				<File
++					RelativePath="..\sender\sender.cpp"
++					>
++				</File>
++				<File
++					RelativePath="..\sender\Text_Sender.cpp"
++					>
++				</File>
++			</Filter>
++			<Filter
++				Name="receiver"
++				>
++				<File
++					RelativePath="..\receiver\Analog.cpp"
++					>
++				</File>
++				<File
++					RelativePath="..\receiver\Button.cpp"
++					>
++				</File>
++				<File
++					RelativePath="..\receiver\Dial.cpp"
++					>
++				</File>
++				<File
++					RelativePath="..\receiver\receiver.cpp"
++					>
++				</File>
++				<File
++					RelativePath="..\receiver\Text_Receiver.cpp"
++					>
++				</File>
++				<File
++					RelativePath="..\receiver\Tracker.cpp"
++					>
++				</File>
++			</Filter>
++		</Filter>
++		<Filter
++			Name="Fichiers d&apos;en-tête"
++			Filter="h;hpp;hxx;hm;inl;inc;xsd"
++			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
++			>
++			<File
++				RelativePath="..\include\Base.hpp"
++				>
++			</File>
++			<File
++				RelativePath="..\include\callback.hpp"
++				>
++			</File>
++			<File
++				RelativePath="..\include\Connection.hpp"
++				>
++			</File>
++			<File
++				RelativePath="..\include\definition.hpp"
++				>
++			</File>
++			<File
++				RelativePath="..\include\Device.hpp"
++				>
++			</File>
++			<File
++				RelativePath="..\include\handlers.hpp"
++				>
++			</File>
++			<File
++				RelativePath="..\include\interface.hpp"
++				>
++			</File>
++			<File
++				RelativePath="..\include\tools.hpp"
++				>
++			</File>
++			<Filter
++				Name="receiver"
++				>
++				<File
++					RelativePath="..\receiver\include\Analog.hpp"
++					>
++				</File>
++				<File
++					RelativePath="..\receiver\include\Button.hpp"
++					>
++				</File>
++				<File
++					RelativePath="..\receiver\include\Dial.hpp"
++					>
++				</File>
++				<File
++					RelativePath="..\receiver\include\Text_Receiver.hpp"
++					>
++				</File>
++				<File
++					RelativePath="..\receiver\include\Tracker.hpp"
++					>
++				</File>
++			</Filter>
++			<Filter
++				Name="sender"
++				>
++				<File
++					RelativePath="..\sender\include\Poser.hpp"
++					>
++				</File>
++				<File
++					RelativePath="..\sender\include\Text_Sender.hpp"
++					>
++				</File>
++			</Filter>
++		</Filter>
++		<Filter
++			Name="Fichiers de ressources"
++			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
++			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
++			>
++		</Filter>
++	</Files>
++	<Globals>
++	</Globals>
++</VisualStudioProject>
+diff -ruN -x .depend vrpn_07_29/quat/quat.c current/quat/quat.c
+--- vrpn_07_29/quat/quat.c	2011-05-23 18:32:16.000000000 +0200
++++ current/quat/quat.c	2012-03-30 12:58:40.996226864 +0200
+@@ -625,10 +625,6 @@
+ {
+    double s,xs,ys,zs,wx,wy,wz,xx,xy,xz,yy,yz,zz;
+ 
+-
+-   /* For unit srcQuat, just set s = 2.0; or set xs = srcQuat[X] + 
+-    *  srcQuat[X], etc. 
+-    *****************************************************************************/
+    s = 2.0 / (srcQuat[X]*srcQuat[X] + srcQuat[Y]*srcQuat[Y] + 
+               srcQuat[Z]*srcQuat[Z] + srcQuat[W]*srcQuat[W]);
+ 
+diff -ruN -x .depend vrpn_07_29/server_src/Makefile current/server_src/Makefile
+--- vrpn_07_29/server_src/Makefile	2011-05-23 18:32:16.000000000 +0200
++++ current/server_src/Makefile	2012-02-28 12:40:00.029421638 +0100
+@@ -236,6 +236,15 @@
+ override LFLAGS += $(PHASESPACE) $(EXTRAOPTS)
+ endif
+ 
++ifeq ($(HW_OS),pc_linux64)
++	override CFLAGS += -DHAVE_DEV_INPUT
++	override CXXFLAGS += -DHAVE_DEV_INPUT
++endif
++ifeq ($(HW_OS),pc_linux)
++	override CFLAGS += -DHAVE_DEV_INPUT
++	override CXXFLAGS += -DHAVE_DEV_INPUT
++endif
++
+ .SUFFIXES: .cpp
+ 
+ .C.o:
+diff -ruN -x .depend vrpn_07_29/server_src/vrpn.cfg current/server_src/vrpn.cfg
+--- vrpn_07_29/server_src/vrpn.cfg	2011-05-23 18:32:16.000000000 +0200
++++ current/server_src/vrpn.cfg	2012-02-28 12:49:56.079421514 +0100
+@@ -1511,6 +1511,25 @@
+ #vrpn_Keyboard	Keyboard0
+ 
+ ################################################################################
++# WARNING : LINUX ONLY !
++# Open the /dev/input devices and treat them as mouse events
++# There is as many as available channel (kernel 2.6.38 : 10 channels)
++#
++# There is three argument:
++#	char	name_of_this_device[] 
++#	char	"name of the hardware device"
++#	int	size of the window
++# The "name of the hardware device" is the Name entry of the device
++# from /proc/bus/input/devices
++# Due to hardware access through /dev/input/*, there is no notion of window.
++# Thus, you must specify the window size. If '-1' is provided, then, this device
++# only provide relative displacement of the channel
++#
++# BEWARE that you must have read access to the wanted device
++
++vrpn_DevInput           Input0          "ImPS/2 ALPS GlidePoint" -1
++
++################################################################################
+ # MotionNode inertial tracking system.
+ #
+ # There are four arguments:
+diff -ruN -x .depend vrpn_07_29/server_src/vrpn_Generic_server_object.C current/server_src/vrpn_Generic_server_object.C
+--- vrpn_07_29/server_src/vrpn_Generic_server_object.C	2011-05-23 18:32:16.000000000 +0200
++++ current/server_src/vrpn_Generic_server_object.C	2012-03-06 15:00:33.510827393 +0100
+@@ -2249,6 +2249,53 @@
+     return 0;
+ }
+ 
++#ifdef HAVE_DEV_INPUT
++//================================
++int vrpn_Generic_Server_Object::setup_DevInput (char * & pch, char * line, FILE * config_file) {
++  char s2 [LINESIZE], s3 [LINESIZE] , s4 [LINESIZE];
++    int int_param = 0;
++    vrpn_DevInput * dev_input;
++    next();
++
++
++    // Get the arguments (class, dev_input_name)
++    if (sscanf(pch,"%511s \"%[^\"]\" %s %d",s2, s3, s4, &int_param) != 4) {
++        if (sscanf(pch,"%511s \"%[^\"]\" %s",s2, s3, s4) != 3) {
++            fprintf(stderr,"Bad vrpn_DevInput line: %s\n",line);
++	    return -1;
++	}
++    }
++
++    // Make sure there's room for a new dev_input
++    if (num_dev_inputs >= VRPN_GSO_MAX_DEV_INPUTS) {
++        fprintf(stderr,"Too many dev_inputs (mice) in config file");
++        return -1;
++    }
++
++    // Open the box
++    if (verbose)
++        printf("Opening vrpn_DevInput: %s\n",s2);
++
++    try {
++      dev_input = new vrpn_DevInput(s2, connection, s3, s4, int_param);
++    }
++    catch (char *&error) {
++        fprintf( stderr, "could not create vrpn_DevInput : %s\n", error );
++	return -1;
++    }
++    catch (...) {
++	fprintf( stderr, "could not create vrpn_DevInput\n" );
++	return -1;
++    }
++    if (NULL == dev_input) {
++        fprintf(stderr,"Can't create new vrpn_DevInput\n");
++        return -1;
++    }
++    dev_inputs[num_dev_inputs++] = dev_input;
++    return 0;
++}
++#endif
++
+ //================================
+ int vrpn_Generic_Server_Object::setup_Tracker_Crossbow (char * & pch, char *line, FILE *config_file) {
+         char port[LINESIZE], name[LINESIZE];
+@@ -4507,6 +4554,9 @@
+   num_analogouts(0),
+   num_DTracks(0),
+   num_posers(0),
++#ifdef HAVE_DEV_INPUT
++  num_dev_inputs(0),
++#endif
+   num_mouses(0)
+   , num_inertiamouses (0)
+   , num_Keyboards(0)
+@@ -4661,6 +4711,10 @@
+               CHECK(setup_Wanda);
+           } else if (isit("vrpn_Mouse")) {
+               CHECK(setup_Mouse);
++#ifdef HAVE_DEV_INPUT
++          } else if (isit("vrpn_DevInput")) {
++              CHECK(setup_DevInput);
++#endif
+           } else if (isit("vrpn_Tng3")) {
+               CHECK(setup_Tng3);
+           } else  if (isit("vrpn_TimeCode_Generator")) {
+@@ -4918,6 +4972,13 @@
+ 	  mouses[i]->mainloop();
+   }
+ 
++#ifdef HAVE_DEV_INPUT
++  // Let all the Mouses (Mice) do their thing
++  for (i=0; i< num_dev_inputs; i++) {
++	  dev_inputs[i]->mainloop();
++  }
++#endif
++
+   // Let all the Loggers do their thing
+   for (i=0; i< num_loggers; i++) {
+ 	  loggers[i]->mainloop();
+diff -ruN -x .depend vrpn_07_29/server_src/vrpn_Generic_server_object.h current/server_src/vrpn_Generic_server_object.h
+--- vrpn_07_29/server_src/vrpn_Generic_server_object.h	2011-05-23 18:32:16.000000000 +0200
++++ current/server_src/vrpn_Generic_server_object.h	2012-03-06 14:12:18.900827148 +0100
+@@ -59,6 +59,9 @@
+ #include "vrpn_nikon_controls.h"
+ #include "vrpn_Poser_Tek4662.h"
+ #include "vrpn_Mouse.h"
++#ifdef HAVE_DEV_INPUT
++#   include "vrpn_DevInput.h"
++#endif
+ #include "vrpn_Tracker_Crossbow.h"
+ #include "vrpn_3DMicroscribe.h"
+ #include "vrpn_5DT16.h"
+@@ -130,6 +133,9 @@
+ const int VRPN_GSO_MAX_DTRACKS =              5;
+ const int VRPN_GSO_MAX_POSER =	              8;
+ const int VRPN_GSO_MAX_MOUSES =	              8;
++#ifdef HAVE_DEV_INPUT
++const int VRPN_GSO_MAX_DEV_INPUTS =           16;
++#endif
+ const int VRPN_GSO_MAX_KEYBOARD =             1;
+ const int VRPN_GSO_MAX_LOGGER =               10;
+ const int VRPN_GSO_MAX_IMAGE_STREAM =         10;
+@@ -210,6 +216,10 @@
+   int		num_posers;
+   vrpn_Mouse	* mouses [VRPN_GSO_MAX_MOUSES];
+   int		num_mouses;
++#ifdef HAVE_DEV_INPUT
++  vrpn_DevInput	* dev_inputs [VRPN_GSO_MAX_DEV_INPUTS];
++  int		num_dev_inputs;
++#endif
+   vrpn_Keyboard * Keyboards [VRPN_GSO_MAX_KEYBOARD];
+   int		num_Keyboards;
+   vrpn_Auxiliary_Logger_Server_Generic * loggers [VRPN_GSO_MAX_LOGGER];
+@@ -288,6 +298,9 @@
+   int setup_JoyFly (char * & pch, char * line, FILE * config_file);
+   int setup_Tracker_3DMouse (char * & pch, char * line, FILE * config_file);
+   int setup_Mouse (char * & pch, char * line, FILE * config_file);
++#ifdef HAVE_DEV_INPUT
++  int setup_DevInput (char * & pch, char * line, FILE * config_file);
++#endif
+   int setup_Tracker_Crossbow (char * & pch, char * line, FILE * config_file);
+   int setup_3DMicroscribe (char * & pch, char * line, FILE * config_file);
+   int setup_5dt16 (char * & pch, char * line, FILE * config_file);
+diff -ruN -x .depend vrpn_07_29/vrpn_DevInput.C current/vrpn_DevInput.C
+--- vrpn_07_29/vrpn_DevInput.C	1970-01-01 01:00:00.000000000 +0100
++++ current/vrpn_DevInput.C	2012-03-07 12:55:22.420659799 +0100
+@@ -0,0 +1,226 @@
++/* file:	vrpn_DevInput.cpp
++ * author:	Mike Weiblen mew@mew.cx 2004-01-14
++ * copyright:	(C) 2003,2004 Michael Weiblen
++ * license:	Released to the Public Domain.
++ * depends:	gpm 1.19.6, VRPN 06_04
++ * tested on:	Linux w/ gcc 2.95.4
++ * references:  http://mew.cx/ http://vrpn.org/
++ *              http://linux.schottelius.org/gpm/
++*/
++
++#include "vrpn_DevInput.h"
++
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <fcntl.h>
++#include <linux/input.h>
++#include <string.h>
++#include <errno.h>
++#include <sys/ioctl.h>
++
++#include <iostream>
++#include <map>
++#include <string>
++#include <sstream>
++
++static const std::string &getDeviceNodes(const std::string &device_name) {
++  static std::map<std::string, std::string> s_devicesNodes;
++  static bool s_initialized = false;
++
++  static std::string default_node="unknown";
++
++  if (!s_initialized) {
++    bool permission_missing = false;
++    unsigned int id = 0;
++    while (1) {
++      std::ostringstream oss;
++      oss << "/dev/input/event" << id;
++
++      int fd = open(oss.str().c_str(), O_RDONLY);
++      if(fd >= 0){
++	char name[512];
++	if(ioctl(fd, EVIOCGNAME(sizeof(name)), name) >= 0) {
++	  s_devicesNodes[name] = oss.str();
++	}
++
++	close(fd);
++      } else {
++	if (errno == ENOENT) break;
++	if (errno == EACCES) permission_missing = true;
++      }
++      errno = 0;
++      id++;
++    }
++    s_initialized = true;
++    if (permission_missing) {
++      std::cout << "vrpn_DevInput device scan warning : permission denied for some nodes !" << std::endl;
++    }
++  }
++
++  std::map<std::string, std::string>::iterator node_name = s_devicesNodes.find(device_name);
++  if (node_name != s_devicesNodes.end()) {
++    return node_name->second;
++  }
++
++
++  throw (std::string("Cannot find the device: ") + device_name).c_str();
++}
++
++///////////////////////////////////////////////////////////////////////////
++
++vrpn_DevInput::vrpn_DevInput( const char* name, vrpn_Connection * cxn, const char *device_name, const char * type, int int_param ) :
++  vrpn_Analog( name, cxn ),
++  vrpn_Button_Filter( name, cxn )
++{
++  int i;
++
++  if (strcmp(type, "keyboard") == 0) {
++    d_type = DEVICE_KEYBOARD;
++  } else if (strcmp(type, "absolute") == 0) {
++    d_type = DEVICE_MOUSE_ABSOLUTE;
++  } else if (strcmp(type, "relative") == 0) {
++    d_type = DEVICE_MOUSE_RELATIVE;
++  } else {
++    throw (char *)"Third parameter must be keyboard, absolute or relative";
++  }
++
++  vrpn_Button_Filter::num_buttons = 0;
++  vrpn_Analog::num_channel        = 0;
++
++  switch (d_type) {
++  case DEVICE_KEYBOARD:
++    if ((int_param < 1) || (int_param >= vrpn_BUTTON_MAX_BUTTONS)) {
++      throw (char *)"In case of keyboard, the value must be between 1 and 256";
++    }
++    vrpn_Button_Filter::num_buttons = int_param;
++    break;
++  case DEVICE_MOUSE_ABSOLUTE:
++    vrpn_Analog::num_channel = REL_MAX;
++    vrpn_Button_Filter::num_buttons = 0x50;
++    d_absolute_min = 0;
++    d_absolute_range = int_param;
++    break;
++  case DEVICE_MOUSE_RELATIVE:
++    vrpn_Analog::num_channel = ABS_MAX;
++    vrpn_Button_Filter::num_buttons = 0x50;
++    break;
++  };
++
++  // initialize the vrpn_Analog
++  for( i = 0; i < vrpn_Analog::num_channel; i++) {
++    vrpn_Analog::channel[i] = vrpn_Analog::last[i] = 0;
++  }
++
++  // initialize the vrpn_Button_Filter
++  for( i = 0; i < vrpn_Button_Filter::num_buttons; i++) {
++    vrpn_Button_Filter::buttons[i] = vrpn_Button_Filter::lastbuttons[i] = 0;
++  }
++
++  std::string node = getDeviceNodes(device_name);
++
++  d_fileDescriptor = open(node.c_str(), O_RDONLY);
++  if(d_fileDescriptor < 0){
++    throw (std::string("Cannot open the device: ") + device_name + std::string(strerror(errno))).c_str();
++  }
++}
++
++///////////////////////////////////////////////////////////////////////////
++
++vrpn_DevInput::~vrpn_DevInput()
++{
++  if (d_fileDescriptor >= 0) {
++    close(d_fileDescriptor);
++  }
++  d_fileDescriptor = -1;
++}
++
++///////////////////////////////////////////////////////////////////////////
++
++void vrpn_DevInput::mainloop()
++{
++  get_report();
++
++  server_mainloop();
++
++  report_changes();
++}
++
++///////////////////////////////////////////////////////////////////////////
++
++int vrpn_DevInput::get_report()
++{
++  fd_set readset;
++
++  if (d_fileDescriptor < 0) {
++    return 0;
++  }
++
++  FD_ZERO( &readset );
++  FD_SET( d_fileDescriptor, &readset );
++  struct timeval timeout = { 0, 0 };
++  select( d_fileDescriptor+1, &readset, NULL, NULL, &timeout );
++
++  gettimeofday( &timestamp, NULL );
++
++  if( ! FD_ISSET( d_fileDescriptor, &readset ) )
++    return 0;
++
++  struct input_event event;
++  if (read(d_fileDescriptor, &event, sizeof(event)) < sizeof(event)) {
++    return 0;
++  }
++
++  switch (event.type) {
++  case EV_KEY: {
++    int button_number = event.code;
++    if ((d_type == DEVICE_MOUSE_RELATIVE) || (d_type == DEVICE_MOUSE_ABSOLUTE)) {
++      button_number -= BTN_MOUSE;
++    }
++    if ((button_number >= 0) && (button_number < vrpn_Button_Filter::num_buttons)) {
++      buttons[button_number] = event.value;
++    }
++  } break;
++  case EV_REL: {
++    int channel_number = event.code;
++    if ((channel_number >= 0) && (channel_number < vrpn_Analog::num_channel)) {
++      for (unsigned int i = 0 ; i < vrpn_Analog::num_channel ; i++) {
++	vrpn_Analog::last[i] = 0;
++      }
++      vrpn_Analog::channel[channel_number] = (vrpn_float64)event.value;
++    }
++  } break;
++  case EV_ABS:
++    int channel_number = event.code;
++    if ((channel_number >= 0) && (channel_number < vrpn_Analog::num_channel)) {
++      vrpn_float64 value = ((vrpn_float64)event.value - d_absolute_min) / d_absolute_range;
++      vrpn_Analog::channel[channel_number] = value;
++    }
++    break;
++  };
++
++  return 1;
++}
++
++///////////////////////////////////////////////////////////////////////////
++
++void vrpn_DevInput::report_changes( vrpn_uint32 class_of_service )
++{
++  vrpn_Analog::timestamp = timestamp;
++  vrpn_Button_Filter::timestamp = timestamp;
++
++  vrpn_Analog::report_changes( class_of_service );
++  vrpn_Button_Filter::report_changes();
++}
++
++///////////////////////////////////////////////////////////////////////////
++
++void vrpn_DevInput::report( vrpn_uint32 class_of_service )
++{
++  vrpn_Analog::timestamp = timestamp;
++  vrpn_Button_Filter::timestamp = timestamp;
++
++  vrpn_Analog::report( class_of_service );
++  vrpn_Button_Filter::report_changes();
++}
++
++/*EOF*/
+diff -ruN -x .depend vrpn_07_29/vrpn_DevInput.h current/vrpn_DevInput.h
+--- vrpn_07_29/vrpn_DevInput.h	1970-01-01 01:00:00.000000000 +0100
++++ current/vrpn_DevInput.h	2012-03-07 12:34:18.780659692 +0100
+@@ -0,0 +1,92 @@
++#ifndef VRPN_DEV_INPUT_H
++#define VRPN_DEV_INPUT_H
++
++///////////////////////////////////////////////////////////////////////////
++// This file contains a distillation of the various DevInput classes that had
++// been spread throughout VRPN.  The interfaces have been rationalized, so
++// that they are the same between operating systems and are factored into
++// independent interfaces.
++///////////////////////////////////////////////////////////////////////////
++
++/* file:	vrpn_DevInput.h
++ * author:	Mike Weiblen mew@mew.cx 2004-01-14
++ * copyright:	(C) 2003,2004 Michael Weiblen
++ * license:	Released to the Public Domain.
++ * depends:	gpm 1.19.6, VRPN 06_04
++ * tested on:	Linux w/ gcc 2.95.4
++ * references:  http://mew.cx/ http://vrpn.org/
++ *              http://linux.schottelius.org/gpm/
++*/
++
++///////////////////////////////////////////////////////////////////////////
++// vrpn_DevInput is a VRPN server class to publish events from the PC's input.
++// It provides a 2-channel vrpn_Analog for X & Y input motion, and a
++// 3-channel vrpn_Button for the input buttons.
++//
++// vrpn_DevInput makes it easy to use the diverse array of commodity input
++// devices that masquerade as a input, such as PS/2 trackballs, gyroscopic
++// free-space pointers, and force-sensing touchpads.
++//
++// This version includes a Linux-specific implementation that leverages the Linux GPM
++// (General Purpose DevInput) server to handle the low-level hardware interfaces
++// and device protocols.  GPM is commonly included in Linux distributions.
++// The GPM homepage is http://linux.schottelius.org/gpm/
++//
++// It also includes a Windows interface to the input.
++//
++// The interface reports input position in fraction of the screen.
++// The previous version of the Windows implementation had reported them
++// in pixels, but this has been changed to match on both platforms.
++// 
++// vrpn_DevInput must be run on a Linux console, not an xterm.  Rationale:
++// 1) Since the console environment doesn't presume the existance of a input,
++//    it avoids issues about mapping input events to window focus, etc.
++// 2) With the input movement controlled by a different user, it's really
++//    not possible to also use a input-based user interface anyway.
++// 3) My VRPN server machine is headless, and doesn't even have an X server.
++///////////////////////////////////////////////////////////////////////////
++
++#include "vrpn_Analog.h"
++#include "vrpn_Button.h"
++#include "linux/input.h"
++
++class VRPN_API vrpn_DevInput :
++	public vrpn_Analog,
++	public vrpn_Button_Filter
++{
++    enum DEVICE_TYPE { DEVICE_KEYBOARD, DEVICE_MOUSE_RELATIVE, DEVICE_MOUSE_ABSOLUTE } d_type;
++
++public:
++    vrpn_DevInput( const char* name, vrpn_Connection* cxn, const char *device, const char *type, int mouse_length );
++    virtual ~vrpn_DevInput();
++
++    virtual void mainloop();
++
++protected:  // methods
++    /// Try to read reports from the device.
++    /// Returns 1 if msg received, or 0 if none received.
++    virtual int get_report();
++
++    /// send report iff changed
++    virtual void report_changes( vrpn_uint32 class_of_service
++		    = vrpn_CONNECTION_LOW_LATENCY );
++
++    /// send report whether or not changed
++    virtual void report( vrpn_uint32 class_of_service
++		    = vrpn_CONNECTION_LOW_LATENCY );
++
++protected:  // data
++    struct timeval timestamp;	///< time of last report from device
++
++private:  // disable unwanted default methods
++    vrpn_DevInput();
++    vrpn_DevInput(const vrpn_DevInput&);
++    const vrpn_DevInput& operator=(const vrpn_DevInput&);
++
++ private:
++    int d_fileDescriptor;
++    vrpn_float64 d_absolute_min;
++    vrpn_float64 d_absolute_range;
++};
++
++#endif
