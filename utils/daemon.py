@@ -63,6 +63,7 @@ class Daemon:
             self._client.send('forked')
 
         self._loader_file  = None
+        self._loader_path  = None
         self._process      = None
 
     def write(self, *messages):
@@ -115,10 +116,11 @@ class Daemon:
         elif command == 'loader_file':
             dirname = os.path.dirname(argument)
             if os.path.isdir(dirname):
-                os.chdir(dirname)
                 self._loader_file = os.path.basename(argument)
+                self._loader_path = dirname
             else:
                 self._loader_file = argument
+                self._loader_path = None
         elif command == 'kill':
             self._stop_blender_player()
         elif command == 'kill daemon':
@@ -156,12 +158,13 @@ class Daemon:
                     command[index] = '"' + argument + '"'
 
             try:
-                self._client.send('command', {'command': command, 'environment': self._environment})
+                self._client.send('command', {'command': command, 'environment': self._environment, 'path': self._loader_path})
                 self._process = subprocess.Popen(command,
                                                  env       = self._environment,
                                                  stdin     = self._process_in,
                                                  stdout    = self._process_out,
                                                  stderr    = self._process_out,
+                                                 cwd       = self._loader_path,
                                                  universal_newlines = True,
                                                  close_fds = ('posix' in sys.builtin_module_names))
             except Exception as error:

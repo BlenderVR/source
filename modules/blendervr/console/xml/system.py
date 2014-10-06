@@ -55,7 +55,7 @@ class blenderplayer(base.single):
     def _default(self):
         super(blenderplayer, self)._default()
         if self._executable is None:
-            if sys.platform == 'win32':
+            if sys.platform.startswith('win'):
                 blender_program = "blenderplayer.exe"
             else:
                 blender_program = "blenderplayer"

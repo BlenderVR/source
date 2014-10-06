@@ -39,6 +39,8 @@ from .. import exceptions
 from ...tools.connector import Common
 import copy
 import select
+import sys
+import subprocess
 
 class Logic:
     def __init__(self):
@@ -90,6 +92,7 @@ class Logic:
             self._net_console  = starter['hostname'] + ':' + str(self._port)
             self._anchor       = starter['anchor']
             self._screenSets   = starter['configs']
+            self._blender_exe  = starter['blender']
             possibleScreenSets = list(self._screenSets.keys())
 
             self._common_processors = self._configuration['processors']
@@ -200,11 +203,12 @@ class Logic:
                 self._processor = None
                 processor_files = []
 
-        # if self._processor and self._processor.use_loader():
-        #     loader_file = os.path.join(blenderVR_root, 'utils', 'loader.blend')
-        # else:
-        #     loader_file = blender_file
-        loader_file = blender_file
+        command = [sys.executable, self._update_loader_script, '--', blender_file]
+        process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process.wait()
+        for line in process.stdout:
+            loader_file = line.decode('UTF-8').rstrip()
+            break
 
         if loader_file != self._loader_file or blender_file != self._blender_file or processor_files != self._processor_files or force:
             self._loader_file     = loader_file
@@ -236,6 +240,7 @@ class Logic:
     def start_simulation(self):
         if self.get_blender_player_state() == 'stopped':
             self.compile_BC()
+            self._update_loader()
             self._screens.start_simulation()
 
     def stop_simulation(self):
@@ -275,4 +280,18 @@ class Logic:
                         self.profile.setValue(['files', 'processor'], processor_file_name)
                         self._force_processor_file(processor_file_name)
         self.update_user_files()
+
+
+    def _update_loader(self):
+        if not os.path.isfile(self._loader_file) or (os.path.getctime(self._blender_file) > os.path.getctime(self._loader_file)):
+            if not os.path.isfile(self._loader_file):
+                self.logger.debug('Creating loader')
+            else:
+                self.logger.debug('Updating loader')
+            command = [self._blender_exe, '-b', '-P', self._update_loader_script, '--', self._blender_file]
+            process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            process.wait()
+            for line in process.stderr:
+                self.logger.debug(line.decode('UTF-8').rstrip())
+
 

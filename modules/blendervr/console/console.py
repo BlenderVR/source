@@ -34,6 +34,7 @@
 ## 
 
 import sys
+import os
 from .logic import console as logic
 from .qt import console as gui
 
@@ -45,6 +46,8 @@ class Console(logic.Logic, gui.GUI):
         self._processor_files = None
 
         self._processor       = None
+
+        self._update_loader_script = os.path.join(blenderVR_root, 'utils', 'update_loader.py')
 
         from . import profile
         self._profile = profile.Profile(profile_file)

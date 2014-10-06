@@ -120,9 +120,6 @@ else: # not VR screen => Console
         def main_profile(self):
             return self._main_profile
 
-        def use_loader(self):
-            return False
-
         def _getProfileName(self):
             return None
 

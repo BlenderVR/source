@@ -95,14 +95,6 @@ class Main:
 
             configuration = self._controller.getConfiguration()
 
-            if configuration['use_loader']:
-                blender_file = configuration['blender_file']
-                dirname      = os.path.dirname(blender_file)
-                if os.path.isdir(dirname):
-                    os.chdir(dirname)
-                    blender_file = os.path.basename(blender_file)
-                bge.logic.LibLoad(blender_file, 'Scene')
-
             self._screen_name = configuration['screen_name']
             del(configuration['screen_name'])
 

@@ -63,14 +63,14 @@ class Base(base.Base):
         self._item = None
 
     def checkItems(self):
-        try:
+        if hasattr(self._item, 'invalid') and self._item.invalid:
+            self.remove()
+            existing = False
+        else:
             str(self._item)
             for item in list(set(self._getSubItems()) - set(self._items_bl)):
                 self.addChildren(item)
             existing = True
-        except:
-            self.remove()
-            existing = False
 
         remove_items = []
         for item in self._items_sy:

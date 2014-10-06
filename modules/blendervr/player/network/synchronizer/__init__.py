@@ -116,8 +116,11 @@ class Master(Base):
             self.addSynchronizedObject(objects_id, object)
         self._addToBuffer(self.NEW_OBJECT, None, newObjects)
 
-        self._addToBuffer(self.OBJECT, id(self._objects),
-                          self._objects.checkItems())
+        try:
+            self._addToBuffer(self.OBJECT, id(self._objects),
+                              self._objects.checkItems())
+        except:
+            self.logger.log_traceback()
 
         # Then update objects attributs
         for objects_id, object in self._synchronizedObjects.items():

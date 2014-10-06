@@ -70,7 +70,7 @@ class Controller(base.Base):
             self._client.setWait(False)
             return
 
-        if command in ['screen', 'complements', 'network', 'blender_file', 'processor_files', 'use_loader']:
+        if command in ['screen', 'complements', 'network', 'blender_file', 'processor_files']:
             self._configuration[command] = argument
         else:
             self._processControllerCommand(command, argument)

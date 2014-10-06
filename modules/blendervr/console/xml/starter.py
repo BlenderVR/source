@@ -34,18 +34,23 @@
 ## 
 
 from . import common_system
+import sys
 
 class XML(common_system.XML):
 
     def __init__(self, parent, name, attrs):
         super(XML, self).__init__(parent, name, attrs)
-        self._attribute_list += ['configs', 'hostname']
+        self._attribute_list += ['configs', 'hostname', 'blender']
         self._configs         = None
         self._current_config  = None
         if 'hostname' in attrs:
             self._hostname = attrs['hostname']
         else:
             self._hostname = None
+        if 'blender' in attrs:
+            self._blender = attrs['blender']
+        else:
+            self._blender = None
 
     def _getChildren(self, name, attrs):
         if name == 'config':
@@ -72,3 +77,9 @@ class XML(common_system.XML):
         if self._hostname is None:
             import socket
             self._hostname = socket.gethostname()
+        if self._blender is None:
+            if sys.platform.startswith('win'):
+                self._blender = "blender.exe"
+            else:
+                self._blender = "blender"
+            

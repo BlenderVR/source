@@ -93,6 +93,7 @@ class Synchronizer(base.Base):
     def removeSynchronizedItem(self, itemID):
         if itemID in self._items:
             del(self._items[itemID])
+        self._synchronizer.removeSynchronizedObject(itemID)
             
 
     def checkItems(self):

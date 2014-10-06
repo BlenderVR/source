@@ -202,7 +202,6 @@ class Logic:
             self._send_log_to_file_information()
             for field in ['screen', 'complements', 'network', 'blender_file', 'processor_files']:
                 client.send(field, getattr(self, '_' + field))
-            client.send('use_loader', (self._loader_file != self._blender_file))
             client.send('base configuration ending')
             client.setCallback(self._message_from_blender_player)
 
@@ -234,6 +233,7 @@ class Logic:
         elif command == 'command':
             if self.profile.getValue(['debug', 'executables']):
                 self.logger.error('Command to run blenderplayer:', ' '.join(argument['command']))
+                self.logger.error('Its path:', argument['path'])
                 self.logger.error('Its environment variables:', argument['environment'])
         elif command == 'forked':
             self._stopDaemon()
