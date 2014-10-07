@@ -18,11 +18,8 @@ if in_blender:
 
     bpy.ops.wm.open_mainfile(filepath=input)
 
-    camera = None
-    for obj in bpy.data.objects:
-        if obj.type == 'CAMERA':
-            camera = obj
-            break
+    # if the file has multiple cameras take only the active one
+    camera = bpy.context.scene.camera
 
     if camera:
         SENSOR='Always_for_blenderVR'
