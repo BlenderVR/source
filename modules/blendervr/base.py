@@ -34,6 +34,7 @@
 ## 
 
 class Base:
+    """Main struct for the blender vr environment"""
     def __init__(self, parent):
         self._parent = parent
 

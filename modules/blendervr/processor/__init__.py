@@ -43,6 +43,11 @@ _log_traceback   = False
 
 
 def getProcessor():
+    """
+    Get the latest added ``Processor`` file.
+
+    :rtype: ``Processor``
+    """
     global _processor_files, _logger, _log_traceback
     import os
 
@@ -88,12 +93,19 @@ def getProcessor():
     return Processor
 
 def appendProcessor(processor_file):
+    """
+    Include the processor file to be executed.
+
+    :param processor_file: Python file with the process functions for the application
+    :type processor_file: string
+    """
     global _processor_files
     _processor_files.insert(0, processor_file)
 
-# Function called by the main process (Virtual environment or Console) Don't call it !
-
 def _getProcessor(processor_files, logger, log_traceback):
+    """
+    Function called by the main process (Virtual environment or Console) Don't call it !
+    """
     global _processor_files, _logger, _log_traceback
 
     random.seed()

@@ -33,10 +33,19 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
+"""
+Main module of the Blender VR application
+"""
+
 # Beware: you must alswo change blenderVR console executable to change the profile pickle file to load
 version=1.0
 
 def is_virtual_environment():
+    """
+    Check if the Blender Game Engine is available.
+
+    :rtype: bool
+    """
     try:
         import bge
         return True

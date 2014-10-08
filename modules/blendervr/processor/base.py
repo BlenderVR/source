@@ -143,6 +143,9 @@ else: # not VR screen => Console
 
         # Interactions with the Virtual Environment
         def sendToVirtualEnvironment(self, command, argument = ''):
+            """
+            Run arbitrary command in the virtual environment
+            """
             self.getConsole().sendToVirtualEnvironment(command, argument)
 
         def receivedFromVirtualEnvironment(self, command, argument):
