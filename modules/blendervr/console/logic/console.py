@@ -280,7 +280,9 @@ class Logic:
                 processor_file_name, ext = os.path.splitext(blender_file_name)
                 if ext == '.blend':
                     processor_file_name += '.processor.py'
-                    if self.profile.getValue(['files', 'processor']) != processor_file_name and os.path.isfile(processor_file_name):
+                    if self.profile.getValue(['files', 'processor']) != processor_file_name:
+                        if not os.path.isfile(processor_file_name):
+                            processor_file_name = os.path.join(blenderVR_root, 'modules', 'blendervr', 'processor', 'default.py')
                         self.profile.setValue(['files', 'processor'], processor_file_name)
                         self._force_processor_file(processor_file_name)
         self.update_user_files()
