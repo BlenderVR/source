@@ -33,47 +33,24 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-"""
-Main module of the Blender VR application
-"""
+import blendervr
 
-# Beware: you must alswo change blenderVR console executable to change the profile pickle file to load
-version=1.0
+if blendervr.is_virtual_environment():
+    import bge
 
-def is_virtual_environment():
-    """
-    Check if the Blender Game Engine is available.
+    class Processor(blendervr.processor.getProcessor()):
+        def __init__(self, parent):
+            super(Processor, self).__init__(parent)
 
-    :rtype: bool
-    """
-    try:
-        import bge
-        return True
-    except:
-        return False
+            if self.blenderVR.isMaster():
+                self.blenderVR.getSceneSynchronizer().getItem(bge.logic).activate(True, True)
 
-def is_creating_loader():
-    """
-    Check if BPY is available.
+else: # not VR screen => Console
 
-    :rtype: bool
-    """
-    try:
-        import bpy
-        return True
-    except:
-        return False
-    
+    class Processor(blendervr.processor.getProcessor()):
 
-if is_virtual_environment():
-    try:
-        import bge
-        from .player import Main
+        def __init__(self, console):
+            super(Processor, self).__init__(console)
 
-        bge.logic.blenderVR = Main()
-
-        def run():
-            bge.logic.blenderVR.run()
-    except:
-        def run():
-            pass
+        def useLoader(self):
+            return True

@@ -153,3 +153,6 @@ else: # not VR screen => Console
                 if interactor.receivedFromVirtualEnvironment(command, argument):
                     return
             self.logger.debug('Unknown command received from virtual environment:', command)
+
+        def useLoader(self):
+            return False
