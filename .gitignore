@@ -4,6 +4,7 @@ __pycache__
 _build
 build
 /docs/modules/rst/*
+/docs/utils/rst/*
 /env
 /venv
 
