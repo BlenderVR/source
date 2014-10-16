@@ -6,3 +6,4 @@ build
 /docs/modules/rst/*
 /env
 /venv
+/modules/blendervr/console/qt/designer/*.py
