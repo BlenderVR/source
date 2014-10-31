@@ -33,7 +33,7 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-from .. import is_virtual_environment
+from .. import *
 from . import Interactor
 import os
 
@@ -247,7 +247,7 @@ if is_virtual_environment():
                     self.update(self.RESET, self._default_user)
 
             return True
-else:
+elif is_console():
 
     from ..tools.gui.qt import QtGui
 

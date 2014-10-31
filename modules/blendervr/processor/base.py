@@ -33,12 +33,14 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-from .. import is_virtual_environment
+from .. import *
 
 if is_virtual_environment():
     from ..player import base
-else:
+elif is_console():
     from ..console import base
+elif is_creating_loader(): 
+    from ..loader import base
 
 class ProcessorCommon(base.Base):
     def __init__(self, parent):
@@ -100,11 +102,12 @@ if is_virtual_environment():
             self.logger.debug('Unknown command received from console:', command)
 
 elif is_creating_loader(): 
-
     class Processor(ProcessorCommon):
-        pass
 
-else: # not VR screen => Console
+        def __init__(self, parent):
+            ProcessorCommon.__init__(self, parent)
+
+elif is_console():
     class Processor(ProcessorCommon):
 
         def __init__(self, parent):

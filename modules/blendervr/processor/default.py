@@ -33,19 +33,26 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-import blendervr
+from .. import *
 
-if blendervr.is_virtual_environment():
-    import bge
+if is_virtual_environment():
 
     class Processor(blendervr.processor.getProcessor()):
         def __init__(self, parent):
             super(Processor, self).__init__(parent)
 
             if self.blenderVR.isMaster():
+                import bge
                 self.blenderVR.getSceneSynchronizer().getItem(bge.logic).activate(True, True)
 
-else: # not VR screen => Console
+elif is_creating_loader(): 
+
+    class Processor(blendervr.processor.getProcessor()):
+
+        def __init__(self, console):
+            super(Processor, self).__init__(console)
+
+elif is_console():
 
     class Processor(blendervr.processor.getProcessor()):
 

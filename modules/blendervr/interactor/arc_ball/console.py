@@ -33,7 +33,7 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-from ... import is_virtual_environment
+from ... import *
 from .. import Interactor
 from ...tools.connector import Common
 
@@ -83,7 +83,7 @@ if is_virtual_environment():
                     self._grabbed = False
             return True
 
-else:
+elif is_console():
     import bge
     from . import ArcBall, removeScale
     from ...tools.gui.qt import QtCore, QtOpenGL, QtGui

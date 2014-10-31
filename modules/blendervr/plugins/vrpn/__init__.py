@@ -33,10 +33,10 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-from .. import base
+from ... import *
 from .. import exceptions
 
-if base.is_virtual_environment():
+if is_virtual_environment():
     class Base(base.Base):
         def __init__(self, parent):
             base.Base.__init__(self, parent)
@@ -51,7 +51,7 @@ if base.is_virtual_environment():
             self.run = self._main.run
             self._main.start()
 
-else: # not VR screen => Console
+elif is_console():
     class Base(base.Base):
         def __init__(self, parent):
             base.Base.__init__(self, parent)

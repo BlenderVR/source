@@ -33,7 +33,7 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-from .. import is_virtual_environment
+from .. import *
 
 if is_virtual_environment():
 
@@ -72,7 +72,7 @@ if is_virtual_environment():
         def receivedFromConsole(self, command, argument):
             return False
 
-else:
+elif is_console():
 
     from ..console import base
 

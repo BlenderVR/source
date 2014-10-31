@@ -63,7 +63,9 @@ def is_creating_loader():
         return True
     except:
         return False
-    
+
+def is_console():
+    return not is_virtual_environment() and not is_creating_loader()
 
 if is_virtual_environment():
     try:

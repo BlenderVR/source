@@ -33,7 +33,7 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-from .. import is_virtual_environment
+from .. import *
 from . import Interactor
 import os
 
@@ -59,7 +59,7 @@ if is_virtual_environment():
             except:
                 self.logger.log_traceback(False)
 
-else:
+elif is_console():
 
     class Chooser(Interactor):
         def __init__(self, parent):

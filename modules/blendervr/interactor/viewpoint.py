@@ -33,7 +33,7 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-from .. import is_virtual_environment
+from .. import *
 from . import Interactor
 
 MOUSE_RESCALE_FOR_ARCBALLS = 1000

@@ -33,7 +33,7 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-from .. import is_virtual_environment
+from .. import *
 
 class Common:
     def __init__(self):
@@ -71,7 +71,7 @@ if is_virtual_environment():
         def virtual_environment(self):
             return self._main
 
-else: # not VR screen => Console
+elif is_console():
     from ..console import base
 
     class Base(Common, base.Base):

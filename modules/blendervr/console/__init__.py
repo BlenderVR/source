@@ -34,9 +34,9 @@
 ## 
 
 import sys
-from .. import is_virtual_environment
+from .. import *
 
-if is_virtual_environment():
+if not is_console():
     import bge
     bge.logic.endGame()
     sys.exit()

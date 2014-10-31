@@ -124,7 +124,7 @@ if blendervr.is_virtual_environment():
                 self.logger.log_traceback(False)
             super(Common, self).keyboardAndMouse(info)
 
-else: # not VR screen => Console
+elif blendervr.is_console():
 
     import os
     from blendervr.tools.gui.qt import QtGui
