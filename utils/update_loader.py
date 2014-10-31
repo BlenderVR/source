@@ -8,13 +8,12 @@ output = '.'.join(output)
 if not sys.platform.startswith('win'):
     output = os.path.join(os.path.dirname(output), '.' + os.path.basename(output))
 
-try:
-    import bpy
-    in_blender = True
-except:
-    in_blender = False
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'modules'))
+import blendervr
 
-if in_blender:
+if blendervr.is_creating_loader():
+
+    import bpy
 
     bpy.ops.wm.open_mainfile(filepath=input)
 

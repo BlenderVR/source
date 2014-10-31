@@ -205,6 +205,8 @@ class Logic:
 
         if self._processor and self._processor.useLoader():
             command = [sys.executable, self._update_loader_script, '--', blender_file]
+            if self.profile.getValue(['debug', 'executables']):
+                self.logger.error('Get loader script name:', ' '.join(command))
             process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             process.wait()
             for line in process.stdout:
@@ -295,6 +297,8 @@ class Logic:
             else:
                 self.logger.debug('Updating loader')
             command = [self._blender_exe, '-b', '-P', self._update_loader_script, '--', self._blender_file]
+            if self.profile.getValue(['debug', 'executables']):
+                self.logger.error('Update loader scripe:', ' '.join(command))
             process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             process.wait()
             for line in process.stderr:

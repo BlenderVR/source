@@ -33,7 +33,14 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-import sys, threading, socket, tempfile, io, os, subprocess, threading
+import sys
+import threading
+import socket
+import tempfile
+import io
+import os
+import subprocess
+import threading
 
 class Daemon:
     def __init__(self):

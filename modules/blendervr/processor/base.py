@@ -99,6 +99,11 @@ if is_virtual_environment():
                     return
             self.logger.debug('Unknown command received from console:', command)
 
+elif is_creating_loader(): 
+
+    class Processor(ProcessorCommon):
+        pass
+
 else: # not VR screen => Console
     class Processor(ProcessorCommon):
 
