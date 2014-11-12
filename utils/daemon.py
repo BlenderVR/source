@@ -33,6 +33,10 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
+"""
+This script runs in the clients and is responsible for spawning the Blender Player.
+"""
+
 import sys, threading, socket, tempfile, io, os, subprocess, threading
 
 class Daemon:
@@ -67,6 +71,12 @@ class Daemon:
         self._process      = None
 
     def write(self, *messages):
+        """
+        Send message to the client
+
+        :param messages: all the messages to send to the client (i.e., console commands)
+        :type messages: list
+        """
         elements = []
         for message in messages:
             elements.append(str(message))
@@ -77,6 +87,9 @@ class Daemon:
         self._stop_blender_player()
 
     def main(self):
+        """
+        Start the Daemon, quits any instance of BlenderPlayer running.
+        """
         try:
             if not self._client.run():
                 self._stop_blender_player()
@@ -91,6 +104,13 @@ class Daemon:
             self._stop_blender_player()
 
     def processCommand(self, command, argument):
+        """
+        Run the received commands
+
+        :param command: Command to execute in the client machine
+        :type command: str
+        :param argument: Value depends on the command
+        """
         global blenderVR_modules
         if command == 'blender_player':
             self._executable         = argument['executable']
