@@ -86,7 +86,7 @@ class Logger(logging.getLoggerClass()):
         element = stack[1]
         self.debug('File "' + element[1] + '", line ' + str(element[2]) + ', in', element[3])
 
-    def _process(self, verbosity, *messages, sep=' '):
+    def _process(self, verbosity, sep=' ', *messages):
         elements = []
         for message in messages:
             if isinstance(message, (dict, tuple, list)):
