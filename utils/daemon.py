@@ -40,7 +40,9 @@ This script runs in the clients and is responsible for spawning the Blender Play
 import sys, threading, socket, tempfile, io, os, subprocess, threading
 
 class Daemon:
-    def __init__(self):
+    def __init__(self, blenderVR_modules):
+        self._blenderVR_modules = blenderVR_modules
+
         self._controller  = sys.argv[1]
         self._screen_name = sys.argv[2].strip("'\"")
 
@@ -111,7 +113,7 @@ class Daemon:
         :type command: str
         :param argument: Value depends on the command
         """
-        global blenderVR_modules
+        blenderVR_modules = self._blenderVR_modules
         if command == 'blender_player':
             self._executable         = argument['executable']
             self._executable_options = argument['options']
@@ -209,6 +211,7 @@ class Daemon:
         if stream_name == 'stdout':
             self._stop_blender_player()
 
+
 if len(sys.argv) > 3 and sys.argv[3] == 'debug':
     debug = True
 else:
@@ -254,8 +257,14 @@ if forked:
     os.dup(0)
     os.dup(0)
 
-blenderVR_root    = os.path.dirname(os.path.dirname(__file__))
-blenderVR_modules = os.path.join(blenderVR_root, 'modules')
-sys.path.append(blenderVR_modules)
 
-Daemon().main()
+def main():
+    blenderVR_root    = os.path.dirname(os.path.dirname(__file__))
+    blenderVR_modules = os.path.join(blenderVR_root, 'modules')
+    sys.path.append(blenderVR_modules)
+
+    Daemon(blenderVR_modules).main()
+
+
+if __name__ == "__main__":
+    main()
