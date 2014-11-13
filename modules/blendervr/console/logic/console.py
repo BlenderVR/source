@@ -291,14 +291,26 @@ class Logic:
 
 
     def _update_loader(self):
-        if not os.path.isfile(self._loader_file) or (os.path.getctime(self._blender_file) > os.path.getctime(self._loader_file)):
+        update = not os.path.isfile(self._loader_file)
+        if not update:
+            loader_time = os.path.getctime(self._loader_file)
+            for processor_file in [self._blender_file] + self._processor_files:
+                if os.path.getctime(processor_file) > loader_time:
+                    update = True
+                    break
+        if update:
             if not os.path.isfile(self._loader_file):
                 self.logger.debug('Creating loader')
             else:
                 self.logger.debug('Updating loader')
-            command = [self._blender_exe, '-b', '-P', self._update_loader_script, '--', self._blender_file]
+            command = [self._blender_exe, '-b', '-P', self._update_loader_script, '--', self._blender_file] + self._processor_files
             if self.profile.getValue(['debug', 'executables']):
                 self.logger.error('Update loader scripe:', ' '.join(command))
+
+            for index, argument in enumerate(command):
+                if ' ' in argument:
+                    command[index] = '"' + argument + '"'
+
             process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             process.wait()
             for line in process.stderr:

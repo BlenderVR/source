@@ -131,13 +131,13 @@ elif blendervr.is_console():
 
     class Common(blendervr.processor.getProcessor()):
 
-        def __init__(self, parent, ui = None, head_navigator = None):
+        def __init__(self, parent, ui_path = None, head_navigator = None):
             super(Common, self).__init__(parent)
 
             # The common processor should be loaded at first !
             self._window = QtGui.QDialog()
-            if ui is not None:
-                self._ui = blendervr.tools.gui.load(os.path.join(blendervr.tools.getModulePath(), *ui), self._window)
+            if ui_path:
+                self._ui = blendervr.tools.gui.load(ui_path, self._window)
                 try:
                     self._ui.navigation.clicked.connect(self.cb_navigation)
                     self._ui.calibration.clicked.connect(self.cb_calibration)

@@ -123,12 +123,13 @@ class Logger(logging.getLoggerClass()):
         return handler
 
 class Console:
-    def __init__(self):
+    def __init__(self, msg = 'Console logger: '):
         self._mapping = {'DEBUG'    : sys.stdout,
                          'INFO'     : sys.stdout,
                          'WARNING'  : sys.stderr,
                          'ERROR'    : sys.stderr,
                          'CRITICAL' : sys.stderr}
+        self._logging_prefix = msg
 
     def write(self, *messages):
         elements = []
@@ -142,7 +143,7 @@ class Console:
                 message_type = message_type[0]
                 if message_type in self._mapping:
                     dest = self._mapping[message_type]
-                    dest.write('Console logger: ' + message + '\n')
+                    dest.write(self._logging_prefix + message + '\n')
                     dest.flush()
             
 
