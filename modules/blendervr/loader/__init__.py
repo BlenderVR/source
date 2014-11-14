@@ -147,11 +147,11 @@ class Creator:
                 processor_files = sys.argv[(sys.argv.index('--')+2):]
 
                 from blendervr.processor import _getProcessor
-                processor_class = _getProcessor(processor_files, logger, True)
+                processor_class = _getProcessor(processor_files, self._logger, True)
                 processor = processor_class(self) 
 
-                print('Processor:', processor)
-
+                processor.process(controller)
+                
                 bpy.ops.wm.save_as_mainfile(copy=True, filepath=self._output_blender_file, relative_remap=True)
 
         elif is_console():

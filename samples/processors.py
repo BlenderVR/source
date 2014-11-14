@@ -124,6 +124,21 @@ if blendervr.is_virtual_environment():
                 self.logger.log_traceback(False)
             super(Common, self).keyboardAndMouse(info)
 
+elif blendervr.is_creating_loader():
+    import bpy
+    
+    class Processor(blendervr.processor.getProcessor()):
+
+        def __init__(self, creator, laser = False):
+            super(Processor, self).__init__(creator)
+            if laser:
+                from blendervr.interactor.laser import Laser
+                self._laser = Laser(self)
+
+        def process(self, controller):
+            if hasattr(self, '_laser'):
+                self._laser.process(controller)
+            
 elif blendervr.is_console():
 
     import os

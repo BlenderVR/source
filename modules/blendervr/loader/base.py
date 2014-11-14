@@ -33,7 +33,11 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
+from .. import *
 from .. import base
+
+if not is_creating_loader():
+    sys.exit()
 
 class Base(base.Base):
     def __init__(self, parent):
