@@ -1,3 +1,8 @@
+"""
+Script that runs in Blender in background mode to transform the ``.blend`` file into a Blender-VR ready file.
+A few Logic Bricks are created among other changes in the initial scene.
+"""
+
 import sys
 import os
 import builtins

@@ -33,6 +33,10 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
+"""
+Handle all the errors, warnings and debug info
+"""
+
 import logging
 import sys
 import pprint
@@ -80,13 +84,13 @@ class Logger(logging.getLoggerClass()):
         element = stack[1]
         return 'File "' + element[1] + '", line ' + str(element[2]) + ', in', element[3]
 
-    def log_position(self): 
+    def log_position(self):
         import inspect
         stack = inspect.stack()
         element = stack[1]
         self.debug('File "' + element[1] + '", line ' + str(element[2]) + ', in', element[3])
 
-    def _process(self, verbosity, *messages, sep=' '):
+    def _process(self, verbosity, sep=' ', *messages):
         elements = []
         for message in messages:
             if isinstance(message, (dict, tuple, list)):
@@ -122,6 +126,7 @@ class Logger(logging.getLoggerClass()):
         self.addHandler(handler)
         return handler
 
+
 class Console:
     def __init__(self, msg = 'Console logger: '):
         self._mapping = {'DEBUG'    : sys.stdout,
@@ -145,13 +150,13 @@ class Console:
                     dest = self._mapping[message_type]
                     dest.write(self._logging_prefix + message + '\n')
                     dest.flush()
-            
 
 if not isinstance(logging.getLoggerClass(), Logger):
     logging.setLoggerClass(Logger)
 
 def getLogger(name):
     return logging.getLogger(name)
+
 
 # def getGUIHandler(login_window):
 #     return handler

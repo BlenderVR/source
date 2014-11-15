@@ -61,6 +61,7 @@ try:
     import imp
     (file, file_name, data) = imp.find_module('blenderVR', [os.path.join(root, 'utils')])
     module = imp.load_module('blenderVR', file, file_name, data)
+    module.main()
 except SystemExit:
     pass
 except:

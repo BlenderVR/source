@@ -33,53 +33,66 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
+"""
+Blender-VR console mode
+"""
+
 import sys, os
-import builtins
 import __main__
 
-sys.path.append(os.path.join(blenderVR_root, 'modules'))
+def main():
+    import builtins
+    builtins.blenderVR_QT = blenderVR_QT
 
-if __main__.environments.d_version:
-    try:
-        import blendervr
-        print('Current version:', blendervr.version)
-    except:
-        pass
-    sys.exit()
+    sys.path.append(os.path.join(blenderVR_root, 'modules'))
 
-if __main__.environments.dis_console:
-    try:
-        import pickle
-        with open(__main__.profile_file, 'rb') as node:
-            consoleuration = pickle.load(node)
-        import pprint
-        print("Consoleuration:")
-        pprint.pprint(consoleuration)
-    except:
-        print('Invalid profile file:', __main__.profile_file)
-    sys.exit()
+    if __main__.environments.d_version:
+        try:
+            import blendervr
+            print('Current version:', blendervr.version)
+        except:
+            pass
+        sys.exit()
 
-if __main__.environments.del_console:
-    try:
-        os.remove(__main__.profile_file)
-    except:
-        pass
-    sys.exit()
+    if __main__.environments.dis_console:
+        try:
+            import pickle
+            with open(__main__.profile_file, 'rb') as node:
+                consoleuration = pickle.load(node)
+            import pprint
+            print("Consoleuration:")
+            pprint.pprint(consoleuration)
+        except:
+            print('Invalid profile file:', __main__.profile_file)
+        sys.exit()
+
+    if __main__.environments.del_console:
+        try:
+            os.remove(__main__.profile_file)
+        except:
+            pass
+        sys.exit()
+
+    import blendervr.console.console
+    console = blendervr.console.console.Console(__main__.profile_file)
+    console.start()
+    console.main()
+    console.quit()
+    del(console)
+
 
 try:
     import PyQt4
-    builtins.blenderVR_QT = 'PyQt4'
+    blenderVR_QT = 'PyQt4'
 except:
     try:
         import PySide
-        builtins.blenderVR_QT = 'PySide'
+        blenderVR_QT = 'PySide'
     except:
         print('No graphic library available : quitting !')
         sys.exit()
 
-import blendervr.console.console
-console = blendervr.console.console.Console(__main__.profile_file)
-console.start()
-console.main()
-console.quit()
-del(console)
+
+if __name__ == "__main__":
+    main()
+
