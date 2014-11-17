@@ -38,6 +38,8 @@ import os
 from .. import *
 from ..tools import logger
 
+ELEMENTS_MAIN_PREFIX='blenderVR:'
+
 if not is_creating_loader() and not is_console():
     sys.exit()
 
@@ -64,23 +66,23 @@ class Creator:
             camera = bpy.context.scene.camera
 
             if camera:
-                SENSOR='Always_for_blenderVR'
+                SENSOR = ELEMENTS_MAIN_PREFIX + 'Sensor'
                 bpy.ops.logic.sensor_add(type='ALWAYS', name=SENSOR, object=camera.name)
                 sensor = camera.game.sensors.get(SENSOR)
                 sensor.use_pulse_true_level = True
 
-                CONTROLLER = 'Controller_for_blenderVR'
+                CONTROLLER = ELEMENTS_MAIN_PREFIX + 'Controller'
                 bpy.ops.logic.controller_add(type='PYTHON', name=CONTROLLER, object=camera.name)
                 controller = camera.game.controllers.get(CONTROLLER)
                 controller.mode = 'MODULE'
                 controller.module = 'blendervr.run'
 
-                ACTUATOR = 'Occulus_filter_for_blenderVR'
+                ACTUATOR = ELEMENTS_MAIN_PREFIX + 'Occulus:Filter'
                 bpy.ops.logic.actuator_add(type='FILTER_2D', name=ACTUATOR, object=camera.name)
                 actuator = camera.game.actuators.get(ACTUATOR)
                 actuator.mode = 'CUSTOMFILTER'
 
-                TEXT = 'Occulus_glsl_for_blenderVR'
+                TEXT = ELEMENTS_MAIN_PREFIX + 'Occulus:GLSL'
                 shader = bpy.data.texts.new(TEXT)
                 actuator.glsl_shader = shader
                 shader.from_string("""uniform sampler2D bgl_RenderedTexture;

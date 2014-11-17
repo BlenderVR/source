@@ -42,3 +42,6 @@ if not is_creating_loader():
 class Base(base.Base):
     def __init__(self, parent):
         base.Base.__init__(self, parent)
+
+    def process(self, controller):
+        pass
