@@ -90,14 +90,14 @@ class Logger(logging.getLoggerClass()):
         element = stack[1]
         self.debug('File "' + element[1] + '", line ' + str(element[2]) + ', in', element[3])
 
-    def _process(self, verbosity, sep=' ', *messages):
+    def _process(self, verbosity, *messages):
         elements = []
         for message in messages:
             if isinstance(message, (dict, tuple, list)):
                 elements.append(pprint.pformat(message))
             else:
                 elements.append(str(message))
-        for message in (sep.join(elements)).rsplit('\n'):
+        for message in (' '.join(elements)).rsplit('\n'):
             getattr(super(Logger, self), verbosity)(message)
 
     def _getVerbosity(self, verbosity):
