@@ -42,7 +42,7 @@ import sys
 import os
 from . import exceptions
 from .buffer import Buffer
-from ..tools.connector import Common
+from ..tools import protocol
 
 from .. import is_virtual_environment
 if not is_virtual_environment():
@@ -401,7 +401,7 @@ class Main:
     def _sendToSlaves(self, command, argument = ''):
         buffer = Buffer()
         buffer.command(self.MESSAGE_PROCESSOR)
-        buffer.string(Common.composeMessage(command, argument))
+        buffer.string(protocol.composeMessage(command, argument))
         self._connector.sendToSlave(buffer)
 
     def _startSimulation(self):
@@ -421,7 +421,7 @@ class Main:
             if command == self.MESSAGE_PAUSE:
                 self._pause(buffer.string())
             elif command == self.MESSAGE_PROCESSOR:
-                command, argument = Common.decomposeMessage(buffer.string())
+                command, argument = protocol.decomposeMessage(buffer.string())
                 self._processor.receivedFromMaster(command, argument)
             
     def getVersion(self):

@@ -36,7 +36,7 @@
 import socket
 import os
 from .. import exceptions
-from ...tools.connector import Common
+from ...tools import protocol
 import copy
 import select
 import sys
@@ -267,12 +267,12 @@ class Logic:
     def sendToVirtualEnvironment(self, command, argument):
         if self.get_blender_player_state() != 'running':
             return False
-        message = Common.composeMessage(command, argument)
+        message = protocol.composeMessage(command, argument)
         self._screens.send_to_blender_player('console_to_virtual_environment', message)
 
     def receivedFromVirtualEnvironment(self, message):
         if self._processor:
-            command, argument = Common.decomposeMessage(message)
+            command, argument = protocol.decomposeMessage(message)
             self._processor.receivedFromVirtualEnvironment(command, argument)
 
     def _linkProcessorToBlenderFile(self):

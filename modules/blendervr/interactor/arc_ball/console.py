@@ -35,7 +35,7 @@
 
 from ... import *
 from .. import Interactor
-from ...tools.connector import Common
+from ...tools import protocol
 
 PRESS_EVENT   = 'press'
 MOVE_EVENT    = 'move'
@@ -66,7 +66,7 @@ if is_virtual_environment():
         def receivedFromConsole(self, command, argument):
             if command != self._name:
                 return False
-            command, argument = Common.decomposeMessage(argument)
+            command, argument = protocol.decomposeMessage(argument)
             if command == PRESS_EVENT:
                 if isinstance(self._object, bge.types.KX_GameObject):
                     self._objectPosition = copy.copy(self._object.localTransform)
@@ -165,7 +165,7 @@ elif is_console():
             if event.button() == self._active_button:
                 self._arcBall.click((event.x(), event.y()))
                 self._draging = True
-                self.sendToVirtualEnvironment(self._name, Common.composeMessage(PRESS_EVENT))
+                self.sendToVirtualEnvironment(self._name, protocol.composeMessage(PRESS_EVENT))
             QtOpenGL.QGLWidget.mousePressEvent(self, event)
 
         def mouseMoveEvent(self, event):
@@ -173,14 +173,14 @@ elif is_console():
                 update = self._arcBall.drag((event.x(), event.y()))
                 self._currentOrientation = self._startOrientation.dot(update)
                 self.updateGL()
-                self.sendToVirtualEnvironment(self._name, Common.composeMessage(MOVE_EVENT, update.tolist()))
+                self.sendToVirtualEnvironment(self._name, protocol.composeMessage(MOVE_EVENT, update.tolist()))
             QtOpenGL.QGLWidget.mouseMoveEvent(self, event)
 
         def mouseReleaseEvent(self, event):
             if event.button() == self._active_button:
                 update = self._arcBall.drag((event.x(), event.y()))
                 self._startOrientation = removeScale(self._startOrientation.dot(update))
-                self.sendToVirtualEnvironment(self._name, Common.composeMessage(RELEASE_EVENT, update.tolist()))
+                self.sendToVirtualEnvironment(self._name, protocol.composeMessage(RELEASE_EVENT, update.tolist()))
                 self._draging = False
             QtOpenGL.QGLWidget.mouseReleaseEvent(self, event)
 

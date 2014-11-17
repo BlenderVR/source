@@ -35,7 +35,7 @@
 
 from .. import *
 from . import Interactor
-from ..tools.connector import Common
+from ..tools import protocol
 
 COMMON_NAME = 'land marks'
 
@@ -66,22 +66,22 @@ if is_virtual_environment():
 
             self._positions = bge.logic.globalDict['blenderVR']['interactors']['landmarks']
 
-            self.sendToConsole(self._name, Common.composeMessage(USERS,list(self.blenderVR.getAllUsers().keys())))
+            self.sendToConsole(self._name, protocol.composeMessage(USERS,list(self.blenderVR.getAllUsers().keys())))
             users = self.blenderVR.getScreenUsers()
             if self.blenderVR.isMaster() and (len(users) == 1):
                 self._user = users[0]
-                self.sendToConsole(self._name, Common.composeMessage(USER, self._user.getName()))
+                self.sendToConsole(self._name, protocol.composeMessage(USER, self._user.getName()))
                 self._send()
 
         def _send(self):
-            self.sendToConsole(self._name, Common.composeMessage(LANDMARKS, list(self._positions.keys())))
+            self.sendToConsole(self._name, protocol.composeMessage(LANDMARKS, list(self._positions.keys())))
 
         def receivedFromConsole(self, command, argument):
             if command != self._name:
                 return False
             if not hasattr(self, '_user'):
                 return True
-            command, argument = Common.decomposeMessage(argument)
+            command, argument = protocol.decomposeMessage(argument)
             if command == SAVE:
                 transform = self._user.localTransform
                 self._positions[argument] = ((transform[0][0], transform[0][1], transform[0][2], transform[0][3]),
@@ -129,7 +129,7 @@ elif is_console():
         def receivedFromVirtualEnvironment(self, command, argument):
             if self._name != command:
                 return False
-            command, argument = Common.decomposeMessage(argument)
+            command, argument = protocol.decomposeMessage(argument)
             if command == LANDMARKS:
                 self._ui.available.reset()
                 argument.sort()
@@ -149,16 +149,16 @@ elif is_console():
         def cb_save(self):
             name = self._ui.name.text()
             if name:
-                self.sendToVirtualEnvironment(self._name, Common.composeMessage(SAVE, name))
+                self.sendToVirtualEnvironment(self._name, protocol.composeMessage(SAVE, name))
 
         def cb_select(self):
             if self._ui.available.currentItem():
-                self.sendToVirtualEnvironment(self._name, Common.composeMessage(LOAD, self._ui.available.currentItem().text()))
+                self.sendToVirtualEnvironment(self._name, protocol.composeMessage(LOAD, self._ui.available.currentItem().text()))
 
         def cb_remove(self):
             if self._ui.available.currentItem():
-                self.sendToVirtualEnvironment(self._name, Common.composeMessage(REMOVE, self._ui.available.currentItem().text()))
+                self.sendToVirtualEnvironment(self._name, protocol.composeMessage(REMOVE, self._ui.available.currentItem().text()))
 
         def cb_select_user(self):
             if self._ui.users.currentText():
-                self.sendToVirtualEnvironment(self._name, Common.composeMessage(USER, self._ui.users.currentText()))
+                self.sendToVirtualEnvironment(self._name, protocol.composeMessage(USER, self._ui.users.currentText()))

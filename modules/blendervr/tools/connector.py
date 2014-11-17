@@ -34,8 +34,8 @@
 ## 
 
 import socket
-import json
 import select
+from . import protocol
 
 class Common:
 
@@ -66,7 +66,7 @@ class Common:
         if len(self._buffers) and self._callback:
             while len(self._buffers) > 0:
                 buffer = self._buffers.pop(0)
-                self._callback(*Common.decomposeMessage(buffer))
+                self._callback(*protocol.decomposeMessage(buffer))
 
     def setClient(self, client, callback = None):
         self.close()
@@ -79,7 +79,7 @@ class Common:
     def send(self, command, argument = ''):
         if self._client is None:
             return
-        message = Common.composeMessage(command, argument)
+        message = protocol.composeMessage(command, argument)
         size = str(len(message)).zfill(self.SIZE_LEN)
         self._send_chunk(size.encode())
         while len(message) > 0:
@@ -110,19 +110,6 @@ class Common:
         if self._client:
             return self._client.fileno()
         return None
-
-    def composeMessage(command, argument = ''):
-        return command + ':' + json.dumps(argument)
-        
-    def decomposeMessage(message):
-        message  = message.split(':')
-        command  = message[0]
-        argument = ':'.join(message[1:])
-        try:
-            argument = json.loads(argument)
-        except:
-            pass
-        return (command, argument)
 
     def setWait(self, block):
         if block:

@@ -38,6 +38,7 @@ import sys
 import os
 from .. import base
 from ...tools import connector
+from ...tools import protocol
 import select
 
 class Controller(base.Base):
@@ -96,7 +97,7 @@ class Controller(base.Base):
             self.blenderVR.quit('Asked by the user through the console')
         elif command == 'console_to_virtual_environment':
             if self.blenderVR.getProcessor() is not None and self.blenderVR.isMaster():
-                command, argument = connector.Common.decomposeMessage(argument)
+                command, argument = protocol.decomposeMessage(argument)
                 self.blenderVR.getProcessor().receivedFromConsole(command, argument)
         elif command == 'log_file':
             if argument:
@@ -124,7 +125,7 @@ class Controller(base.Base):
         self._sendToConsole('running')
 
     def sendToConsole(self, command, argument):
-        message = connector.Common.composeMessage(command, argument)
+        message = protocol.composeMessage(command, argument)
         self._sendToConsole('virtual_environment_to_console', message)
 
     def run(self):
