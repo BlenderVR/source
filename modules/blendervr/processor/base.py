@@ -107,6 +107,9 @@ elif is_creating_loader():
         def __init__(self, parent):
             ProcessorCommon.__init__(self, parent)
 
+        def process(self, controller):
+            pass
+
 elif is_console():
     class Processor(ProcessorCommon):
 
