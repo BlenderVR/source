@@ -22,7 +22,7 @@ Source Code
 **********************
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    utils/index.rst
    modules/index.rst

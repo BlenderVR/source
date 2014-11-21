@@ -34,6 +34,9 @@
 ## 
 
 """
+Blender-VR Console
+******************
+
 Blender-VR console mode
 """
 

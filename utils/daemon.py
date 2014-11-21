@@ -34,6 +34,9 @@
 ## 
 
 """
+Daemon
+******
+
 This script runs in the clients and is responsible for spawning the Blender Player.
 """
 
