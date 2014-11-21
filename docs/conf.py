@@ -263,3 +263,15 @@ texinfo_documents = [
 
 # Include __init__ arguments in the autodocs
 autoclass_content = 'both'
+
+# hack to add non-standard modules (e.g., bge, PySyde, ...)
+import imp
+def import_dummy():
+    name = 'dummy'
+    path = os.path.abspath('.')
+    module_info = imp.find_module(name, [path])
+    module = imp.load_module(name, *module_info)
+    sys.modules[name] = module
+
+import_dummy()
+import builtins
