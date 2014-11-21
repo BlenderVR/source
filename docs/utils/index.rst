@@ -7,7 +7,6 @@
 Files to support the Blender VR application.
 
 .. toctree::
-
    :maxdepth: 1
 
    rst/daemon
