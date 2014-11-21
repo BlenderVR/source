@@ -1,7 +1,12 @@
-import builtins
-import imp
-import os
+"""
+Dummy Module
+************
+
+Hack package to bypass Sphinx/Apidoc requirements
+"""
+
 import sys
+import builtins
 
 def load_module(name, module):
     sys.modules[name] = module
@@ -32,3 +37,8 @@ load_module('PySide', PySide)
 
 # globals
 load_global('blenderVR_QT', 'PyQt4')
+import blendervr
+load_global('blendervr', blendervr)
+
+# misc hacks
+sys.argv.extend(('--', 'dummy.blend'))
