@@ -33,11 +33,13 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-"""@package blendervr
-Main blenderVR module.
-
-It has to be loaded by a python controller inside Blender File. Moreover, you should run blendervr.run() each frame (ie.: triggered by an Always Actuator). Thus, you should get the interactions
 """
+@package blendervr
+
+Player Module
+*************
+"""
+
 import sys
 import os
 from . import exceptions
@@ -56,7 +58,7 @@ class Main:
     MESSAGE_PROCESSOR = b'r'
 
     def __init__(self):
-        """ Contstructor : load all necessary elements """
+        """ Constructor : load all necessary elements """
         self.run    = lambda *args : None
         self._scene = bge.logic.getCurrentScene()
 
@@ -84,7 +86,7 @@ class Main:
             sys.stderr.write(traceback.format_exc())
             sys.stderr.flush()
             bge.logic.endGame()
-            sys.exit()            
+            sys.exit()
 
         # Now, the logger is active !
 
@@ -247,7 +249,7 @@ class Main:
             pass
         except:
             self.stopDueToError()
-    
+
     def _run_slave(self):
         self._scene.suspend()
 
@@ -304,7 +306,11 @@ class Main:
 
         This method must be call instead of any other method to properly quit blenderVR.
         Otherwise, you may have problem of not closed socket next time you run blenderVR
-        The reason is printed inside the log file of displayed on the console"""
+        The reason is printed inside the log file of displayed on the console
+
+        :param reason:
+        :type reason: `str`
+        """
         if hasattr(self, '_connector'):
             self._connector.quit(reason)
 

@@ -40,8 +40,11 @@ from ..tools import logger
 
 ELEMENTS_MAIN_PREFIX='blenderVR:'
 
-if not is_creating_loader() and not is_console():
-    sys.exit()
+
+def main():
+    if not is_creating_loader() and not is_console():
+        sys.exit()
+
 
 class Creator:
     def __init__(self, logger):
@@ -55,7 +58,7 @@ class Creator:
         self._output_blender_file = '.'.join(self._output_blender_file)
         if not sys.platform.startswith('win'):
             self._output_blender_file = os.path.join(os.path.dirname(self._output_blender_file), '.' + os.path.basename(self._output_blender_file))
-        
+
     def process(self):
         if is_creating_loader():
             import bpy
@@ -153,9 +156,12 @@ class Creator:
                 processor = processor_class(self) 
 
                 processor.process(controller)
-                
+
                 bpy.ops.wm.save_as_mainfile(copy=True, filepath=self._output_blender_file, relative_remap=True)
 
         elif is_console():
             print(self._output_blender_file)
-                
+
+
+if __name__ == "__main__":
+    main()

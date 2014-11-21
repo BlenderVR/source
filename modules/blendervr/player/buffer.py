@@ -101,7 +101,7 @@ class Buffer:
         self._buffer += struct.pack(">9f", data[0][0], data[0][1], data[0][2],
                                            data[1][0], data[1][1], data[1][2],
                                            data[2][0], data[2][1], data[2][2])
-        
+
     def matrix_4x4(self, data = None):
         if data is None:
             data = self._extract(">16f")

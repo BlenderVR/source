@@ -36,6 +36,10 @@
 class Base:
     """Main struct for the blender vr environment"""
     def __init__(self, parent):
+        """
+        :param parent:
+        :type parent: module or class
+        """
         self._parent = parent
 
         if isinstance(self._parent, Base):
@@ -46,16 +50,31 @@ class Base:
         self._main_running_module_logger = self._main_running_module._logger
 
     def quit(self):
+        """
+        """
         del(self._parent)
         del(self._main_running_module)
         del(self._main_running_module_logger)
 
     @property
     def logger(self):
+        """
+        Logger of the main running module
+
+        :rtype: callback function
+        """
         return self._main_running_module_logger
 
     def getParent(self):
+        """
+        Returns the module that inherits the Base class
+
+        :rtype: module or class
+        """
         return self._parent
 
     def getMainRunningModule(self):
+        """
+        :rtype: module
+        """
         return self._main_running_module

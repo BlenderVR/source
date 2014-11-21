@@ -33,6 +33,14 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
+"""
+Handle all the processors, which are defined per project.
+
+A processor is a python module that allows Blender-VR to run special code for specific project.
+
+It can, for example, load OSC modules, or link the HMD to the scene camera.
+"""
+
 import random
 import copy
 from .base import Processor
@@ -92,6 +100,7 @@ def getProcessor():
     _logger.warning('Cannot import "' + str(Processor.__name__) + '" class for logger from "' + file_name + '"')
     return Processor
 
+
 def appendProcessor(processor_file):
     """
     Include the processor file to be executed.
@@ -101,6 +110,7 @@ def appendProcessor(processor_file):
     """
     global _processor_files
     _processor_files.insert(0, processor_file)
+
 
 def _getProcessor(processor_files, logger, log_traceback):
     """

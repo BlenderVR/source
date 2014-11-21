@@ -34,7 +34,7 @@
 ## 
 
 """
-Main module of the Blender VR application
+Main module of the Blender-VR application
 """
 
 # Beware: you must alswo change blenderVR console executable to change the profile pickle file to load
@@ -65,6 +65,11 @@ def is_creating_loader():
         return False
 
 def is_console():
+    """
+    Check if it is in console mode.
+
+    :rtype: bool
+    """
     return not is_virtual_environment() and not is_creating_loader()
 
 if is_virtual_environment():
