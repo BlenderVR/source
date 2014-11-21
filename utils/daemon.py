@@ -215,53 +215,56 @@ class Daemon:
             self._stop_blender_player()
 
 
-if len(sys.argv) > 3 and sys.argv[3] == 'debug':
-    debug = True
-else:
-    debug = False
-
-if not debug:
-    try:
-        # on Linux, we daemonize !
-        process_id = os.fork()
-        forked = True
-    except:
-        forked = False
-else:
-    forked = False
-
-if forked:
-    if process_id < 0:
-        # Fork error.  Exit badly.
-        sys.exit(1)
-    elif process_id != 0:
-        # This is the parent process.  Exit.
-        sys.exit(0)
-
-    process_id = os.setsid()
-    if process_id == -1:
-        # Uh oh, there was a problem.
-        sys.exit(1)
-
-    devnull = "/dev/null"
-    if hasattr(os, "devnull"):
-        # Python has set os.devnull on this system, use it instead
-        # as it might be different than /dev/null.
-        devnull = os.devnull
-
-    import resource
-    for fd in range(resource.getrlimit(resource.RLIMIT_NOFILE)[0]):
-        try:
-            os.close(fd)
-        except OSError:
-            pass
-
-    os.open(devnull, os.O_RDWR)
-    os.dup(0)
-    os.dup(0)
-
-
 def main():
+    global debug
+    global forked
+
+    if len(sys.argv) > 3 and sys.argv[3] == 'debug':
+        debug = True
+    else:
+        debug = False
+
+    if not debug:
+        try:
+            # on Linux, we daemonize !
+            process_id = os.fork()
+            forked = True
+        except:
+            forked = False
+    else:
+        forked = False
+
+    if forked:
+        if process_id < 0:
+            # Fork error.  Exit badly.
+            sys.exit(1)
+        elif process_id != 0:
+            # This is the parent process.  Exit.
+            sys.exit(0)
+
+        process_id = os.setsid()
+        if process_id == -1:
+            # Uh oh, there was a problem.
+            sys.exit(1)
+
+        devnull = "/dev/null"
+        if hasattr(os, "devnull"):
+            # Python has set os.devnull on this system, use it instead
+            # as it might be different than /dev/null.
+            devnull = os.devnull
+
+        import resource
+        for fd in range(resource.getrlimit(resource.RLIMIT_NOFILE)[0]):
+            try:
+                os.close(fd)
+            except OSError:
+                pass
+
+        os.open(devnull, os.O_RDWR)
+        os.dup(0)
+        os.dup(0)
+
+
     blenderVR_root    = os.path.dirname(os.path.dirname(__file__))
     blenderVR_modules = os.path.join(blenderVR_root, 'modules')
     sys.path.append(blenderVR_modules)
