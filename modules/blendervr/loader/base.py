@@ -37,6 +37,7 @@ from .. import *
 from .. import base
 
 if not is_creating_loader():
+    import sys
     sys.exit()
 
 class Base(base.Base):
