@@ -163,5 +163,5 @@ class Creator:
             print(self._output_blender_file)
 
 
-if __name__ == "__main__":
-    main()
+# XXX
+main()

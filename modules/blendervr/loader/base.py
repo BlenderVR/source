@@ -36,9 +36,12 @@
 from .. import *
 from .. import base
 
-if not is_creating_loader():
-    import sys
-    sys.exit()
+
+def main():
+    if not is_creating_loader():
+        import sys
+        sys.exit()
+
 
 class Base(base.Base):
     def __init__(self, parent):
@@ -46,3 +49,7 @@ class Base(base.Base):
 
     def process(self, controller):
         pass
+
+
+# XXX
+main()

@@ -36,10 +36,11 @@
 import sys
 from .. import *
 
-if not is_console():
-    import bge
-    bge.logic.endGame()
-    sys.exit()
+def main():
+    if not is_console():
+        import bge
+        bge.logic.endGame()
+        sys.exit()
 
 import os
 
@@ -60,3 +61,7 @@ def unstripAnchor(anchor, path):
     if path[1] and anchor is not None:
         return os.path.join(anchor, path[0])
     return path[0]
+
+
+# XXX
+main()

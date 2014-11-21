@@ -40,6 +40,7 @@ Main module of the Blender-VR application
 # Beware: you must alswo change blenderVR console executable to change the profile pickle file to load
 version=1.0
 
+
 def is_virtual_environment():
     """
     Check if the Blender Game Engine is available.
@@ -51,6 +52,7 @@ def is_virtual_environment():
         return True
     except:
         return False
+
 
 def is_creating_loader():
     """
@@ -64,6 +66,7 @@ def is_creating_loader():
     except:
         return False
 
+
 def is_console():
     """
     Check if it is in console mode.
@@ -72,15 +75,21 @@ def is_console():
     """
     return not is_virtual_environment() and not is_creating_loader()
 
-if is_virtual_environment():
-    try:
-        import bge
-        from .player import Main
 
-        bge.logic.blenderVR = Main()
+def main():
+    if is_virtual_environment():
+        try:
+            import bge
+            from .player import Main
 
-        def run():
-            bge.logic.blenderVR.run()
-    except:
-        def run():
-            pass
+            bge.logic.blenderVR = Main()
+
+            def run():
+                bge.logic.blenderVR.run()
+        except:
+            def run():
+                pass
+
+
+# XXX
+main()
