@@ -15,6 +15,23 @@
 import sys
 import os
 
+# generate the .rst files
+from sphinx.apidoc import main as apidoc_main
+
+
+def generate_rst():
+    """Dynamically generate RST files for the documentation"""
+    # generate the rst files
+    os.system("sphinx-apidoc -o modules/rst/ --force --separate --maxdepth=1 ../modules/blendervr/")
+    os.system("sphinx-apidoc -o utils/rst --force --no-headings --separate --maxdepth=1 ../utils/")
+
+    # remote the unused files
+    os.system("rm modules/rst/modules.rst")
+    os.system("rm utils/rst/modules.rst")
+
+generate_rst()
+
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
