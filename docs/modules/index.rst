@@ -4,7 +4,7 @@
  Modules
 #########
 
-Main modules for the Blender VR application.
+Main modules for the Blender-VR application.
 
 .. toctree::
    :maxdepth: 1
