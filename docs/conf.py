@@ -21,13 +21,15 @@ from sphinx.apidoc import main as apidoc_main
 
 def generate_rst():
     """Dynamically generate RST files for the documentation"""
+
+    # NOTE it may need OS specific file separation, need to test in Windows
     # generate the rst files
     os.system("sphinx-apidoc -o modules/rst/ --force --separate --maxdepth=1 ../modules/blendervr/")
     os.system("sphinx-apidoc -o utils/rst --force --no-headings --separate --maxdepth=1 ../utils/")
 
     # remote the unused files
-    os.system("rm modules/rst/modules.rst")
-    os.system("rm utils/rst/modules.rst")
+    os.remove("modules/rst/modules.rst")
+    os.remove("utils/rst/modules.rst")
 
 generate_rst()
 
