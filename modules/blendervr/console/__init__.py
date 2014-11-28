@@ -63,5 +63,6 @@ def unstripAnchor(anchor, path):
     return path[0]
 
 
-# XXX
-main()
+import os
+if os.environ.get('READTHEDOCS', False) != 'True':
+    main()

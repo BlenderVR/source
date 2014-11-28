@@ -163,5 +163,6 @@ class Creator:
             print(self._output_blender_file)
 
 
-# XXX
-main()
+import os
+if os.environ.get('READTHEDOCS', False) != 'True':
+    main()

@@ -91,5 +91,6 @@ def main():
                 pass
 
 
-# XXX
-main()
+import os
+if os.environ.get('READTHEDOCS', False) != 'True':
+    main()

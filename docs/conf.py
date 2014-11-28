@@ -33,6 +33,8 @@ def generate_rst():
 
 generate_rst()
 
+# set the environment varilable so some functions don't run in the scripts
+os.environ.setdefault('READTHEDOCS', 'True')
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the

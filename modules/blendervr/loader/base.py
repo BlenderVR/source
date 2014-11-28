@@ -51,5 +51,6 @@ class Base(base.Base):
         pass
 
 
-# XXX
-main()
+import os
+if os.environ.get('READTHEDOCS', False) != 'True':
+    main()
