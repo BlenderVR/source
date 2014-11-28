@@ -35,7 +35,7 @@
 
 """
 OSC Plugin
-******
+**********
 
 This script instantiates the OSC plugin: an OSC API embedded in BlenderVR,
 used to send OSC messages (for sound control) to a third party program (e.g. PureData, MaxMSP, etc.)
