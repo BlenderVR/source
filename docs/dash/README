@@ -1,0 +1,9 @@
+How to build Dash DocSets
+
+Note: This is for OSX only
+
+1. Install pip
+2. Install and activate  virtual environment (optional)
+3. $ pip install -r requirements.txt
+4. If you want to upload the Docset update the generate-doc2dash.sh file accordingly
+5. $ ./generate-doc2dash.sh
