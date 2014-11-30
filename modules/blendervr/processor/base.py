@@ -64,6 +64,10 @@ if is_virtual_environment():
             ProcessorCommon.__init__(self, parent)
 
         def setAsObjectToSynchronize(self, name):
+            """
+            :param name:
+            :type name: `str`
+            """
             self.blenderVR.addObjectToSynchronize(self, name)
 
         def start(self):
@@ -80,12 +84,24 @@ if is_virtual_environment():
                 interactor.user_position(info)
 
         def keyboardAndMouse(self, info):
+            """
+            :param info:
+            :type info:
+            """
             for interactor in self._interactors:
                 if interactor.keyboardAndMouse(info):
                     break
 
         # Interactions between rendering nodes
         def sendToSlaves(self, command, argument = ''):
+            """
+            Send command to run in the slaves nodes
+
+            :param command:
+            :type command: `str`
+            :param argument:
+            :type argument: `str`
+            """
             self.blenderVR._sendToSlaves(command, argument)
 
         def receivedFromMaster(self, command, argument):
@@ -93,15 +109,32 @@ if is_virtual_environment():
 
         # Interactions with the console
         def sendToConsole(self, command, argument = ''):
+            """
+            Send command to run in the console
+
+            :param command:
+            :type command: `str`
+            :param argument:
+            :type argument: `str`
+            """
             self.blenderVR._controller.sendToConsole(command, argument)
 
         def receivedFromConsole(self, command, argument):
+            """
+            Received command from the master node
+
+            :param command:
+            :type command: `str`
+            :param argument:
+            :type argument: `str`
+            """
             for interactor in self._interactors:
                 if interactor.receivedFromConsole(command, argument):
                     return
             self.logger.debug('Unknown command received from console:', command)
 
-elif is_creating_loader(): 
+
+elif is_creating_loader():
     class Processor(ProcessorCommon):
 
         def __init__(self, parent):
@@ -156,6 +189,11 @@ elif is_console():
         def sendToVirtualEnvironment(self, command, argument = ''):
             """
             Run arbitrary command in the virtual environment
+
+            :param command:
+            :type command: `str`
+            :param argument:
+            :type argument: `str`
             """
             self.getConsole().sendToVirtualEnvironment(command, argument)
 
