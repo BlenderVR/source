@@ -65,8 +65,6 @@ if is_virtual_environment():
 
         def setAsObjectToSynchronize(self, name):
             """
-            :param name:
-            :type name: `str`
             """
             self.blenderVR.addObjectToSynchronize(self, name)
 
@@ -85,8 +83,6 @@ if is_virtual_environment():
 
         def keyboardAndMouse(self, info):
             """
-            :param info:
-            :type info:
             """
             for interactor in self._interactors:
                 if interactor.keyboardAndMouse(info):
@@ -96,11 +92,6 @@ if is_virtual_environment():
         def sendToSlaves(self, command, argument = ''):
             """
             Send command to run in the slaves nodes
-
-            :param command:
-            :type command: `str`
-            :param argument:
-            :type argument: `str`
             """
             self.blenderVR._sendToSlaves(command, argument)
 
@@ -111,22 +102,12 @@ if is_virtual_environment():
         def sendToConsole(self, command, argument = ''):
             """
             Send command to run in the console
-
-            :param command:
-            :type command: `str`
-            :param argument:
-            :type argument: `str`
             """
             self.blenderVR._controller.sendToConsole(command, argument)
 
         def receivedFromConsole(self, command, argument):
             """
             Received command from the master node
-
-            :param command:
-            :type command: `str`
-            :param argument:
-            :type argument: `str`
             """
             for interactor in self._interactors:
                 if interactor.receivedFromConsole(command, argument):
@@ -189,11 +170,6 @@ elif is_console():
         def sendToVirtualEnvironment(self, command, argument = ''):
             """
             Run arbitrary command in the virtual environment
-
-            :param command:
-            :type command: `str`
-            :param argument:
-            :type argument: `str`
             """
             self.getConsole().sendToVirtualEnvironment(command, argument)
 
