@@ -10,7 +10,7 @@ import sys
 import os
 import builtins
 
-builtins.blenderVR_root = os.path.dirname(os.path.dirname(__file__))
+blenderVR_root = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(os.path.join(blenderVR_root, 'modules'))
 
 import blendervr.tools.logger

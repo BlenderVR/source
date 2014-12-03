@@ -47,7 +47,7 @@ def main():
     import builtins
     builtins.blenderVR_QT = blenderVR_QT
 
-    sys.path.append(os.path.join(blenderVR_root, 'modules'))
+    sys.path.append(os.path.join(__main__.blenderVR_root, 'modules'))
 
     if __main__.environments.d_version:
         try:

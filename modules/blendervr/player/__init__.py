@@ -64,10 +64,6 @@ class Main:
 
         self._is_stereo = ('-s' in sys.argv)
 
-        import builtins
-        from ..tools import getModulePath
-        builtins.blenderVR_root = os.path.dirname(os.path.dirname(os.path.dirname(getModulePath())))
-
         configuration = {}
         try:
             from ..tools import logger

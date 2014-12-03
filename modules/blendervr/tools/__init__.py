@@ -33,13 +33,17 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
+import inspect
+import os
+
 def getModulePath():
-    import inspect
     stack = inspect.stack()
     module_file = stack[1][1]
 
-    import os
     path = os.path.dirname(module_file)
     if os.path.basename(path) == '__pycache__':
         return os.path.dirname(path)
     return path
+
+def getRootPath():
+    return os.path.dirname(os.path.dirname(os.path.dirname(getModulePath())))

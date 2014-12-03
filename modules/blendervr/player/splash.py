@@ -40,11 +40,12 @@ import os
 import mathutils
 from bgl import *
 from . import base
+from ..tools import getRootPath
 
 class Splash(base.Base):
     def __init__(self, parent):
         super(Splash, self).__init__(parent)
-        utils_path = os.path.join(blenderVR_root, 'utils')
+        utils_path = os.path.join(getRootPath(), 'utils')
         font_path = os.path.join(utils_path, 'font.ttf')
         self._font_id = blf.load(font_path)
         self._ecg_values = [2.2115759e+00, 1.9184524e+00, 1.6262298e+00, 1.3363817e+00, 1.0457467e+00, 8.7953729e-01,

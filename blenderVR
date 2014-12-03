@@ -2,7 +2,6 @@
 
 import sys
 import os
-import builtins
 
 if sys.platform.startswith("win"):
     path = os.path.join(os.environ['APPDATA'])
@@ -16,7 +15,7 @@ if not os.path.isdir(path): os.makedirs(path)
 
 profile_file = os.path.join(path, 'vr', 'profile_1.0.pickle')
 
-builtins.blenderVR_profilePath = os.path.join(path, 'vr', 'modules')
+blenderVR_profilePath = os.path.join(path, 'vr', 'modules')
 if not os.path.isdir(blenderVR_profilePath): os.makedirs(blenderVR_profilePath)
 
 def isValidRoot(root):
@@ -55,7 +54,7 @@ if not isValidRoot(root):
     print('Try adding --blenderVR-root option to blenderVR (' + sys.argv[0] + ' --blenderVR-root="path") !')
     sys.exit()
 
-builtins.blenderVR_root = root
+blenderVR_root = root
 
 try:
     import imp

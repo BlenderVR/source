@@ -33,7 +33,10 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-import pickle, os, copy
+import pickle
+import os
+import copy
+from ..tools import getRootPath
 
 class Profile:
     def __init__(self, configuration_file):
@@ -44,7 +47,7 @@ class Profile:
             with open(self._configuration_file, 'rb') as node:
                 self._data = pickle.load(node)
         except:
-            self._data = {'root': blenderVR_root}
+            self._data = {'root': getRootPath()}
             self._write()
 
     def lock(self, lock):

@@ -37,6 +37,7 @@ import socket
 import os
 from .. import exceptions
 from ...tools import protocol
+from ...tools import getRootPath
 import copy
 import select
 import sys
@@ -238,7 +239,7 @@ class Logic:
     def compile_BC(self):
         try:
             import compileall
-            compileall.compile_dir(os.path.join(blenderVR_root, 'modules', 'blendervr'), quiet = True)
+            compileall.compile_dir(os.path.join(getRootPath(), 'modules', 'blendervr'), quiet = True)
         except:
             self.logger.log_traceback(False)
 
@@ -284,7 +285,7 @@ class Logic:
                     processor_file_name += '.processor.py'
                     if self.profile.getValue(['files', 'processor']) != processor_file_name:
                         if not os.path.isfile(processor_file_name):
-                            processor_file_name = os.path.join(blenderVR_root, 'modules', 'blendervr', 'processor', 'default.py')
+                            processor_file_name = os.path.join(getRootPath(), 'modules', 'blendervr', 'processor', 'default.py')
                         self.profile.setValue(['files', 'processor'], processor_file_name)
                         self._force_processor_file(processor_file_name)
         self.update_user_files()

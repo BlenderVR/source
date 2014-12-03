@@ -75,7 +75,6 @@ def is_console():
     """
     return not is_virtual_environment() and not is_creating_loader()
 
-
 def main():
     if is_virtual_environment():
         try:
