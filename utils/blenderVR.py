@@ -45,7 +45,6 @@ import __main__
 
 def main():
     import builtins
-    builtins.blenderVR_QT = blenderVR_QT
 
     sys.path.append(os.path.join(__main__.blenderVR_root, 'modules'))
 
@@ -82,19 +81,6 @@ def main():
     console.main()
     console.quit()
     del(console)
-
-
-try:
-    import PyQt4
-    blenderVR_QT = 'PyQt4'
-except:
-    try:
-        import PySide
-        blenderVR_QT = 'PySide'
-    except:
-        print('No graphic library available : quitting !')
-        sys.exit()
-
 
 if __name__ == "__main__":
     main()

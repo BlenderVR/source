@@ -33,11 +33,23 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
+def getQTVersion():
+    try:
+        import PyQt4
+        return 'PyQt4'
+    except:
+        try:
+            import PySide
+            return 'PySide'
+        except:
+            print('No graphic library available : quitting !')
+            sys.exit()
+
 try:
 
     import os
     import random
-    if blenderVR_QT == 'PyQt4':
+    if getQTVersion() == 'PyQt4':
         from PyQt4 import QtGui
     else:
         from PySide import QtGui
@@ -50,7 +62,7 @@ try:
             return None
         py_file = fileName + '.py'
         if not os.path.isfile(py_file) or os.path.getmtime(py_file) < os.path.getmtime(ui_file):
-            if blenderVR_QT == 'PyQt4':
+            if getQTVersion() == 'PyQt4':
                 command = 'pyuic4 -w'
             else:
                 command = 'pyside-uic'
