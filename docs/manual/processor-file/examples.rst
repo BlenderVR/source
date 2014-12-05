@@ -62,7 +62,6 @@ Most of the time this won't need to change. The exception is when the file being
 already modified to work with Blender-VR (e.g., the file generated on-the-fly after running it once).
 
 .. code-block:: python
-   :lineno-start: 3
 
     if blendervr.is_console():
         class Processor(blendervr.processor.getProcessor()):
@@ -79,7 +78,6 @@ If a project requires specific changes in the ``.blend`` file they are introduce
 This is the place where a specific ``Actuator`` can be added for a Head-Mounted display for example.
 
 .. code-block:: python
-   :lineno-start: 12
 
     elif blendervr.is_creating_loader():
         import bpy
@@ -94,7 +92,6 @@ This part of the code is called when the ``.blend`` file is loaded in the Blende
 The most basic usage is to syncronize all the scene objects, as it's being done here.
 
 .. code-block:: python
-   :lineno-start: 19
 
     elif blendervr.is_virtual_environment():
         import bge
