@@ -1,23 +1,26 @@
+# -*- coding: utf-8 -*-
+# file: blendervr/tools/logger.py
+
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
-## Laurent Pointal, Julian Adenauer, 
-## 
+## Laurent Pointal, Julian Adenauer,
+##
 ## This software is a computer program whose purpose is to distribute
 ## blender to render on Virtual Reality device systems.
-## 
+##
 ## This software is governed by the CeCILL  license under French law and
-## abiding by the rules of distribution of free software.  You can  use, 
+## abiding by the rules of distribution of free software.  You can  use,
 ## modify and/ or redistribute the software under the terms of the CeCILL
 ## license as circulated by CEA, CNRS and INRIA at the following URL
-## "http://www.cecill.info". 
-## 
+## "http://www.cecill.info".
+##
 ## As a counterpart to the access to the source code and  rights to copy,
 ## modify and redistribute granted by the license, users are provided only
 ## with a limited warranty  and the software's author,  the holder of the
 ## economic rights,  and the successive licensors  have only  limited
-## liability. 
-## 
+## liability.
+##
 ## In this respect, the user's attention is drawn to the risks associated
 ## with loading,  using,  modifying and/or developing or reproducing the
 ## software by the user in light of its specific status of free software,
@@ -25,13 +28,13 @@
 ## therefore means  that it is reserved for developers  and  experienced
 ## professionals having in-depth computer knowledge. Users are therefore
 ## encouraged to load and test the software's suitability as regards their
-## requirements in conditions enabling the security of their systems and/or 
-## data to be ensured and,  more generally, to use and operate it in the 
-## same conditions as regards security. 
-## 
+## requirements in conditions enabling the security of their systems and/or
+## data to be ensured and,  more generally, to use and operate it in the
+## same conditions as regards security.
+##
 ## The fact that you are presently reading this means that you have had
 ## knowledge of the CeCILL license and that you accept its terms.
-## 
+##
 
 """
 Handle all the errors, warnings and debug info
@@ -42,6 +45,7 @@ import sys
 import pprint
 
 verbosities = ['debug', 'info', 'warning', 'error', 'critical']
+
 
 class Logger(logging.getLoggerClass()):
 
@@ -75,20 +79,24 @@ class Logger(logging.getLoggerClass()):
             stack = inspect.stack()
             stack.reverse()
             for element in stack:
-                self.debug('File "' + element[1] + '", line ' + str(element[2]) + ', in', element[3], "\n", element[4][0].rstrip())
+                self.debug('File "' + element[1] + '", line ' +
+                        str(element[2]) + ', in', element[3], "\n",
+                                            element[4][0].rstrip())
             self.debug('***************************')
 
     def get_position(self):
         import inspect
         stack = inspect.stack()
         element = stack[1]
-        return 'File "' + element[1] + '", line ' + str(element[2]) + ', in', element[3]
+        return 'File "' + element[1] + '", line ' + str(element[2]) \
+                                                    + ', in', element[3]
 
     def log_position(self):
         import inspect
         stack = inspect.stack()
         element = stack[1]
-        self.debug('File "' + element[1] + '", line ' + str(element[2]) + ', in', element[3])
+        self.debug('File "' + element[1] + '", line ' + str(element[2])
+                                                    + ', in', element[3])
 
     def _process(self, verbosity, *messages):
         elements = []
@@ -117,23 +125,25 @@ class Logger(logging.getLoggerClass()):
 
         return logging.WARNING
 
-    def addLoginWindow(self, login_window, addName = False):
+    def addLoginWindow(self, login_window, addName=False):
         handler = logging.StreamHandler(login_window)
         if addName:
-            handler.setFormatter(logging.Formatter('%(levelname)s> %(asctime)s [%(name)s] %(message)s'))
+            handler.setFormatter(logging.Formatter('%(levelname)s> %(asctime)s'
+                                                ' [%(name)s] %(message)s'))
         else:
-            handler.setFormatter(logging.Formatter('%(levelname)s> %(asctime)s %(message)s'))
+            handler.setFormatter(logging.Formatter('%(levelname)s> %(asctime)s'
+                                                ' %(message)s'))
         self.addHandler(handler)
         return handler
 
 
 class Console:
-    def __init__(self, msg = 'Console logger: '):
-        self._mapping = {'DEBUG'    : sys.stdout,
-                         'INFO'     : sys.stdout,
-                         'WARNING'  : sys.stderr,
-                         'ERROR'    : sys.stderr,
-                         'CRITICAL' : sys.stderr}
+    def __init__(self, msg='Console logger: '):
+        self._mapping = {'DEBUG': sys.stdout,
+                         'INFO': sys.stdout,
+                         'WARNING': sys.stderr,
+                         'ERROR': sys.stderr,
+                         'CRITICAL': sys.stderr}
         self._logging_prefix = msg
 
     def write(self, *messages):
@@ -153,6 +163,7 @@ class Console:
 
 if not isinstance(logging.getLoggerClass(), Logger):
     logging.setLoggerClass(Logger)
+
 
 def getLogger(name):
     return logging.getLogger(name)

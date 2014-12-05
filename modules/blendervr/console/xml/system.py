@@ -37,7 +37,6 @@ import sys
 import os
 from . import common_system
 from . import base
-from ...tools import getRootPath
 
 class blenderplayer(base.single):
     def __init__(self, parent, name, attrs):
@@ -159,4 +158,4 @@ class XML(common_system.XML):
     def _default(self):
         super(XML, self)._default()
         if self._root is None:
-            self._root = getRootPath()
+            self._root = blenderVR_root

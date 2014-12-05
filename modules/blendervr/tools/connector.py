@@ -1,23 +1,26 @@
+# -*- coding: utf-8 -*-
+# file: blendervr/tools/connector.py
+
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
-## Laurent Pointal, Julian Adenauer, 
-## 
+## Laurent Pointal, Julian Adenauer,
+##
 ## This software is a computer program whose purpose is to distribute
 ## blender to render on Virtual Reality device systems.
-## 
+##
 ## This software is governed by the CeCILL  license under French law and
-## abiding by the rules of distribution of free software.  You can  use, 
+## abiding by the rules of distribution of free software.  You can  use,
 ## modify and/ or redistribute the software under the terms of the CeCILL
 ## license as circulated by CEA, CNRS and INRIA at the following URL
-## "http://www.cecill.info". 
-## 
+## "http://www.cecill.info".
+##
 ## As a counterpart to the access to the source code and  rights to copy,
 ## modify and redistribute granted by the license, users are provided only
 ## with a limited warranty  and the software's author,  the holder of the
 ## economic rights,  and the successive licensors  have only  limited
-## liability. 
-## 
+## liability.
+##
 ## In this respect, the user's attention is drawn to the risks associated
 ## with loading,  using,  modifying and/or developing or reproducing the
 ## software by the user in light of its specific status of free software,
@@ -25,34 +28,35 @@
 ## therefore means  that it is reserved for developers  and  experienced
 ## professionals having in-depth computer knowledge. Users are therefore
 ## encouraged to load and test the software's suitability as regards their
-## requirements in conditions enabling the security of their systems and/or 
-## data to be ensured and,  more generally, to use and operate it in the 
-## same conditions as regards security. 
-## 
+## requirements in conditions enabling the security of their systems and/or
+## data to be ensured and,  more generally, to use and operate it in the
+## same conditions as regards security.
+##
 ## The fact that you are presently reading this means that you have had
 ## knowledge of the CeCILL license and that you accept its terms.
-## 
+##
 
 import socket
 import select
 from . import protocol
 
+
 class Common:
 
-    SIZE_LEN        = 10
-    BUFFER_LEN      = 1024
+    SIZE_LEN = 10
+    BUFFER_LEN = 1024
 
     def __init__(self):
-        self._client     = None
-        self._callback   = None
-        self._buffers    = []
+        self._client = None
+        self._callback = None
+        self._buffers = []
         self._initBuffer()
         self.setWait(True)
 
     def _initBuffer(self):
         if hasattr(self, '_buffer') and (len(self._buffer) > 0):
             self._buffers.append(self._buffer.decode())
-        self._size   = 0
+        self._size = 0
         self._buffer = b''
 
     def __del__(self):
@@ -65,10 +69,10 @@ class Common:
     def _flushBuffers(self):
         if len(self._buffers) and self._callback:
             while len(self._buffers) > 0:
-                buffer = self._buffers.pop(0)
-                self._callback(*protocol.decomposeMessage(buffer))
+                buff = self._buffers.pop(0)
+                self._callback(*protocol.decomposeMessage(buff))
 
-    def setClient(self, client, callback = None):
+    def setClient(self, client, callback=None):
         self.close()
         self._client = client
         self._client.setblocking(0)
@@ -76,18 +80,19 @@ class Common:
     def getClient(self):
         return self._client
 
-    def send(self, command, argument = ''):
+    def send(self, command, argument=''):
         if self._client is None:
             return
         message = protocol.composeMessage(command, argument)
         size = str(len(message)).zfill(self.SIZE_LEN)
         self._send_chunk(size.encode())
         while len(message) > 0:
-            buffer = message[:self.BUFFER_LEN]
+            buff = message[:self.BUFFER_LEN]
             message = message[self.BUFFER_LEN:]
-            self._send_chunk(buffer.encode())
+            self._send_chunk(buff.encode())
 
-    # Be carefull: we use non blocking socket. So, we must wait for the buffer to be empty before sending elements ...
+    # Be carefull: we use non blocking socket. So, we must wait for the #
+    # buffer to be empty before sending elements ...
     def _send_chunk(self, data):
         total_send = 0
         while total_send < len(data):
@@ -122,7 +127,8 @@ class Common:
             if self._client is None:
                 return False
 
-            inputready, outputready, exceptready = select.select([self._client], [], [], self._timeoutSelect)
+            inputready, outputready, exceptready = select.select(
+                            [self._client], [], [], self._timeoutSelect)
 
             if self._client not in inputready:
                 return True
@@ -147,7 +153,7 @@ class Common:
                 if len(self._buffer) == self._size:
                     self._initBuffer()
                     self._flushBuffers()
-                    
+
 
 class Client(Common):
     def __init__(self, controller, module, screen_name):
@@ -163,6 +169,7 @@ class Client(Common):
 
         self.send(module, screen_name)
 
+
 class Server(Common):
     def __init__(self, client):
         Common.__init__(self)
@@ -173,7 +180,7 @@ class Server(Common):
             self.run()
 
     def _receiveClientInformation(self, module, screen_name):
-        self._module      = module
+        self._module = module
         self._screen_name = screen_name
         self.setCallback(None)
         self.setWait(False)

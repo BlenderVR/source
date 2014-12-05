@@ -1,12 +1,68 @@
 #!/usr/bin/env python3
+# -*- encoding: utf-8 -*-
+# file: blenderVR
 
+## Copyright (C) LIMSI-CNRS (2014)
+##
+## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
+## Laurent Pointal, Julian Adenauer,
+##
+## This software is a computer program whose purpose is to distribute
+## blender to render on Virtual Reality device systems.
+##
+## This software is governed by the CeCILL  license under French law and
+## abiding by the rules of distribution of free software.  You can  use,
+## modify and/ or redistribute the software under the terms of the CeCILL
+## license as circulated by CEA, CNRS and INRIA at the following URL
+## "http://www.cecill.info".
+##
+## As a counterpart to the access to the source code and  rights to copy,
+## modify and redistribute granted by the license, users are provided only
+## with a limited warranty  and the software's author,  the holder of the
+## economic rights,  and the successive licensors  have only  limited
+## liability.
+##
+## In this respect, the user's attention is drawn to the risks associated
+## with loading,  using,  modifying and/or developing or reproducing the
+## software by the user in light of its specific status of free software,
+## that may mean  that it is complicated to manipulate,  and  that  also
+## therefore means  that it is reserved for developers  and  experienced
+## professionals having in-depth computer knowledge. Users are therefore
+## encouraged to load and test the software's suitability as regards their
+## requirements in conditions enabling the security of their systems and/or
+## data to be ensured and,  more generally, to use and operate it in the
+## same conditions as regards security.
+##
+## The fact that you are presently reading this means that you have had
+## knowledge of the CeCILL license and that you accept its terms.
+##
+
+"""
+Daemon
+******
+
+This script runs in the clients and is responsible for spawning the
+Blender Player.
+
+Using the blenderVR root (relative to this script dir or given via
+command line), it setup the Python PATH to make blendervr package (
+from modules subdir) available,
+
+*Important*: it store the ``blenderVR_root`` variable inside builtins, so that
+all scripts can access it.
+
+Then it import blenderVR module from utils directory and start its
+main() function.
+"""
 import sys
 import os
+import builtins
 
 if sys.platform.startswith("win"):
     path = os.path.join(os.environ['APPDATA'])
 elif sys.platform == 'darwin':
-    path = os.path.join(os.path.expanduser('~'), 'Library', 'Application Support')
+    path = os.path.join(os.path.expanduser('~'), 'Library',
+                                        'Application Support')
 else: # Unix ...
     path = os.path.join(os.path.expanduser('~'), '.config')
 path = os.path.join(path, 'blender')
@@ -15,27 +71,48 @@ if not os.path.isdir(path): os.makedirs(path)
 
 profile_file = os.path.join(path, 'vr', 'profile_1.0.pickle')
 
-blenderVR_profilePath = os.path.join(path, 'vr', 'modules')
+builtins.blenderVR_profilePath = os.path.join(path, 'vr', 'modules')
 if not os.path.isdir(blenderVR_profilePath): os.makedirs(blenderVR_profilePath)
 
 def isValidRoot(root):
+    """Check if a given path is valid as blenderVR root.
+
+    This is done by searching a 'modules' subdirectory within that path
+    (this modules which contains the blendervr Python package)
+
+    :param root: path to test
+    :type root: str
+    :return: boolean indicator that path is valid
+    :rtype: bool
+    """
     if root is None:
         return False
     return os.path.isdir(os.path.join(root, 'modules'))
 
+# Prepare command-line arguments parsing, then parse it.
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("--version", dest="d_version", help="Current version of blender player", action="store_true", default=False)
-parser.add_argument("--blenderVR-root", dest="blenderVR_root", help="Modify the blenderVR root")
-parser.add_argument("--display-console", dest="dis_console", help="Display current configuration of the console", action="store_true", default=False)
-parser.add_argument("--delete-console", dest="del_console", help="Delete current configuration of the console", action="store_true", default=False)
+parser.add_argument("--version", dest="d_version",
+                    help="Current version of blender player",
+                    action="store_true", default=False)
+parser.add_argument("--blenderVR-root", dest="blenderVR_root",
+                    help="Modify the blenderVR root")
+parser.add_argument("--display-console", dest="dis_console",
+                    help="Display current configuration of the console",
+                    action="store_true", default=False)
+parser.add_argument("--delete-console", dest="del_console",
+                    help="Delete current configuration of the console",
+                    action="store_true", default=False)
 
 environments = parser.parse_args(sys.argv[1:])
 
 root = None
+
+# Is blenderVR_root given on command line ?
 if environments.blenderVR_root is not None:
     root= environments.blenderVR_root
 
+# Is root available in profile file ?
 if not isValidRoot(root):
     try:
         import pickle
@@ -46,20 +123,27 @@ if not isValidRoot(root):
     except:
         pass
 
+# Use our container directory as root.
 if not isValidRoot(root):
     root = os.path.dirname(os.path.realpath(__file__))
 
+# Without root, we cannot start.
 if not isValidRoot(root):
     print('Cannot find blenderVR root !')
-    print('Try adding --blenderVR-root option to blenderVR (' + sys.argv[0] + ' --blenderVR-root="path") !')
+    print('Try adding --blenderVR-root option to blenderVR (' + sys.argv[0]
+            + ' --blenderVR-root="path") !')
     sys.exit()
 
-blenderVR_root = root
+# IMPORTANT !
+# Modify all scipts environment by inserting a new builtin name.
+builtins.blenderVR_root = root
 
+# Start main() function from utils/blenderVR.py module.
 try:
     import imp
-    (file, file_name, data) = imp.find_module('blenderVR', [os.path.join(root, 'utils')])
-    module = imp.load_module('blenderVR', file, file_name, data)
+    (fileobj, file_name, data) = imp.find_module('blenderVR',
+                                        [os.path.join(root, 'utils')])
+    module = imp.load_module('blenderVR', fileobj, file_name, data)
     module.main()
 except SystemExit:
     pass
@@ -68,5 +152,6 @@ except:
     traceback.print_exc()
 
     print('Invalid blenderVR root !')
-    print('Try defining BLENDER_VR_ROOT before launching BC (BLENDER_VR_ROOT=\'path\' ' + sys.argv[0] + ') !')
+    print('Try defining BLENDER_VR_ROOT before launching BC '
+                '(BLENDER_VR_ROOT=\'path\' ' + sys.argv[0] + ') !')
     sys.exit()

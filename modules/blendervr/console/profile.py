@@ -1,23 +1,26 @@
+# -*- coding: utf-8 -*-
+# file: blendervr/console/profile.py
+
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
-## Laurent Pointal, Julian Adenauer, 
-## 
+## Laurent Pointal, Julian Adenauer,
+##
 ## This software is a computer program whose purpose is to distribute
 ## blender to render on Virtual Reality device systems.
-## 
+##
 ## This software is governed by the CeCILL  license under French law and
-## abiding by the rules of distribution of free software.  You can  use, 
+## abiding by the rules of distribution of free software.  You can  use,
 ## modify and/ or redistribute the software under the terms of the CeCILL
 ## license as circulated by CEA, CNRS and INRIA at the following URL
-## "http://www.cecill.info". 
-## 
+## "http://www.cecill.info".
+##
 ## As a counterpart to the access to the source code and  rights to copy,
 ## modify and redistribute granted by the license, users are provided only
 ## with a limited warranty  and the software's author,  the holder of the
 ## economic rights,  and the successive licensors  have only  limited
-## liability. 
-## 
+## liability.
+##
 ## In this respect, the user's attention is drawn to the risks associated
 ## with loading,  using,  modifying and/or developing or reproducing the
 ## software by the user in light of its specific status of free software,
@@ -25,29 +28,29 @@
 ## therefore means  that it is reserved for developers  and  experienced
 ## professionals having in-depth computer knowledge. Users are therefore
 ## encouraged to load and test the software's suitability as regards their
-## requirements in conditions enabling the security of their systems and/or 
-## data to be ensured and,  more generally, to use and operate it in the 
-## same conditions as regards security. 
-## 
+## requirements in conditions enabling the security of their systems and/or
+## data to be ensured and,  more generally, to use and operate it in the
+## same conditions as regards security.
+##
 ## The fact that you are presently reading this means that you have had
 ## knowledge of the CeCILL license and that you accept its terms.
-## 
+##
 
 import pickle
 import os
 import copy
-from ..tools import getRootPath
+
 
 class Profile:
     def __init__(self, configuration_file):
         self._configuration_file = configuration_file
-        self._lock               = False
+        self._lock = False
 
         try:
             with open(self._configuration_file, 'rb') as node:
                 self._data = pickle.load(node)
         except:
-            self._data = {'root': getRootPath()}
+            self._data = {'root': blenderVR_root}
             self._write()
 
     def lock(self, lock):
@@ -57,7 +60,7 @@ class Profile:
         import pprint
         pprint.pprint(self._data)
 
-    def setDefault(self, default, node = None, root = None):
+    def setDefault(self, default, node=None, root=None):
         if root is not None:
             root = self._normalizeIndex(root)
             current = self.getValue(root)
@@ -68,7 +71,7 @@ class Profile:
                 node = eval(self._getArrayElementByIndex(root))
             else:
                 return
-        if node == None:
+        if node is None:
             node = self._data
         for key, value in default.items():
             if key not in node:
@@ -103,7 +106,7 @@ class Profile:
             result.append(normalized_name)
         return result
 
-    def setValue(self, index, value, write = True):
+    def setValue(self, index, value, write=True):
         if self._lock:
             return
         index = self._normalizeIndex(index)
@@ -113,7 +116,8 @@ class Profile:
             cumul = [index[0]]
             for cur in index[1:-1]:
                 if cur not in eval(self._getArrayElementByIndex(cumul)):
-                    exec(self._getArrayElementByIndex(cumul) + "['" + cur + "'] = {}")
+                    exec(self._getArrayElementByIndex(cumul)
+                                        + "['" + cur + "'] = {}")
                 cumul.append(cur)
             var = self._getArrayElementByIndex(index)
             if value is None:
@@ -137,22 +141,22 @@ class Profile:
         except:
             return None
 
-    def appendValue(self, index, value, write = True):
+    def appendValue(self, index, value, write=True):
         previous = self.getValue(index)
         if not isinstance(previous, (list, tuple)):
-            previous = [ previous ]
+            previous = [previous]
         if isinstance(value, (list, tuple)):
             current = previous + value
         else:
-            current = previous + [ value ]
+            current = previous + [value]
         self.setValue(index, current, write)
 
-    def prependValue(self, index, value, write = True):
+    def prependValue(self, index, value, write=True):
         previous = self.getValue(index)
         if not isinstance(previous, (list, tuple)):
-            previous = [ previous ]
+            previous = [previous]
         if isinstance(value, (list, tuple)):
             current = value + previous
         else:
-            current = [ value ] + previous
+            current = [value] + previous
         self.setValue(index, current, write)

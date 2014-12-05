@@ -1,23 +1,26 @@
+# -*- coding: utf-8 -*-
+# file: blendervr/player/__init__.py
+
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
-## Laurent Pointal, Julian Adenauer, 
-## 
+## Laurent Pointal, Julian Adenauer,
+##
 ## This software is a computer program whose purpose is to distribute
 ## blender to render on Virtual Reality device systems.
-## 
+##
 ## This software is governed by the CeCILL  license under French law and
-## abiding by the rules of distribution of free software.  You can  use, 
+## abiding by the rules of distribution of free software.  You can  use,
 ## modify and/ or redistribute the software under the terms of the CeCILL
 ## license as circulated by CEA, CNRS and INRIA at the following URL
-## "http://www.cecill.info". 
-## 
+## "http://www.cecill.info".
+##
 ## As a counterpart to the access to the source code and  rights to copy,
 ## modify and redistribute granted by the license, users are provided only
 ## with a limited warranty  and the software's author,  the holder of the
 ## economic rights,  and the successive licensors  have only  limited
-## liability. 
-## 
+## liability.
+##
 ## In this respect, the user's attention is drawn to the risks associated
 ## with loading,  using,  modifying and/or developing or reproducing the
 ## software by the user in light of its specific status of free software,
@@ -25,13 +28,13 @@
 ## therefore means  that it is reserved for developers  and  experienced
 ## professionals having in-depth computer knowledge. Users are therefore
 ## encouraged to load and test the software's suitability as regards their
-## requirements in conditions enabling the security of their systems and/or 
-## data to be ensured and,  more generally, to use and operate it in the 
-## same conditions as regards security. 
-## 
+## requirements in conditions enabling the security of their systems and/or
+## data to be ensured and,  more generally, to use and operate it in the
+## same conditions as regards security.
+##
 ## The fact that you are presently reading this means that you have had
 ## knowledge of the CeCILL license and that you accept its terms.
-## 
+##
 
 """
 @package blendervr
@@ -52,6 +55,7 @@ if not is_virtual_environment():
 
 import bge
 
+
 class Main:
 
     MESSAGE_PAUSE = b'p'
@@ -59,10 +63,15 @@ class Main:
 
     def __init__(self):
         """ Constructor : load all necessary elements """
-        self.run    = lambda *args : None
+        self.run = lambda *args: None
         self._scene = bge.logic.getCurrentScene()
 
         self._is_stereo = ('-s' in sys.argv)
+
+        import builtins
+        from ..tools import getModulePath
+        builtins.blenderVR_root = os.path.dirname(
+                        os.path.dirname(os.path.dirname(getModulePath())))
 
         configuration = {}
         try:
@@ -71,7 +80,8 @@ class Main:
 
             # Define connexions until the controller is running ...
             console_logger = logger.Console()
-            self._default_logger = self._logger.addLoginWindow(console_logger, True)
+            self._default_logger = self._logger.addLoginWindow(
+                                                        console_logger, True)
             self._logger.setLevel('debug')
 
             from .network import controller
@@ -96,7 +106,8 @@ class Main:
             self._screen_name = configuration['screen_name']
             del(configuration['screen_name'])
 
-            self.logger.info('Current blender file: ' + configuration['blender_file'])
+            self.logger.info('Current blender file: ' +
+                              configuration['blender_file'])
 
             # Load global dictionnary because we will use it later !
             bge.logic.loadGlobalDict()
@@ -105,12 +116,14 @@ class Main:
 
             self._paused = ''
 
-            # Suspend the scene before getting the network because in standalone screen, resume can occure inside the constructor ...
+            # Suspend the scene before getting the network because in
+            # standalone screen, resume can occure inside the constructor ...
             self._scene.suspend()
 
             # Configure the network connexions: deals with network
             from . import network
-            self._connector, self._net_synchro = network.getNetworks(self, configuration['network'])
+            self._connector, self._net_synchro = network.getNetworks(
+                                                self, configuration['network'])
 
             del(configuration['network'])
 
@@ -123,12 +136,14 @@ class Main:
             # Configure the users
             from . import user
             self._users = {}
-            for userName, userInformation in configuration['complements']['users'].items():
-                self._users[userName] = user.User(self, len(self._users), userInformation)
+            usersconf = configuration['complements']['users']    # shortcut
+            for userName, userInformation in usersconf.items():
+                self._users[userName] = user.User(self, len(self._users),
+                                                  userInformation)
             del(configuration['complements']['users'])
 
-
-            # Configure the screen: the elements that configure the projection for each window
+            # Configure the screen: the elements that configure the
+            # projection for each window
             from . import screen
             self._screen = screen.getScreen(self, configuration['screen'])
             del(configuration['screen'])
@@ -144,9 +159,11 @@ class Main:
             if 'plugins' in configuration['complements']:
                 plugins_to_remove = []
                 for plugin in self._plugins:
-                    if plugin.getName() in configuration['complements']['plugins']:
+                    # shortcut
+                    plugconf = configuration['complements']['plugins']
+                    if plugin.getName() in plugconf:
                         try:
-                            plugin.setConfiguration(configuration['complements']['plugins'][plugin.getName()])
+                            plugin.setConfiguration(plugconf[plugin.getName()])
                         except exceptions.PluginError as plugin_error:
                             if plugin_error.hasToClear():
                                 plugins_to_remove.append(plugin)
@@ -158,13 +175,15 @@ class Main:
 
             del(configuration['complements'])
 
-            # Configure splash screen: the electocardiogram that is displayed when waiting for every connexions
+            # Configure splash screen: the electocardiogram that is displayed
+            # when waiting for every connexions
             from . import splash
             self._splash = splash.Splash(self)
 
             # Configure the processor
             from ..processor import _getProcessor
-            processor = _getProcessor(configuration['processor_files'], self.logger, True)
+            processor = _getProcessor(configuration['processor_files'],
+                                                            self.logger, True)
             del(configuration['processor_files'])
             try:
                 self._processor = processor(self)
@@ -172,14 +191,15 @@ class Main:
                 self.logger.error('Error inside the processor:')
                 raise
 
-            if hasattr(self, '_keyboardAndMouse') and not self._keyboardAndMouse.checkMethod(False):
+            if hasattr(self, '_keyboardAndMouse') and\
+                         not self._keyboardAndMouse.checkMethod(False):
                 del(self._keyboardAndMouse)
 
             self._splash.setMessage("Waiting for all slaves !")
             self._splash.start()
 
             if hasattr(self, '_keyboardAndMouse'):
-                self._keyboardAndMouse.start();
+                self._keyboardAndMouse.start()
 
             self._plugin_hook('start')
 
@@ -187,7 +207,7 @@ class Main:
 
             self.getProcessor().start()
 
-            self.run = lambda *args : None
+            self.run = lambda *args: None
             self._scene.pre_render.append(self.wait_for_everybody)
 
         except exceptions.Common as error:
@@ -197,7 +217,7 @@ class Main:
         except:
             self.stopDueToError()
 
-    def _plugin_hook(self, method, log_traceback = False):
+    def _plugin_hook(self, method, log_traceback=False):
         plugins_to_remove = []
         for plugin in self._plugins:
             if not hasattr(plugin, method):
@@ -277,7 +297,8 @@ class Main:
         return self._screen_name
 
     def getUserByName(self, userName):
-        """Given a user name, get its object, or raise an exception if the user does not exists"""
+        """Given a user name, get its object, or raise an exception if
+        the user does not exists"""
         if userName in self._users:
             return self._users[userName]
         raise exceptions.User('User "' + userName + '" not found')
@@ -300,8 +321,10 @@ class Main:
     def quit(self, reason):
         """Main quit method
 
-        This method must be call instead of any other method to properly quit blenderVR.
-        Otherwise, you may have problem of not closed socket next time you run blenderVR
+        This method must be call instead of any other method to properly
+        quit blenderVR.
+        Otherwise, you may have problem of not closed socket next time you
+        run blenderVR.
         The reason is printed inside the log file of displayed on the console
 
         :param reason:
@@ -321,7 +344,8 @@ class Main:
     def getScale(self):
         """Get the scale between the virtual World and the Vehicule
 
-        This method always return 1 for the moment: we have to improve the scale management !"""
+        This method always return 1 for the moment: we have to improve the
+        scale management !"""
         return 1
 
     def isPaused(self):
@@ -329,7 +353,7 @@ class Main:
             return True
         return False
 
-    def pause(self, title = ''):
+    def pause(self, title=''):
         if not self.isMaster() or not isinstance(title, str):
             return
         self._pause(title)
@@ -353,7 +377,8 @@ class Main:
 
     def stopDueToError(self):
         self.logger.log_traceback(True)
-        self.logger.error('Due to previous error, we cannot continue to run blenderVR !')
+        self.logger.error('Due to previous error, we cannot continue '
+                          'to run blenderVR !')
         self._stopAll()
 
     @property
@@ -374,8 +399,9 @@ class Main:
 
     def _stopAll(self):
         """Internal stop: do not use"""
-        self.run = lambda *args : None
-        if hasattr(self, '_pre_render') and self._pre_render in self._scene.pre_render:
+        self.run = lambda *args: None
+        if hasattr(self, '_pre_render') and \
+                            self._pre_render in self._scene.pre_render:
             self._scene.pre_render.remove(self._pre_render)
 
     def _suspendResumeInternal(self):
@@ -385,26 +411,26 @@ class Main:
             if self.isMaster():
                 self._scene.resume()
             self._splash.stop()
-        else: # No network for the moment or pause !
-            # On doit arreter la scene !
+        else:  # No network for the moment or pause !
+            # We must stop the scene.
             self._scene.suspend()
             self._splash.start()
             if self._connector.isReady():
                 self._splash.setMessage(self._paused)
 
-    def _masterSendPause(self): 
+    def _masterSendPause(self):
         if not self.isMaster():
             return
-        buffer = Buffer()
-        buffer.command(self.MESSAGE_PAUSE)
-        buffer.string(self._paused)
-        self._connector.sendToSlave(buffer)
+        buff = Buffer()
+        buff.command(self.MESSAGE_PAUSE)
+        buff.string(self._paused)
+        self._connector.sendToSlave(buff)
 
-    def _sendToSlaves(self, command, argument = ''):
-        buffer = Buffer()
-        buffer.command(self.MESSAGE_PROCESSOR)
-        buffer.string(protocol.composeMessage(command, argument))
-        self._connector.sendToSlave(buffer)
+    def _sendToSlaves(self, command, argument=''):
+        buff = Buffer()
+        buff.command(self.MESSAGE_PROCESSOR)
+        buff.string(protocol.composeMessage(command, argument))
+        self._connector.sendToSlave(buff)
 
     def _startSimulation(self):
         """Internal start of the simulation: do not use"""
@@ -417,15 +443,15 @@ class Main:
         self._paused = title
         self._suspendResumeInternal()
 
-    def _messageFromMaster(self, buffer):
-        while not buffer.isEmpty():
-            command = buffer.command()
+    def _messageFromMaster(self, buff):
+        while not buff.isEmpty():
+            command = buff.command()
             if command == self.MESSAGE_PAUSE:
-                self._pause(buffer.string())
+                self._pause(buff.string())
             elif command == self.MESSAGE_PROCESSOR:
-                command, argument = protocol.decomposeMessage(buffer.string())
+                command, argument = protocol.decomposeMessage(buff.string())
                 self._processor.receivedFromMaster(command, argument)
-            
+
     def getVersion(self):
         from .. import version
         return version

@@ -1,8 +1,12 @@
+# -*- coding: utf-8 -*-
+# file: utils/update_loader.py
+
 """
 Update Loader
 *************
 
-Script that runs in Blender in background mode to transform the ``.blend`` file into a Blender-VR ready file.
+Script that runs in Blender in background mode to transform the ``.blend``
+file into a Blender-VR ready file.
 A few Logic Bricks are created among other changes in the initial scene.
 """
 
@@ -10,7 +14,7 @@ import sys
 import os
 import builtins
 
-blenderVR_root = os.path.dirname(os.path.dirname(__file__))
+builtins.blenderVR_root = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(os.path.join(blenderVR_root, 'modules'))
 
 import blendervr.tools.logger

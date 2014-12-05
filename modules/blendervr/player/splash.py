@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# file: blendervr/player/splash.py
+
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
@@ -40,51 +43,61 @@ import os
 import mathutils
 from bgl import *
 from . import base
-from ..tools import getRootPath
+
+ECG_VALUES = [2.2115759e+00, 1.9184524e+00, 1.6262298e+00, 1.3363817e+00,
+              1.0457467e+00, 8.7953729e-01, 8.0215353e-01, 7.2426229e-01,
+              6.5531316e-01, 7.2484014e-01, 8.0165860e-01, 8.7841227e-01,
+              8.9891580e-01, 8.9938683e-01, 9.0013088e-01, 9.0042507e-01,
+              8.9932180e-01, 9.4631408e-01, 1.0210519e+00, 1.0902796e+00,
+              1.1501810e+00, 1.1975850e+00, 1.2304606e+00, 1.2475264e+00,
+              1.2478137e+00, 1.2309090e+00, 1.1975449e+00, 1.1497013e+00,
+              1.0900498e+00, 1.0214188e+00, 9.4676607e-01, 8.9919702e-01,
+              8.9986325e-01, 8.9991225e-01, 8.9988388e-01, 8.9977460e-01,
+              8.9966892e-01, 8.9969241e-01, 8.9980904e-01, 8.9988400e-01,
+              9.0185543e-01, 9.2238531e-01, 9.3397361e-01, 9.3126973e-01,
+              9.1529574e-01, 8.9942898e-01, 8.9962413e-01, 8.9978944e-01,
+              8.9995322e-01, 8.9989238e-01, 8.9966710e-01, 8.9959321e-01,
+              8.9979372e-01, 8.9998970e-01, 8.9988168e-01, 8.9960574e-01,
+              8.9957540e-01, 8.9987410e-01, 9.0006866e-01, 8.9979595e-01,
+              8.9937733e-01, 8.9969153e-01, 9.1359251e-01, 9.9441355e-01,
+              1.0596300e+00, 1.1037278e+00, 1.1246771e+00, 1.1277361e+00,
+              1.1011566e+00, 1.0485388e+00, 9.7126260e-01, 8.9859989e-01,
+              8.9977939e-01, 9.0055926e-01, 8.9983003e-01, 8.9861560e-01,
+              8.9962911e-01, 9.4572544e-01, 1.2391061e+00, 1.5307464e+00,
+              1.8201066e+00, 2.1104914e+00, 2.4091746e+00, 2.3016856e+00]
 
 class Splash(base.Base):
     def __init__(self, parent):
         super(Splash, self).__init__(parent)
-        utils_path = os.path.join(getRootPath(), 'utils')
+        utils_path = os.path.join(blenderVR_root, 'utils')
         font_path = os.path.join(utils_path, 'font.ttf')
         self._font_id = blf.load(font_path)
-        self._ecg_values = [2.2115759e+00, 1.9184524e+00, 1.6262298e+00, 1.3363817e+00, 1.0457467e+00, 8.7953729e-01,
-                            8.0215353e-01, 7.2426229e-01, 6.5531316e-01, 7.2484014e-01, 8.0165860e-01, 8.7841227e-01,
-                            8.9891580e-01, 8.9938683e-01, 9.0013088e-01, 9.0042507e-01, 8.9932180e-01, 9.4631408e-01,
-                            1.0210519e+00, 1.0902796e+00, 1.1501810e+00, 1.1975850e+00, 1.2304606e+00, 1.2475264e+00,
-                            1.2478137e+00, 1.2309090e+00, 1.1975449e+00, 1.1497013e+00, 1.0900498e+00, 1.0214188e+00,
-                            9.4676607e-01, 8.9919702e-01, 8.9986325e-01, 8.9991225e-01, 8.9988388e-01, 8.9977460e-01,
-                            8.9966892e-01, 8.9969241e-01, 8.9980904e-01, 8.9988400e-01, 9.0185543e-01, 9.2238531e-01,
-                            9.3397361e-01, 9.3126973e-01, 9.1529574e-01, 8.9942898e-01, 8.9962413e-01, 8.9978944e-01,
-                            8.9995322e-01, 8.9989238e-01, 8.9966710e-01, 8.9959321e-01, 8.9979372e-01, 8.9998970e-01,
-                            8.9988168e-01, 8.9960574e-01, 8.9957540e-01, 8.9987410e-01, 9.0006866e-01, 8.9979595e-01,
-                            8.9937733e-01, 8.9969153e-01, 9.1359251e-01, 9.9441355e-01, 1.0596300e+00, 1.1037278e+00,
-                            1.1246771e+00, 1.1277361e+00, 1.1011566e+00, 1.0485388e+00, 9.7126260e-01, 8.9859989e-01,
-                            8.9977939e-01, 9.0055926e-01, 8.9983003e-01, 8.9861560e-01, 8.9962911e-01, 9.4572544e-01,
-                            1.2391061e+00, 1.5307464e+00, 1.8201066e+00, 2.1104914e+00, 2.4091746e+00, 2.3016856e+00]
+        self._ecg_values = ECG_VALUES
         self._message = ''
         self._ecg_values_size = len(self._ecg_values)
         self._repeat = 10
         self._total_size = self._ecg_values_size * self._repeat
         self._extinction = 3.0
 
-        self._official_splash = (bge.logic.getCurrentScene().name == "blenderVR Splash Screen")
+        self._official_splash = (bge.logic.getCurrentScene().name ==
+                                                "blenderVR Splash Screen")
 
         if self._official_splash:
             return
 
         logo_path = os.path.join(utils_path, 'bc.ppm')
-        file = open(logo_path, 'r')
-        magic = file.readline().strip()
+        logofile = open(logo_path, 'r')
+        magic = logofile.readline().strip()
         if magic != 'P3':
             self.logger.warning('Cannot load blenderVR Logo !')
             return
-        comment = file.readline()
-        format = file.readline().strip().split(' ')
-        highest = float(file.readline())
+        comment = logofile.readline()
+        assert comment    # avoid unused warning
+        logoformat = logofile.readline().strip().split(' ')
+        highest = float(logofile.readline())
         texture_buffer = []
         while 1:
-            line = file.readline().strip()
+            line = logofile.readline().strip()
             try:
                 value = float(line)
             except ValueError:
@@ -92,13 +105,14 @@ class Splash(base.Base):
             texture_buffer.append(int(255 * (value / highest)))
         texture_buffer = Buffer(GL_BYTE, len(texture_buffer), texture_buffer)
 
-
         glEnable(GL_TEXTURE_2D)
-        texture_id_buffer = Buffer(GL_INT,1)
+        texture_id_buffer = Buffer(GL_INT, 1)
         glGenTextures(1, texture_id_buffer)
         self._texture_id = texture_id_buffer[0]
         glBindTexture(GL_TEXTURE_2D, self._texture_id)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, int(format[0]), int(format[1]), 0, GL_RGB,GL_UNSIGNED_BYTE, texture_buffer)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, int(logoformat[0]),
+                    int(logoformat[1]), 0, GL_RGB, GL_UNSIGNED_BYTE,
+                    texture_buffer)
         glDisable(GL_TEXTURE_2D)
 
     def setMessage(self, message):
@@ -124,12 +138,15 @@ class Splash(base.Base):
         dimensions = blf.dimensions(self._font_id, text)
         scale = 90 * self._width / dimensions[0]
         blf.size(self._font_id, 100, int(scale))
-        blf.position(self._font_id, 0.05 * self._width, (line + 1) * self._height/6.0, 0)
+        blf.position(self._font_id, 0.05 * self._width,
+                                        (line + 1) * self._height / 6.0, 0)
         blf.draw(self._font_id, text)
 
     def _draw_ecg(self, index, width, shift):
         index %= self._total_size
-        glVertex2f( shift + width * index / self._total_size, self._height * self._ecg_values[int(index) % self._ecg_values_size] / 12.0)
+        glVertex2f(shift + width * index / self._total_size,
+                   self._height * self._ecg_values[
+                                   int(index) % self._ecg_values_size] / 12.0)
 
     def _run(self):
         self._width = bge.render.getWindowWidth()
@@ -137,18 +154,19 @@ class Splash(base.Base):
 
         if not self._official_splash:
             glClearColor(0.0, 0.0, 0.0, 1.0)
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT)
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
+                    | GL_STENCIL_BUFFER_BIT)
         glDisable(GL_BLEND)
         glDisable(GL_LIGHTING)
         glDisable(GL_COLOR_MATERIAL)
         glDisable(GL_TEXTURE_1D)
         glDisable(GL_TEXTURE_2D)
 
-        glEnable( GL_POINT_SMOOTH );
-        glEnable( GL_LINE_SMOOTH );
-        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-        glEnable( GL_BLEND );
-        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        glEnable(GL_POINT_SMOOTH)
+        glEnable(GL_LINE_SMOOTH)
+        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST)
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
@@ -169,8 +187,10 @@ class Splash(base.Base):
                 glEnable(GL_TEXTURE_2D)
                 glBindTexture(GL_TEXTURE_2D, self._texture_id)
 
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                                                                GL_NEAREST)
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                                                                GL_NEAREST)
 
                 x1 = self._width / 2.0 - square_size / 2.0
                 y1 = self._height / 2.0
@@ -202,18 +222,19 @@ class Splash(base.Base):
         self._draw_text(self._message, 1)
 
         line_width = 10.0
+        assert line_width    # avoid assigned but never used
         width = 0.9 * self._width
         shift = 0.05 * self._width
         glLineWidth(1.0)
 
         window = int(self._extinction * self._ecg_values_size)
-        start  = int(self._ecg_values_size * time.time()) - self._first_time
-        end    = start + window
+        start = int(self._ecg_values_size * time.time()) - self._first_time
+        end = start + window
         for index in range(start, end):
             if ((index + 1) % self._total_size) != 0:
                 attenuation = (index - start) / window
 
-                glLineWidth(4.0*attenuation)
+                glLineWidth(4.0 * attenuation)
                 glColor4f(0.0, 3.0 * attenuation, 0.0, 1.0)
                 glBegin(GL_LINES)
                 self._draw_ecg(index, width, shift)

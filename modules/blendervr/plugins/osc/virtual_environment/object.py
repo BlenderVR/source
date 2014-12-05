@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# file: blendervr/plugins/osc/virtual_environment/object.py
+
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
@@ -35,8 +38,8 @@
 
 from . import base
 import bge
-import mathutils
 from .. import exceptions
+
 
 class Object(base.Base):
     def __init__(self, parent, obj):
@@ -49,19 +52,20 @@ class Object(base.Base):
             raise exceptions.OSC_Invalid_Object(str(obj))
         if id(self._object) in self.getParent()._objects:
             raise exceptions.OSC_Invalid_Already_Created(str(obj))
-        self._commands['sound']    = { 'type'  : 'string'}
-        self._commands['position'] = { 'type'  : 'matrix'}
-        self._commands['loop']     = { 'type'  : 'state'}
-        self._commands_order       = ['sound', 'loop', 'volume', 'start', 'position', 'mute']
+        self._commands['sound'] = {'type': 'string'}
+        self._commands['position'] = {'type': 'matrix'}
+        self._commands['loop'] = {'type': 'state'}
+        self._commands_order = ['sound', 'loop', 'volume', 'start',
+                                'position', 'mute']
         self.define_commands()
 
     def run(self):
         camera = bge.logic.getCurrentScene().active_camera
-        camera_position       = camera.worldOrientation.to_4x4()
+        camera_position = camera.worldOrientation.to_4x4()
         camera_position[0][3] = camera.worldPosition[0]
         camera_position[1][3] = camera.worldPosition[1]
         camera_position[2][3] = camera.worldPosition[2]
-        object_position       = self._object.worldOrientation.to_4x4()
+        object_position = self._object.worldOrientation.to_4x4()
         object_position[0][3] = self._object.worldPosition[0]
         object_position[1][3] = self._object.worldPosition[1]
         object_position[2][3] = self._object.worldPosition[2]
