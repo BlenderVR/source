@@ -13,6 +13,8 @@ Processor File
 *************************
 
 .. toctree::
+   :maxdepth: 1
+
    processor-file/quickstart.rst
    processor-file/examples.rst
    processor-file/architecture.rst
