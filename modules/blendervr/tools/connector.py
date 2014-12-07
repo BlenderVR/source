@@ -1,4 +1,4 @@
-## Copyright (C) LIMSI-CNRS (2014)
+## copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
 ## Laurent Pointal, Julian Adenauer, 
@@ -43,7 +43,7 @@ class Common:
     BUFFER_LEN      = 1024
 
     def __init__(self):
-        self._client     = None
+        self._socket     = None
         self._callback   = None
         self._buffers    = []
         self._initBuffer()
@@ -68,16 +68,16 @@ class Common:
                 buffer = self._buffers.pop(0)
                 self._callback(*protocol.decomposeMessage(buffer))
 
-    def setClient(self, client, callback = None):
+    def setSocket(self, _socket, callback = None):
         self.close()
-        self._client = client
-        self._client.setblocking(0)
+        self._socket = _socket
+        self._socket.setblocking(0)
 
-    def getClient(self):
-        return self._client
+    def getSocket(self):
+        return self._socket
 
     def send(self, command, argument = ''):
-        if self._client is None:
+        if self._socket is None:
             return
         message = protocol.composeMessage(command, argument)
         size = str(len(message)).zfill(self.SIZE_LEN)
@@ -91,24 +91,24 @@ class Common:
     def _send_chunk(self, data):
         total_send = 0
         while total_send < len(data):
-            select.select([], [self._client], [])
-            sent = self._client.send(data[total_send:])
+            select.select([], [self._socket], [])
+            sent = self._socket.send(data[total_send:])
             if sent == 0:
                 raise RuntimeError("socket connection broken")
             total_send += sent
 
     def close(self):
-        if self._client:
+        if self._socket:
             try:
-                self._client.shutdown(socket.SHUT_RDWR)
-                self._client.close()
+                self._socket.shutdown(socket.SHUT_RDWR)
+                self._socket.close()
             except:
                 pass
-            self._client = None
+            self._socket = None
 
     def fileno(self):
-        if self._client:
-            return self._client.fileno()
+        if self._socket:
+            return self._socket.fileno()
         return None
 
     def setWait(self, block):
@@ -119,12 +119,12 @@ class Common:
 
     def run(self):
         while True:
-            if self._client is None:
+            if self._socket is None:
                 return False
 
-            inputready, outputready, exceptready = select.select([self._client], [], [], self._timeoutSelect)
+            inputready, outputready, exceptready = select.select([self._socket], [], [], self._timeoutSelect)
 
-            if self._client not in inputready:
+            if self._socket not in inputready:
                 return True
 
             if self._size == 0:
@@ -133,7 +133,7 @@ class Common:
                 data_size = self._size - len(self._buffer)
 
             try:
-                data = self._client.recv(data_size)
+                data = self._socket.recv(data_size)
             except:
                 data = False
             if not data:
@@ -150,33 +150,90 @@ class Common:
                     
 
 class Client(Common):
-    def __init__(self, controller, module, screen_name):
+    def __init__(self, controller, module, complement = ''):
         Common.__init__(self)
 
         if isinstance(controller, str):
             controller = controller.split(':')
             controller[1] = int(controller[1])
-        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.connect(tuple(controller))
+        _socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        _socket.connect(tuple(controller))
 
-        self.setClient(client)
+        self.setSocket(_socket)
 
-        self.send(module, screen_name)
+        self.send(module, complement)
 
 class Server(Common):
-    def __init__(self, client):
+    def __init__(self, _socket):
         Common.__init__(self)
-        self.setClient(client)
+        self.setSocket(_socket)
         self.setCallback(self._receiveClientInformation)
         self.setWait(True)
-        while not hasattr(self, '_screen_name'):
+        while not hasattr(self, '_complement'):
             self.run()
 
-    def _receiveClientInformation(self, module, screen_name):
-        self._module      = module
-        self._screen_name = screen_name
+    def _receiveClientInformation(self, module, complement):
+        self._module     = module
+        self._complement = complement
         self.setCallback(None)
         self.setWait(False)
 
     def getClientInformation(self):
-        return (self._module, self._screen_name)
+        return (self._module, self._complement)
+
+class Listener:
+    def __init__(self, client_processor):
+        self._clients = {}
+
+        self._server  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._port    = 31415
+        while True:
+            try:
+                self._server.bind(('', self._port))
+                break
+            except socket.error:
+                self._port += 1
+
+        self._server.listen(100)
+        self.addCallback(self._server.fileno(), self._connect_client)
+        self._client_processor = client_processor
+
+    def select(self):
+        inputready, outputready, exceptready = select.select(self._clients.keys(), [], [])
+        for sock in inputready:
+            if sock in self._clients:
+                if not self._clients[sock]():
+                    del(self._clients[sock])
+
+    def _connect_client(self):
+        conn, addr = self._server.accept()
+
+        from ..tools.connector import Server
+        client = Server(conn)
+
+        self._client_processor(client.getClientInformation())
+        return True
+        
+    def getPort(self):
+        return self._port
+
+    def addCallback(self, socket, callback):
+        if isinstance(client, Common):
+            socket = client.getSocket()
+        elif isinstance(client, int):
+            socket = client
+        else:
+            return False
+        self._clients[socket] = callback
+        return True
+
+    def delCallback(self, socket):
+        if isinstance(client, Common):
+            self._clients[client.getSocket()] = callback
+        elif isinstance(client, int):
+            self._clients[client.getSocket()] = callback
+        if socket in self._clients:
+            del(self._clients[socket])
+        
+                
+        

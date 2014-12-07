@@ -3,9 +3,9 @@
 import sys
 import os
 
-if sys.platform.startswith("win"):
+if sys.platform.startswith('win'): # Windows
     path = os.path.join(os.environ['APPDATA'])
-elif sys.platform == 'darwin':
+elif sys.platform == 'darwin': # MacOSX
     path = os.path.join(os.path.expanduser('~'), 'Library', 'Application Support')
 else: # Unix ...
     path = os.path.join(os.path.expanduser('~'), '.config')
@@ -29,6 +29,7 @@ parser.add_argument("--version", dest="d_version", help="Current version of blen
 parser.add_argument("--blenderVR-root", dest="blenderVR_root", help="Modify the blenderVR root")
 parser.add_argument("--display-console", dest="dis_console", help="Display current configuration of the console", action="store_true", default=False)
 parser.add_argument("--delete-console", dest="del_console", help="Delete current configuration of the console", action="store_true", default=False)
+parser.add_argument("--test-daemon", dest="test_daemon", help="Test the new daemon module", action="store_true", default=False)
 
 environments = parser.parse_args(sys.argv[1:])
 
@@ -54,13 +55,42 @@ if not isValidRoot(root):
     print('Try adding --blenderVR-root option to blenderVR (' + sys.argv[0] + ' --blenderVR-root="path") !')
     sys.exit()
 
+try:
+    if environments.dis_console:
+        import pickle
+        with open(profile_file, 'rb') as node:
+            configuration = pickle.load(node)
+        import pprint
+        print("Configuration:")
+        pprint.pprint(configuration)
+        sys.exit()
+    if environments.del_console:
+        os.remove(profile_file)
+        sys.exit()
+except FileNotFoundError:
+    print('Invalid profile file:', profile_file)
+    sys.exit()
+        
+
 blenderVR_root = root
 
 try:
-    import imp
-    (file, file_name, data) = imp.find_module('blenderVR', [os.path.join(root, 'utils')])
-    module = imp.load_module('blenderVR', file, file_name, data)
-    module.main()
+    sys.path.append(os.path.join(blenderVR_root, 'modules'))
+    if environments.d_version:
+        try:
+            import blendervr
+            print('Current version:', blendervr.version)
+        except:
+            pass
+        sys.exit()
+
+    import blendervr.console.daemon
+    application = blendervr.console.daemon.Daemon(profile_file, environments.debug)
+    application.start()
+    application.main()
+    application.quit()
+    del(application)
+
 except SystemExit:
     pass
 except:

@@ -33,55 +33,20 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-"""
-Blender-VR Console
-******************
+from .. import base
 
-Blender-VR console mode
-"""
+class Base(base.Base):
+    def __init__(self, parent):
+        base.Base.__init__(self, parent)
+        self._main_running_module_profile = self._main_running_module._profile
 
-import sys, os
-import __main__
+    def quit(self):
+        del(self._main_running_module_profile)
+        base.Base.quit(self)
 
-def main():
-    import builtins
+    @property
+    def profile(self):
+        return self._main_running_module_profile
 
-    sys.path.append(os.path.join(__main__.blenderVR_root, 'modules'))
-
-    if __main__.environments.d_version:
-        try:
-            import blendervr
-            print('Current version:', blendervr.version)
-        except:
-            pass
-        sys.exit()
-
-    if __main__.environments.dis_console:
-        try:
-            import pickle
-            with open(__main__.profile_file, 'rb') as node:
-                consoleuration = pickle.load(node)
-            import pprint
-            print("Consoleuration:")
-            pprint.pprint(consoleuration)
-        except:
-            print('Invalid profile file:', __main__.profile_file)
-        sys.exit()
-
-    if __main__.environments.del_console:
-        try:
-            os.remove(__main__.profile_file)
-        except:
-            pass
-        sys.exit()
-
-    import blendervr.console.console
-    console = blendervr.console.console.Console(__main__.profile_file)
-    console.start()
-    console.main()
-    console.quit()
-    del(console)
-
-if __name__ == "__main__":
-    main()
-
+    def getConsole(self):
+        return self.getMainRunningModule()
