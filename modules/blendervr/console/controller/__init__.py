@@ -33,9 +33,6 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-import socket
-import select
-from .. import base
 import os
 import sys
 

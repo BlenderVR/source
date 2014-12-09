@@ -87,9 +87,9 @@ try:
 
     environment = os.environ
     environment['PYTHONPATH'] = moduleRoot
-    options     = [profile_file]
     import subprocess
     if environments.controller:
+        options     = [profile_file]
         if environments.debug:
             stdout_stream = None
             options.append('debug')
@@ -103,7 +103,7 @@ try:
             process.wait()
             sys.exit()
     if environments.ui and environments.port:
-        process = subprocess.Popen([sys.executable, os.path.join(root, 'utils', 'console', 'ui.py'), profile_file, debug, '-p', environments.port], env = environment)
+        process = subprocess.Popen([sys.executable, os.path.join(root, 'utils', 'console', 'ui.py'), environments.port], env = environment)
         process.wait()
 
 except SystemExit:

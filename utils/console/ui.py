@@ -34,5 +34,12 @@
 ## 
 
 import sys
+port  = sys.argv[1]
+debug = 'debug' in sys.argv
 
-print()
+import blendervr.console.ui
+application = blendervr.console.ui.UI(port)
+application.start()
+application.main()
+application.quit()
+del(application)

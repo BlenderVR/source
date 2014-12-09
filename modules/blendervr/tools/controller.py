@@ -88,7 +88,7 @@ class Common:
 
     def receive(self):
         if self._socket is None:
-            return
+            return False
         try:
             size = int(self._receive_chunk(self.SIZE_LEN))
             return protocol.decomposeMessage(self._receive_chunk(size))
@@ -97,7 +97,7 @@ class Common:
         return False
 
     def _receive_chunk(self, size):
-        data = None
+        data = b''
         while len(data) < size:
             data_chunk = self._socket.recv(size)
             if not data_chunk:

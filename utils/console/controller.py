@@ -35,7 +35,7 @@
 
 import sys
 profile_file = sys.argv[1]
-if sys.argv[1] == 'debug':
+if 'debug' in sys.argv:
     debug = True
 else:
     debug = False

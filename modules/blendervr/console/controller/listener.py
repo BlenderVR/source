@@ -40,9 +40,12 @@ from ...tools import controller
 
 class Client(controller.Common):
     def __init__(self, _socket):
-        Common.__init__(self)
+        controller.Common.__init__(self)
         self.setSocket(_socket)
-        self._module, self._complement = self.receive()
+        result = self.receive()
+        if result:
+            self._module     = result[0]
+            self._complement = result[1]
 
     def getClientInformation(self):
         return (self._module, self._complement)
@@ -74,8 +77,7 @@ class Listener:
     def _connect_client(self):
         conn, addr = self._socket.accept()
 
-        from ..tools.connector import Server
-        client = Server(conn)
+        client = Client(conn)
 
         self._client_processor(client)
 

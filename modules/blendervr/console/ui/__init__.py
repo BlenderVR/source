@@ -33,3 +33,39 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
+import os
+import sys
+import time
+
+class UI():
+    def __init__(self, port, debug = False):
+        self._debug = debug
+        self._port  = port
+        
+        from ...tools import logger
+        self._logger = logger.getLogger('blenderVR')
+
+        if self._debug:
+            # Define connexions until the controller is running ...
+            console_logger = logger.Console()
+            self._default_logger = self._logger.addLoginWindow(console_logger, True)
+            self._logger.setLevel('debug')
+            
+    def start(self):
+        from ...tools import controller
+        self._controller = controller.Controller('localhost:' + str(self._port), 'UI')
+
+        from ... import version
+        self.logger.info('blenderVR version:', version)
+
+    def main(self):
+        while True:
+            time.sleep(1)
+
+    def quit(self):
+        pass
+
+    @property
+    def logger(self):
+        return self._logger
+
