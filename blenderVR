@@ -18,39 +18,37 @@ profile_file = os.path.join(path, 'vr', 'profile_1.0.pickle')
 blenderVR_profilePath = os.path.join(path, 'vr', 'modules')
 if not os.path.isdir(blenderVR_profilePath): os.makedirs(blenderVR_profilePath)
 
-def isValidRoot(root):
-    if root is None:
-        return False
-    return os.path.isdir(os.path.join(root, 'modules'))
-
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("--version", dest="d_version", help="Current version of blender player", action="store_true", default=False)
-parser.add_argument("--blenderVR-root", dest="blenderVR_root", help="Modify the blenderVR root")
-parser.add_argument("--display-console", dest="dis_console", help="Display current configuration of the console", action="store_true", default=False)
-parser.add_argument("--delete-console", dest="del_console", help="Delete current configuration of the console", action="store_true", default=False)
-parser.add_argument("--test-daemon", dest="test_daemon", help="Test the new daemon module", action="store_true", default=False)
+parser.add_argument('-v', '--version', dest='d_version', help='Current version of blender player', action='store_true', default=False)
+parser.add_argument('--blenderVR-root', dest='blenderVR_root', help='Modify the blenderVR root')
+parser.add_argument('--display-console', dest='dis_console', help='Display current configuration of the console', action='store_true', default=False)
+parser.add_argument('--delete-console', dest='del_console', help='Delete current configuration of the console', action='store_true', default=False)
+parser.add_argument('-d', '--debug', dest='debug', help='Debug blenderVR application', action='store_true', default=False)
+parser.add_argument('-c', '--controller', dest='controller', help='Start the controller', action='store_true', default=False)
+parser.add_argument('-u', '--user-interface', dest='ui', help='Open the user interface', action='store_true', default=False)
+parser.add_argument('-a', '--all', dest='all', help='Start the controller and Open the user interface', action='store_true', default=False)
+parser.add_argument('-p', '--port', dest='port', help='Set the port of the controller')
 
 environments = parser.parse_args(sys.argv[1:])
 
-root = None
-if environments.blenderVR_root is not None:
-    root= environments.blenderVR_root
-
-if not isValidRoot(root):
+def getRootPath(environment):
+    if environment is not None:
+        return environment
     try:
         import pickle
         with open(profile_file, 'rb') as node:
             configuration = pickle.load(node)
         if 'root' in configuration:
-            root = configuration['root']
+            return configuration['root']
     except:
         pass
+    return os.path.dirname(os.path.realpath(__file__))
 
-if not isValidRoot(root):
-    root = os.path.dirname(os.path.realpath(__file__))
-
-if not isValidRoot(root):
+root = getRootPath(environments.blenderVR_root)
+if root and os.path.isdir(os.path.join(root, 'modules')):
+    moduleRoot = os.path.join(root, 'modules')
+else:
     print('Cannot find blenderVR root !')
     print('Try adding --blenderVR-root option to blenderVR (' + sys.argv[0] + ' --blenderVR-root="path") !')
     sys.exit()
@@ -72,10 +70,13 @@ except FileNotFoundError:
     sys.exit()
         
 
-blenderVR_root = root
+if environments.all:
+    environments.ui         = True
+    environments.controller = True
+    environments.all        = False
 
 try:
-    sys.path.append(os.path.join(blenderVR_root, 'modules'))
+    sys.path.append(moduleRoot)
     if environments.d_version:
         try:
             import blendervr
@@ -84,19 +85,30 @@ try:
             pass
         sys.exit()
 
-    import blendervr.console.daemon
-    application = blendervr.console.daemon.Daemon(profile_file, environments.debug)
-    application.start()
-    application.main()
-    application.quit()
-    del(application)
+    environment = os.environ
+    environment['PYTHONPATH'] = moduleRoot
+    options     = [profile_file]
+    import subprocess
+    if environments.controller:
+        if environments.debug:
+            stdout_stream = None
+            options.append('debug')
+        else:
+            stdout_stream = subprocess.PIPE
+        process = subprocess.Popen([sys.executable, os.path.join(root, 'utils', 'console', 'controller.py')] + options, env = environment, shell = False, stdout = stdout_stream)
+        if not environments.debug:
+            port = process.stdout.readline().decode().strip()
+            print('port:', port)
+        else:
+            process.wait()
+            sys.exit()
+    if environments.ui and environments.port:
+        process = subprocess.Popen([sys.executable, os.path.join(root, 'utils', 'console', 'ui.py'), profile_file, debug, '-p', environments.port], env = environment)
+        process.wait()
 
 except SystemExit:
     pass
 except:
     import traceback
     traceback.print_exc()
-
-    print('Invalid blenderVR root !')
-    print('Try defining BLENDER_VR_ROOT before launching BC (BLENDER_VR_ROOT=\'path\' ' + sys.argv[0] + ') !')
     sys.exit()

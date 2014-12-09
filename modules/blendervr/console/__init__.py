@@ -32,37 +32,3 @@
 ## The fact that you are presently reading this means that you have had
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
-
-import sys
-from .. import *
-
-def main():
-    if not is_console():
-        import bge
-        bge.logic.endGame()
-        sys.exit()
-
-import os
-
-def stripAnchor(anchor, path):
-    if path is None:
-        return None
-    if anchor is not None:
-        relpath = os.path.relpath(path, anchor)
-        if not relpath.startswith('..'):
-            return (relpath, True)
-    return (path, False)
-
-from . import logic
-
-def unstripAnchor(anchor, path):
-    if path is None:
-        return None
-    if path[1] and anchor is not None:
-        return os.path.join(anchor, path[0])
-    return path[0]
-
-
-import os
-if os.environ.get('READTHEDOCS', False) != 'True':
-    main()

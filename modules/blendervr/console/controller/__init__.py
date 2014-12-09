@@ -37,6 +37,7 @@ import socket
 import select
 from .. import base
 import os
+import sys
 
 class Controller():
     def __init__(self, profile_file, debug):
@@ -83,7 +84,8 @@ class Controller():
         from . import listener
         self._listener = listener.Listener(self._process_client)
 
-        print('port:', self._listener.getPort())
+        sys.stdout.write(str(self._listener.getPort()) + "\n")
+        sys.stdout.flush()
         from ... import version
         self.logger.info('blenderVR version:', version)
 

@@ -47,6 +47,3 @@ class Base(base.Base):
     @property
     def profile(self):
         return self._main_running_module_profile
-
-    def getConsole(self):
-        return self.getMainRunningModule()
