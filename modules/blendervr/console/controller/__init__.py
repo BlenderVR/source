@@ -90,7 +90,6 @@ class Controller():
         self._listener.select()
 
     def _process_client(self, client):
-        return
 
         if module == 'ui':
             from . import ui

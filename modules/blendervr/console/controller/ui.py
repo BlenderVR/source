@@ -42,4 +42,5 @@ class UI(base.Base):
         self.getMainRunningModule().addCallback(self._socket.fileno(), self._callback())
 
     def _callback(self):
-        pass
+        message = self._client.receive()
+        print(message)
