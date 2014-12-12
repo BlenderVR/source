@@ -36,7 +36,7 @@
 import os
 import sys
 import time
-import readline
+from . import interpreter
 
 class UI():
     def __init__(self, port, debug = False):
@@ -52,32 +52,19 @@ class UI():
             self._default_logger = self._logger.addLoginWindow(console_logger, True)
             self._logger.setLevel('debug')
 
-        self._commandPrefix = None
-        self._matchingWords = ['quit', 'load']
-            
-    def complete(self, prefix, index):
-         if prefix != self._commandPrefix:
-            # we have a new prefix!
-            # find all words that start with this prefix
-            self.matching_words = [w for w in self._matchingWords if w.startswith(prefix)]
-            self._commandPrefix = prefix
-        try:
-            return self.matching_words[index]
-        except IndexError:
-            return None
+        self._controller  = None
+        self._interpreter = interpreter.Interpreter(self._controller)
 
     def start(self):
-        from ...tools import controller
-        self._controller = controller.Controller('localhost:' + str(self._port), 'UI')
+        # from ...tools import controller
+        # self._controller = controller.Controller('localhost:' + str(self._port), 'UI')
 
         from ... import version
         self.logger.info('blenderVR version:', version)
 
-        readline.parse_and_bind("tab: complete")
-        readline.set_completer(completer.complete)
-
     def main(self):
-        print repr(raw_input(">>> "))
+        result = self._interpreter.cmdloop()
+        print(result)
 
     def quit(self):
         pass
