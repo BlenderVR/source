@@ -39,8 +39,9 @@ class UI(base.Base):
     def __init__(self, parent, client):
         base.Base.__init__(self, parent)
         self._client = client
-        self.getMainRunningModule().addCallback(self._socket.fileno(), self._callback())
+        self.getMainRunningModule().addCallback(self._client, self._callback())
 
     def _callback(self):
         message = self._client.receive()
         print(message)
+        self._client.send(message)

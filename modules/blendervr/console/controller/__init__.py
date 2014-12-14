@@ -52,7 +52,7 @@ class Controller():
         self._previous_state     = None
         self._common_processors  = []
 
-        self._uis                = {}
+        self._uis                = []
         
         self._processor          = None
 
@@ -77,9 +77,12 @@ class Controller():
         from ...plugins import getPlugins
         self._plugins = getPlugins(self, self._logger)
 
+        from . import configuration
+        self._configuration = configuration.Configuration(self)
+
     def start(self):
         from . import listener
-        self._listener = listener.Listener(self._process_client)
+        self._listener = listener.Listener(self._connect_client)
 
         sys.stdout.write(str(self._listener.getPort()) + "\n")
         sys.stdout.flush()
@@ -87,19 +90,27 @@ class Controller():
         self.logger.info('blenderVR version:', version)
 
     def main(self):
-        self._listener.select()
+        while True:
+            self._listener.select()
 
-    def _process_client(self, client):
-
-        if module == 'ui':
-            from . import ui
-            new_ui = ui.UI(self, client, complement)
+    def addCallback(self, client, callback):
+        self._listener.addCallback(client, callback)
+    def delCallback(self, client):
+        self._listener.delCallback(client)
             
+    def _connect_client(self, client):
+        type, name = client.getClientInformation()
+        print('Connexion:', type, name)
+        if type == 'UI':
+            from . import ui
+            self._uis.append(ui.UI(self, client))
+            return
         # if module == 'daemon' or module == 'blender_player':
         #     screen = self._screens.getScreen(complement)
         #     if screen:
         #         screen.setNetworkClient(module, client, addr)
-        
+        self.logger.error('Cannot understand client type :', type)
+
     def quit(self):
         pass
 

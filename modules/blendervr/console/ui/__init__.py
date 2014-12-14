@@ -52,13 +52,11 @@ class UI():
             self._default_logger = self._logger.addLoginWindow(console_logger, True)
             self._logger.setLevel('debug')
 
-        self._controller  = None
+        from ...tools import controller
+        self._controller = controller.Controller('localhost:' + str(self._port), 'UI')
         self._interpreter = interpreter.Interpreter(self._controller)
 
     def start(self):
-        # from ...tools import controller
-        # self._controller = controller.Controller('localhost:' + str(self._port), 'UI')
-
         from ... import version
         self.logger.info('blenderVR version:', version)
 
