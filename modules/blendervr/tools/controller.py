@@ -86,9 +86,13 @@ class Common:
                 raise RuntimeError("socket connection broken")
             total_send += sent
 
-    def receive(self):
+    def receive(self, block = True):
         if self._socket is None:
             return False
+        if not block:
+            inputready, outputready, exceptready = select.select([self._socket], [], [])
+            if self._socket not in inputready:
+                return False
         try:
             size = int(self._receive_chunk(self.SIZE_LEN))
             return protocol.decomposeMessage(self._receive_chunk(size))

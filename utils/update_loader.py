@@ -8,7 +8,6 @@ A few Logic Bricks are created among other changes in the initial scene.
 
 import sys
 import os
-import builtins
 
 blenderVR_root = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(os.path.join(blenderVR_root, 'modules'))
