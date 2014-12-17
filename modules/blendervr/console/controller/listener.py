@@ -37,6 +37,7 @@ import socket
 import select
 from ...tools import protocol
 from ...tools import controller
+from . import base
 
 class Client(controller.Common):
     def __init__(self, _socket):
@@ -50,8 +51,9 @@ class Client(controller.Common):
     def getClientInformation(self):
         return (self._module, self._complement)
 
-class Listener:
-    def __init__(self, client_processor):
+class Listener(base.Base):
+    def __init__(self, parent):
+        base.Base.__init__(self, parent)
         self._clients = {}
 
         self._socket  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -64,17 +66,17 @@ class Listener:
                 self._port += 1
 
         self._socket.listen(100)
+        self._client_processor = self.getMainRunningModule()._connect_client
         self.addCallback(self._socket.fileno(), self._connect_client)
-        self._client_processor = client_processor
 
     def select(self):
-        print('Listener, wait:', self._clients.keys())
+        self.logger.debug('Listener, wait:', len(self._clients.keys()))
         inputready, outputready, exceptready = select.select(self._clients.keys(), [], [])
-        print('Listener, unlock')
+        self.logger.debug('Listener, unlock')
         for sock in inputready:
             if sock in self._clients:
                 if not self._clients[sock]():
-                    del(self._clients[sock])
+                    self.delCallback(sock)
 
     def _connect_client(self):
         conn, addr = self._socket.accept()
@@ -99,7 +101,7 @@ class Listener:
             return False
 
     def addCallback(self, client, callback):
-        print('add callback:', client, callback)
+        self.logger.log_position()
         socket = Listener._getFileNo(client)
         if socket:
             self._clients[socket] = callback
@@ -107,6 +109,7 @@ class Listener:
         return False
 
     def delCallback(self, client):
+        self.logger.log_position()
         socket = Listener._getFileNo(client)
         if socket and socket in self._clients:
             del(self._clients[socket])

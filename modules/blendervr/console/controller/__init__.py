@@ -82,7 +82,7 @@ class Controller():
 
     def start(self):
         from . import listener
-        self._listener = listener.Listener(self._connect_client)
+        self._listener = listener.Listener(self)
 
         sys.stdout.write(str(self._listener.getPort()) + "\n")
         sys.stdout.flush()
@@ -95,12 +95,12 @@ class Controller():
 
     def addCallback(self, client, callback):
         self._listener.addCallback(client, callback)
+
     def delCallback(self, client):
         self._listener.delCallback(client)
             
     def _connect_client(self, client):
         type, name = client.getClientInformation()
-        print('Connexion:', type, name)
         if type == 'UI':
             from . import ui
             self._uis.append(ui.UI(self, client))

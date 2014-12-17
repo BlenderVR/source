@@ -37,11 +37,11 @@ from . import base
 
 class UI(base.Base):
     def __init__(self, parent, client):
-        print('Yop ?')
         base.Base.__init__(self, parent)
         self._client = client
-        self.getMainRunningModule().addCallback(self._client, self._callback())
+        self.getMainRunningModule().addCallback(self._client, self._callback)
 
     def _callback(self):
         command, argument = self._client.receive()
         self._client.send(command, argument)
+        return True
