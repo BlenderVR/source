@@ -42,6 +42,6 @@ class UI(base.Base):
         self.getMainRunningModule().addCallback(self._client, self._callback)
 
     def _callback(self):
-        command, argument = self._client.receive()
+        received = self._client.receive()
+        command, argument = received
         self._client.send(command, argument)
-        return True

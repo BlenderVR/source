@@ -37,6 +37,10 @@ import socket
 import select
 from . import protocol
 
+class closedSocket(Exception):
+    def __init__(self):
+        Exception.__init__(self, 'Socket closed in the meantime')
+
 class Common:
 
     SIZE_LEN        = 10
@@ -71,11 +75,15 @@ class Common:
             return
         message = protocol.composeMessage(command, argument)
         size = str(len(message)).zfill(self.SIZE_LEN)
-        self._send_chunk(size.encode())
-        while len(message) > 0:
-            buffer = message[:self.BUFFER_LEN]
-            message = message[self.BUFFER_LEN:]
-            self._send_chunk(buffer.encode())
+        try:
+            self._send_chunk(size.encode())
+            while len(message) > 0:
+                buffer = message[:self.BUFFER_LEN]
+                message = message[self.BUFFER_LEN:]
+                self._send_chunk(buffer.encode())
+        except:
+            self.close()
+            raise
 
     def _send_chunk(self, data):
         total_send = 0
@@ -83,7 +91,7 @@ class Common:
             select.select([], [self._socket], [])
             sent = self._socket.send(data[total_send:])
             if sent == 0:
-                raise RuntimeError("socket connection broken")
+                raise closedSocket()
             total_send += sent
 
     def receive(self, block = True):
@@ -96,8 +104,9 @@ class Common:
         try:
             size = int(self._receive_chunk(self.SIZE_LEN))
             return protocol.decomposeMessage(self._receive_chunk(size))
-        except:
+        except closedSocket:
             self.close()
+            raise
         return False
 
     def _receive_chunk(self, size):
@@ -105,7 +114,7 @@ class Common:
         while len(data) < size:
             data_chunk = self._socket.recv(size)
             if not data_chunk:
-                raise Exception()
+                raise closedSocket()
             data += data_chunk
         return data.decode()
 

@@ -67,50 +67,44 @@ class Listener(base.Base):
 
         self._socket.listen(100)
         self._client_processor = self.getMainRunningModule()._connect_client
-        self.addCallback(self._socket.fileno(), self._connect_client)
+        self.addCallback(self._socket, self._connect_client)
 
     def select(self):
-        self.logger.debug('Listener, wait:', len(self._clients.keys()))
         inputready, outputready, exceptready = select.select(self._clients.keys(), [], [])
-        self.logger.debug('Listener, unlock')
         for sock in inputready:
             if sock in self._clients:
-                if not self._clients[sock]():
+                try:
+                    self._clients[sock]()
+                except controller.closedSocket:
                     self.delCallback(sock)
+                except:
+                    self.log_traceback()
 
     def _connect_client(self):
         conn, addr = self._socket.accept()
-
         client = Client(conn)
-
         self._client_processor(client)
-
         return True
         
     def getPort(self):
         return self._port
 
-    def _getFileNo(client):
+    def _getSocketDescriptor(client):
         if isinstance(client, controller.Common):
             return client.getSocket()
         elif isinstance(client, socket.socket):
-            return client.fileno()
-        elif isinstance(client, int):
             return client
-        else:
-            return False
+        return False
 
     def addCallback(self, client, callback):
-        self.logger.log_position()
-        socket = Listener._getFileNo(client)
+        socket = Listener._getSocketDescriptor(client)
         if socket:
             self._clients[socket] = callback
             return True
         return False
 
     def delCallback(self, client):
-        self.logger.log_position()
-        socket = Listener._getFileNo(client)
+        socket = Listener._getSocketDescriptor(client)
         if socket and socket in self._clients:
             del(self._clients[socket])
             return True
