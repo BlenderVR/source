@@ -68,9 +68,9 @@ class Listener:
         self._client_processor = client_processor
 
     def select(self):
-        print('Wait:', self._clients.keys())
+        print('Listener, wait:', self._clients.keys())
         inputready, outputready, exceptready = select.select(self._clients.keys(), [], [])
-        print('unlock')
+        print('Listener, unlock')
         for sock in inputready:
             if sock in self._clients:
                 if not self._clients[sock]():
@@ -101,7 +101,6 @@ class Listener:
     def addCallback(self, client, callback):
         print('add callback:', client, callback)
         socket = Listener._getFileNo(client)
-        print('add callback 1:', socket)
         if socket:
             self._clients[socket] = callback
             return True
