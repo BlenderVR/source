@@ -34,14 +34,24 @@
 ##
 
 from . import base
+import sys
 
-class UI(base.Base):
+class UI(base.Client):
     def __init__(self, parent, client):
-        base.Base.__init__(self, parent)
-        self._client = client
-        self.getMainRunningModule().addCallback(self._client, self._callback)
+        base.Client.__init__(self, parent, client)
 
-    def _callback(self):
-        received = self._client.receive()
-        command, argument = received
-        self._client.send(command, argument)
+    def cb_connect(self):
+        self.logger.debug('Connexion of a client:', self._client)
+
+    def cb_data(self):
+        result = self._client.receive()
+        command, argument = result
+        if command == 'ping':
+            self.logger.debug('Ping !')
+            self._client.send(command, argument)
+        if command == 'exit':
+            sys.exit()
+
+    def cb_disconnect(self):
+        self.logger.debug('Disconnexion of a client:', self._client)
+

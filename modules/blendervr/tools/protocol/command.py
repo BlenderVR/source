@@ -41,6 +41,5 @@ class Command:
         return self._connection
 
     def sendReceiveSingle(self, command, argument = None):
-        print('Envoie:', self._connection, command, argument)
         self._connection.send(command, argument)
         result = self._connection.receive()

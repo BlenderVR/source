@@ -43,6 +43,9 @@ else:
 import blendervr.console.controller
 application = blendervr.console.controller.Controller(profile_file, debug)
 application.start()
-application.main()
+try:
+    application.main()
+except (KeyboardInterrupt, SystemExit):
+    pass
 application.quit()
 del(application)

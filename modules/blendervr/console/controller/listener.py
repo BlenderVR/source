@@ -35,18 +35,23 @@
 
 import socket
 import select
+import sys
 from ...tools import protocol
 from ...tools import controller
 from . import base
 
 class Client(controller.Common):
-    def __init__(self, _socket):
+    def __init__(self, sock):
         controller.Common.__init__(self)
-        self.setSocket(_socket)
+        self.setSocket(sock)
         result = self.receive()
         if result:
             self._module     = result[0]
             self._complement = result[1]
+        self._peername = self._socket.getpeername()
+
+    def __str__(self):
+        return str(self._peername[0])
 
     def getClientInformation(self):
         return (self._module, self._complement)
@@ -54,7 +59,8 @@ class Client(controller.Common):
 class Listener(base.Base):
     def __init__(self, parent):
         base.Base.__init__(self, parent)
-        self._clients = {}
+        self._sockets = []
+        self._peers = {}
 
         self._socket  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._port    = 31415
@@ -66,49 +72,54 @@ class Listener(base.Base):
                 self._port += 1
 
         self._socket.listen(100)
-        self._client_processor = self.getMainRunningModule()._connect_client
-        self.addCallback(self._socket, self._connect_client)
+        self._sockets.append(self._socket)
 
     def select(self):
-        inputready, outputready, exceptready = select.select(self._clients.keys(), [], [])
+        inputready, outputready, exceptready = select.select(self._sockets, [], [])
         for sock in inputready:
-            if sock in self._clients:
+            if sock == self._socket:
+                self._connect_peer()
+            if sock in self._peers:
                 try:
-                    self._clients[sock]()
+                    self._peers[sock].cb_data()
                 except controller.closedSocket:
-                    self.delCallback(sock)
+                    self._disconnect_peer(sock)
+                except SystemExit:
+                    for sock in self._sockets:
+                        self._disconnect_peer(sock)
+                        sock.close()
+                    sys.exit()
                 except:
-                    self.log_traceback()
+                    self.logger.log_traceback(False)
 
-    def _connect_client(self):
+    def _connect_peer(self):
         conn, addr = self._socket.accept()
         client = Client(conn)
-        self._client_processor(client)
-        return True
-        
+        peer = self.getMainRunningModule()._create_client(client)
+        self._sockets.append(conn)
+        self._peers[conn] = peer
+        peer.cb_connect()
+
+    def _disconnect_peer(self, client):
+        if isinstance(client, base.Client):
+            sock = client.getClient().getSocket()
+        elif isinstance(client, controller.Common):
+            sock = client.getSocket()
+        elif isinstance(client, socket.socket):
+            sock = client
+        else:
+            return
+
+        if sock in self._sockets:
+            self._sockets.remove(sock)
+        if sock in self._peers:
+            peer = self._peers[sock]
+            del(self._peers[sock])
+            peer.cb_disconnect()
+
     def getPort(self):
         return self._port
 
-    def _getSocketDescriptor(client):
-        if isinstance(client, controller.Common):
-            return client.getSocket()
-        elif isinstance(client, socket.socket):
-            return client
-        return False
-
-    def addCallback(self, client, callback):
-        socket = Listener._getSocketDescriptor(client)
-        if socket:
-            self._clients[socket] = callback
-            return True
-        return False
-
-    def delCallback(self, client):
-        socket = Listener._getSocketDescriptor(client)
-        if socket and socket in self._clients:
-            del(self._clients[socket])
-            return True
-        return False
         
                 
         

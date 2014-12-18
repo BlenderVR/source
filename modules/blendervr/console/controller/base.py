@@ -38,3 +38,23 @@ from .. import base
 class Base(base.Base):
     def __init__(self, parent):
         base.Base.__init__(self, parent)
+
+class Client(Base):
+    def __init__(self, parent, client):
+        Base.__init__(self, parent)
+        self._client = client
+
+    def getClient(self):
+        return self._client
+
+    def send(self, command, argument):
+        self._client.send(command, argument)
+        
+    def cb_connect(self):
+        pass
+
+    def cb_disconnect(self):
+        pass
+
+    def cb_data(self):
+        pass

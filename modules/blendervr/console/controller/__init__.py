@@ -93,18 +93,13 @@ class Controller():
         while True:
             self._listener.select()
 
-    def addCallback(self, client, callback):
-        self._listener.addCallback(client, callback)
-
-    def delCallback(self, client):
-        self._listener.delCallback(client)
-            
-    def _connect_client(self, client):
+    def _create_client(self, client):
         type, name = client.getClientInformation()
         if type == 'UI':
             from . import ui
-            self._uis.append(ui.UI(self, client))
-            return
+            userInterface = ui.UI(self, client)
+            self._uis.append(userInterface)
+            return userInterface
         # if module == 'daemon' or module == 'blender_player':
         #     screen = self._screens.getScreen(complement)
         #     if screen:

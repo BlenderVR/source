@@ -34,6 +34,7 @@
 ## 
 
 from cmd import Cmd
+import sys
 
 class Common(Cmd):
     def __init__(self, connection):
@@ -45,5 +46,9 @@ class Common(Cmd):
             return self.do_quit('quit')
         Cmd.default(self, line)
 
+    def do_exit(self, args):
+        self._connection.send('exit')
+        sys.exit()
+        
     def do_quit(self, args):
         return True
