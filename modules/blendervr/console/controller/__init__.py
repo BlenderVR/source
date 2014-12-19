@@ -35,6 +35,7 @@
 
 import os
 import sys
+from . import ui
 
 class Controller():
     def __init__(self, profile_file, debug):
@@ -91,12 +92,14 @@ class Controller():
 
     def main(self):
         while True:
-            self._listener.select()
+            try:
+                self._listener.select()
+            except (KeyboardInterrupt, SystemExit):
+                break
 
     def _create_client(self, client):
         type, name = client.getClientInformation()
         if type == 'UI':
-            from . import ui
             userInterface = ui.UI(self, client)
             self._uis.append(userInterface)
             return userInterface
@@ -106,6 +109,15 @@ class Controller():
         #         screen.setNetworkClient(module, client, addr)
         self.logger.error('Cannot understand client type :', type)
 
+    def _delete_client(self, client):
+        if client in self._uis:
+            self._uis.remove(client)
+            return
+        # if module == 'daemon' or module == 'blender_player':
+        #     screen = self._screens.getScreen(complement)
+        #     if screen:
+        #         screen.setNetworkClient(module, client, addr)
+        
     def quit(self):
         pass
 

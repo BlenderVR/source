@@ -99,24 +99,17 @@ class Listener(base.Base):
         peer = self.getMainRunningModule()._create_client(client)
         self._sockets.append(conn)
         self._peers[conn] = peer
+        peer._listenet_required_client = client
         peer.cb_connect()
 
-    def _disconnect_peer(self, client):
-        if isinstance(client, base.Client):
-            sock = client.getClient().getSocket()
-        elif isinstance(client, controller.Common):
-            sock = client.getSocket()
-        elif isinstance(client, socket.socket):
-            sock = client
-        else:
-            return
-
+    def _disconnect_peer(self, sock):
         if sock in self._sockets:
             self._sockets.remove(sock)
         if sock in self._peers:
             peer = self._peers[sock]
             del(self._peers[sock])
             peer.cb_disconnect()
+            self.getMainRunningModule()._delete_client(peer)
 
     def getPort(self):
         return self._port

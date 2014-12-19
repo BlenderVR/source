@@ -69,6 +69,8 @@ class UI():
             self._interpreter.cmdloop()
         except controller.closedSocket as e:
             self.logger.warning(e)
+        except (KeyboardInterrupt, SystemExit):
+            return
 
     def quit(self):
         pass
