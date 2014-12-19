@@ -37,23 +37,27 @@ import os
 import sys
 import time
 from . import interpreter
+from ...tools import controller
 
 class UI():
     def __init__(self, port, debug = False):
-        self._debug = debug
         self._port  = port
         
         from ...tools import logger
         self._logger = logger.getLogger('blenderVR')
 
-        if self._debug:
+        console_logger = logger.Console()
+        self._default_logger = self._logger.addLoginWindow(console_logger, True)
+        if debug:
             # Define connexions until the controller is running ...
-            console_logger = logger.Console()
-            self._default_logger = self._logger.addLoginWindow(console_logger, True)
             self._logger.setLevel('debug')
 
         from ...tools import controller
-        self._controller = controller.Controller('localhost:' + str(self._port), 'UI')
+        try:
+            self._controller = controller.Controller('localhost:' + str(self._port), 'UI')
+        except ConnectionRefusedError:
+            self.logger.warning('Cannot find the controller on localhost:' + str(self._port))
+            sys.exit()
         self._interpreter = interpreter.Interpreter(self._controller)
 
     def start(self):
@@ -61,8 +65,10 @@ class UI():
         self.logger.info('blenderVR version:', version)
 
     def main(self):
-        result = self._interpreter.cmdloop()
-        print(result)
+        try:
+            self._interpreter.cmdloop()
+        except controller.closedSocket as e:
+            self.logger.warning(e)
 
     def quit(self):
         pass

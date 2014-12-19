@@ -87,6 +87,7 @@ class Listener(base.Base):
                 except SystemExit:
                     for sock in self._sockets:
                         self._disconnect_peer(sock)
+                        sock.shutdown(socket.SHUT_RDWR)
                         sock.close()
                     sys.exit()
                 except:

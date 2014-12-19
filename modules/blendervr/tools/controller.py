@@ -98,7 +98,7 @@ class Common:
         if self._socket is None:
             return False
         if not block:
-            inputready, outputready, exceptready = select.select([self._socket], [], [])
+            inputready, outputready, exceptready = select.select([self._socket], [], [], 0)
             if self._socket not in inputready:
                 return False
         try:
@@ -126,8 +126,7 @@ class Common:
             except:
                 pass
         self._socket = None
-
-
+        
 class Controller(Common):
     def __init__(self, controller, module, complement = ''):
         Common.__init__(self)

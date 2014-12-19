@@ -52,3 +52,8 @@ class Common(Cmd):
         
     def do_quit(self, args):
         return True
+
+    def emptyline(self):
+        result = self._connection.receive(False)
+        if result:
+            print('information:', result)
