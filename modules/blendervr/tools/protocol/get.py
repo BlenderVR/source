@@ -44,32 +44,32 @@ class Get(Command):
 
         :returns: path (or None)
         """
-        return self.sendReceiveSingle('get configuration')
+        return self.ask('get', 'configuration')
 
     def simulation(self):
         """Get the simulation (.blend) file
 
         :returns: path (or None)
         """
-        return self.sendReceiveSingle('get simulation file')
+        return self.ask('get' ,'simulation file')
 
     def processor(self):
         """Get the processor (.processor.py) file
 
         :returns: path (or None)
         """
-        return self.sendReceiveSingle('get processor file')
+        return self.ask('get', 'processor file')
 
-    def allScreenSets(self):
+    def screenSets(self):
         """Get all the available screen sets
 
         :returns: array of strings (or None)
         """
-        return self.sendReceiveSingle('get configuration')
+        return self.ask('get', 'screen sets')
 
     def screenSet(self):
         """Get the current screen set
 
         :returns: string (or None)
         """
-        return self.sendReceiveSingle('get configuration')
+        return self.ask('get' , 'screen set')

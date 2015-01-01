@@ -36,6 +36,21 @@
 from .simple import Simple
 from ...tools.protocol import set
 
+completions = [
+    'Mage Slayer (Alara Reborn)',
+    'Magefire Wings (Alara Reborn)',
+    'Sages of the Anima (Alara Reborn)',
+    'Sanctum Plowbeast (Alara Reborn)',
+    'Sangrite Backlash (Alara Reborn)',
+    'Sanity Gnawers (Alara Reborn)',
+    'Sen Triplets (Alara Reborn)'
+]
+
 class Set(Simple):
     def __init__(self, connection):
-        Simple.__init__(self, set.Set(connection), ['simulation', 'configuration'])
+        Simple.__init__(self, set.Set(connection), ['simulation', 'configuration', 'processor'])
+
+    def complete_screenSet(self, text, line, begidx, endidx):
+        mline = line.partition(' ')[2]
+        offs = len(mline) - len(text)
+        return [s[offs:] for s in completions if s.startswith(mline)]

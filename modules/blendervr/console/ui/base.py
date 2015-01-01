@@ -39,6 +39,10 @@ class Base(base.Base):
     def __init__(self, parent):
         base.Base.__init__(self, parent)
 
-    def quit(self):
-        del(self._main_running_module_profile)
-        base.Base.quit(self)
+    @property
+    def UI(self):
+        return self._main_running_module
+
+    @property
+    def controller(self):
+        return self._main_running_module._controller

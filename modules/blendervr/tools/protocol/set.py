@@ -34,23 +34,32 @@
 ## 
 
 from .command import Command
+from . import composeMessage
 
 class Set(Command):
     def __init__(self, connection):
         Command.__init__(self, connection)
 
-    def configuration(self, argument):
+    def configuration(self, file):
         """
         Set the XML configuration file
         """
-        cmd = 'set configuration'
-        result = self.sendReceiveSingle(cmd, argument)
-        return result == cmd
+        self.send('set', composeMessage('configuration', file))
 
-    def simulation(self, argument):
+    def simulation(self, file):
         """
         Set the simulation (.blend) file
         """
-        cmd = 'set simulation'
-        result = self.sendReceiveSingle(cmd, argument)
-        return result == cmd
+        self.send('set', composeMessage('simulation', file))
+
+    def processor(self, file):
+        """
+        Set the processor (.processor.py) file
+        """
+        self.send('set', composeMessage('processor', file))
+
+    def screenSet(self, screenSet):
+        """
+        Set the current screen set
+        """
+        self.send('set', composeMessage('screen set', screenSet))

@@ -33,12 +33,4 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-from .. import base
-
-class Base(base.Base):
-    def __init__(self, parent):
-        base.Base.__init__(self, parent)
-
-    def quit(self):
-        del(self._main_running_module_profile)
-        base.Base.quit(self)
+class Main(Exception): pass

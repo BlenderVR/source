@@ -40,7 +40,7 @@ from . import interpreter
 from ...tools import controller
 
 class UI():
-    def __init__(self, port, debug = False):
+    def __init__(self, port, debug = True):
         self._port  = port
         
         from ...tools import logger
@@ -51,7 +51,7 @@ class UI():
         if debug:
             # Define connexions until the controller is running ...
             self._logger.setLevel('debug')
-
+            
         from ...tools import controller
         try:
             self._controller = controller.Controller('localhost:' + str(self._port), 'UI')
@@ -59,21 +59,37 @@ class UI():
             self.logger.warning('Cannot find the controller on localhost:' + str(self._port))
             sys.exit()
         self._interpreter = interpreter.Interpreter(self._controller)
+        self._quit        = False
 
     def start(self):
         from ... import version
         self.logger.info('blenderVR version:', version)
 
+        try:
+            from . import completer
+            self._completer = completer.Completer(self)
+        except ImportError:
+            self.logger.info('Readline module not available.')
+        else:
+            self.logger.debug('Readline module available.')
+
     def main(self):
         try:
-            self._interpreter.cmdloop()
+            while not self._quit:
+                try:
+                    line = input('blenderVR: ')
+                except (EOFError, KeyboardInterrupt):
+                    self._quit = True
+                else:
+                    print('Dispatch %s' % line)
+                    self._quit = (line == 'exit')
         except controller.closedSocket as e:
             self.logger.warning(e)
         except (KeyboardInterrupt, SystemExit):
             return
 
     def quit(self):
-        pass
+        self._quit = True
 
     @property
     def logger(self):

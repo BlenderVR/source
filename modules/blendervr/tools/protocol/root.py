@@ -33,12 +33,18 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-from .. import base
+from .command import Command
 
-class Base(base.Base):
-    def __init__(self, parent):
-        base.Base.__init__(self, parent)
+from .set import Set
+from .get import Get
+from .reload import Reload
 
-    def quit(self):
-        del(self._main_running_module_profile)
-        base.Base.quit(self)
+class Root(Command):
+    def __init__(self, connection):
+        Command.__init__(self, connection)
+
+    def children():
+        return [Set, Get, Reload]
+        
+    def ping(self):
+        pass

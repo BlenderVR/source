@@ -33,19 +33,20 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-from . import base
+from .command import Command
 
-class XML(base.XML):
+class Reload(Command):
+    def __init__(self, connection):
+        Command.__init__(self, connection)
 
-    def __init__(self, parent, name, attrs):
-        super(XML, self).__init__(parent, name, attrs)
+    def configuration(self):
+        """
+        Reload the XML configuration file
+        """
+        self.send('reload configuration')
 
-    def _getChildren(self, name, attrs):
-        for plugin in self.getConsole().plugins:
-            if name == plugin.getName():
-                parser = plugin.getXMLParserClass()
-                if parser:
-                    self._class_list += [name]
-                    setattr(self, '_' + name, parser(self, name, attrs))
-                    return getattr(self, '_' + name)
-        return super(XML, self)._getChildren(name, attrs)
+    def processor(self):
+        """
+        Reload the processor (.processor.py) file
+        """
+        self.sendReceiveSingle('reload processor')

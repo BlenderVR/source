@@ -62,7 +62,7 @@ class Configure(xml.sax.handler.ContentHandler, xml.sax.handler.EntityResolver, 
         configuration_file = self._lookForConfigurationFile(config_file)
         if configuration_file is None:
             from .. import exceptions
-            raise exceptions.Main('Invalid configuration file !')
+            raise exceptions.Main('Missing configuration file !')
         self._parser.parse(configuration_file)
 
     def resolveEntity(self,publicID,systemID):

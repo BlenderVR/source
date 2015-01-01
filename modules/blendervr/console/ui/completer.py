@@ -33,12 +33,57 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-from .. import base
+import readline
+from . import base
+from ...tools.protocol.root import Root
+    
+class Completer(base.Base):
 
-class Base(base.Base):
     def __init__(self, parent):
         base.Base.__init__(self, parent)
 
-    def quit(self):
-        del(self._main_running_module_profile)
-        base.Base.quit(self)
+        readline.set_completer(self.complete)
+        readline.parse_and_bind('tab: complete')
+
+
+        self._options = {}
+        self._addLevel(Root)
+        self.logger.debug(self._options)
+
+    def _addLevel(self, _class):
+        forbidden = ['ask', 'getConnection', 'send', 'children']
+        self._options[_class.__name__] = []
+        for method in dir(_class):
+            if not method.startswith('_') and method not in forbidden:
+                self._options[_class.__name__].append(method)
+        if hasattr(_class, 'children'):
+            for children in _class.children():
+                self._options[_class.__name__].append(children.__name__)
+                self._addLevel(children)        
+        
+    def getOptions(self, text):
+        return sorted(['start', 'stop', 'list', 'print'])
+                
+    def complete(self, text, state):
+        try:
+            response = None
+            if state == 0:
+                options = self.getOptions(text)
+                # This is the first time for this text, so build a match list.
+                if text:
+                    self.matches = [s 
+                                    for s in options
+                                    if s and s.startswith(text)]
+                else:
+                    self.matches = options[:]
+        
+            # Return the state'th item from the match list,
+            # if we have that many.
+            try:
+                response = self.matches[state]
+            except IndexError:
+                response = None
+            return response
+        except:
+            self.logger.log_traceback(True)
+

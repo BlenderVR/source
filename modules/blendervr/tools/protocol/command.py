@@ -40,6 +40,10 @@ class Command:
     def getConnection(self):
         return self._connection
 
-    def sendReceiveSingle(self, command, argument = None):
+    def send(self, command, argument = None):
         self._connection.send(command, argument)
-        result = self._connection.receive()
+
+    def ask(self, command, argument = None):
+        self._connection.send(command, argument)
+        return self._connection.receive()
+        

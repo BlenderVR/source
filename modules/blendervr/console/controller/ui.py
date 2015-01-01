@@ -34,11 +34,16 @@
 ##
 
 from . import base
+from ...tools.protocol import decomposeMessage
 import sys
 
 class UI(base.Client):
     def __init__(self, parent, client):
         base.Client.__init__(self, parent, client)
+        self._mappings = {'configuration': ['config', 'file'],
+                          'simulation file': ['simulation', 'blender', 'file'],
+                          'processor file': ['simulation', 'processor', 'file'],
+                          'screen set':['virtual environment', 'screen set']}
 
     def cb_connect(self):
         self.logger.debug('Connexion of a client:', self._client)
@@ -46,12 +51,33 @@ class UI(base.Client):
     def cb_data(self):
         result = self._client.receive()
         command, argument = result
+        if command == 'exit':
+            sys.exit()
         if command == 'ping':
             self.logger.debug('Ping !')
             self._client.send(command, argument)
-        if command == 'exit':
-            sys.exit()
+            return
+        if command == 'set':
+            self.set(argument)
+            return
+        if command == 'get':
+            self.get(argument)
+            return
+        if command == 'reload configuration':
+            self.controller.configuration()
+            return
+        self.logger.debug('unknown command:', command, '(', argument, ')')
 
     def cb_disconnect(self):
         self.logger.debug('Disconnexion of a client:', self._client)
 
+    def set(self, argument):
+        command, argument = decomposeMessage(argument)
+        if command == 'configuration':
+            self.profile.setValue(['config', 'file'], argument[0])
+            self.controller.configuration()
+            return
+
+    def get(self, argument):
+        command = argument[0]
+        

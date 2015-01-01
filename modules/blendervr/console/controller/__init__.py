@@ -47,8 +47,6 @@ class Controller():
         self._loader_file        = None
         self._processor_files    = None
 
-        self._possibleScreenSets = None
-        self._currentScreenSet   = None
         self._anchor             = None
         self._previous_state     = None
         self._common_processors  = []
@@ -85,10 +83,14 @@ class Controller():
         from . import listener
         self._listener = listener.Listener(self)
 
-        sys.stdout.write(str(self._listener.getPort()) + "\n")
+        sys.stdout.write(str(self.getPort()) + "\n")
         sys.stdout.flush()
         from ... import version
         self.logger.info('blenderVR version:', version)
+        self.configuration()
+        
+    def getPort(self):
+        return self._listener.getPort()
 
     def main(self):
         while True:
@@ -96,6 +98,9 @@ class Controller():
                 self._listener.select()
             except (KeyboardInterrupt, SystemExit):
                 break
+
+    def quit(self):
+        pass
 
     def _create_client(self, client):
         type, name = client.getClientInformation()
@@ -117,9 +122,23 @@ class Controller():
         #     screen = self._screens.getScreen(complement)
         #     if screen:
         #         screen.setNetworkClient(module, client, addr)
-        
-    def quit(self):
-        pass
+
+    def configuration(self):
+        """
+        Called whenever the configuration file changed (file modified or user choose another file) 
+        """
+        self._configuration.load()
+
+    def screenSets(self, screenSets):
+        """
+        Called by the configuration file loader
+        """
+        current = self.profile.getValue(['screen', 'set'])
+        if current in screenSets:
+            self.screenSet()
+
+    def screenSet(self):
+        print('Yop !')
 
     @property
     def profile(self):

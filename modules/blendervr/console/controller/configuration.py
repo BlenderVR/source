@@ -34,11 +34,14 @@
 ##
 
 from . import base
+from . import exceptions
+import copy
+import os
 
 class Configuration(base.Base):
     def __init__(self, parent):
         base.Base.__init__(self, parent)
-        self.load()
+        self._common_processors  = []
 
     def load(self):
         try:
@@ -56,29 +59,22 @@ class Configuration(base.Base):
             elif configuration_path not in configuration_paths:
                 configuration_paths.append(configuration_path)
 
-            previous_common_processors = self._common_processors
+            from . import xml
+            config                  = xml.Configure(self, configuration_paths, configuration_file)
+            self._configuration     = config.getConfiguration()
 
-            from .. import xml
-            config              = xml.Configure(self, configuration_paths, configuration_file)
-            self._configuration = config.getConfiguration()
-
-            starter            = self._configuration['starter']
-            self._net_console  = starter['hostname'] + ':' + str(self._port)
-            self._anchor       = starter['anchor']
-            self._screenSets   = starter['configs']
-            self._blender_exe  = starter['blender']
-            possibleScreenSets = list(self._screenSets.keys())
-
+            starter                 = self._configuration['starter']
+            self._net_console       = starter['hostname'] + ':' + str(self.controller.getPort())
+            self._anchor            = starter['anchor']
+            self._screenSets        = starter['configs']
+            self._blender_exe       = starter['blender']
             self._common_processors = self._configuration['processors']
 
-            if self._possibleScreenSets != possibleScreenSets:
-                self._possibleScreenSets = possibleScreenSets
-                self.display_screen_sets(self._possibleScreenSets)
-            self.set_screen_set()
+            self.controller.screenSets(list(self._screenSets.keys()))
 
         except SystemExit:
             raise
         except exceptions.Main as error:
-            self.logger.error(str(error))
+            self.logger.error(error)
         except:
             self.logger.log_traceback(False)

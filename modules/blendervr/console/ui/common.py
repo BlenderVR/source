@@ -54,6 +54,8 @@ class Common(Cmd):
         return True
 
     def emptyline(self):
-        result = self._connection.receive(False)
-        if result:
+        while True:
+            result = self._connection.receive(False)
+            if not result:
+                break
             print('information:', result)

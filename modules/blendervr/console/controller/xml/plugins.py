@@ -33,12 +33,19 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-from .. import base
+from . import base
 
-class Base(base.Base):
-    def __init__(self, parent):
-        base.Base.__init__(self, parent)
+class XML(base.XML):
 
-    def quit(self):
-        del(self._main_running_module_profile)
-        base.Base.quit(self)
+    def __init__(self, parent, name, attrs):
+        super(XML, self).__init__(parent, name, attrs)
+
+    def _getChildren(self, name, attrs):
+        for plugin in self.controller.plugins:
+            if name == plugin.getName():
+                parser = plugin.getXMLParserClass()
+                if parser:
+                    self._class_list += [name]
+                    setattr(self, '_' + name, parser(self, name, attrs))
+                    return getattr(self, '_' + name)
+        return super(XML, self)._getChildren(name, attrs)

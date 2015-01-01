@@ -37,7 +37,7 @@ import sys
 import os
 from . import common_system
 from . import base
-from ...tools import getRootPath
+from ....tools import getRootPath
 
 class blenderplayer(base.single):
     def __init__(self, parent, name, attrs):

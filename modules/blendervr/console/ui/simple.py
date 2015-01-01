@@ -55,7 +55,7 @@ class Simple(Common):
             if action in path_completion:
                 self._cmd_methods.append('complete_' + action)
                 setattr(self, 'complete_' + action, self._path_completion)
-
+        
     # Overloading of this method to add our own methods
     def get_names(self):
         return self._cmd_methods

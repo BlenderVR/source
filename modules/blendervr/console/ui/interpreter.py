@@ -34,7 +34,7 @@
 ## 
 
 from .common import Common
-            
+
 class Interpreter(Common):
     def __init__(self, connection = None):
         Common.__init__(self, connection)

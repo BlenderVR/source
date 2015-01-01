@@ -38,6 +38,15 @@ from .. import base
 class Base(base.Base):
     def __init__(self, parent):
         base.Base.__init__(self, parent)
+        self._main_running_module_profile = self._main_running_module._profile
+
+    @property
+    def controller(self):
+        return self._main_running_module
+        
+    @property
+    def profile(self):
+        return self._main_running_module_profile
 
 class Client(Base):
     def __init__(self, parent, client):
