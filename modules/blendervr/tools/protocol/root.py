@@ -35,16 +35,9 @@
 
 from .command import Command
 
-from .set import Set
-from .get import Get
-from .reload import Reload
-
 class Root(Command):
     def __init__(self, connection):
         Command.__init__(self, connection)
 
-    def children():
-        return [Set, Get, Reload]
-        
     def ping(self):
         pass

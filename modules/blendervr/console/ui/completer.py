@@ -35,7 +35,9 @@
 
 import readline
 from . import base
-from ...tools.protocol.root import Root
+import importlib
+import os
+import glob
     
 class Completer(base.Base):
 
@@ -45,38 +47,85 @@ class Completer(base.Base):
         readline.set_completer(self.complete)
         readline.parse_and_bind('tab: complete')
 
-
         self._options = {}
-        self._addLevel(Root)
-        self.logger.debug(self._options)
+        from ...tools.protocol.root import Root
+        self._addLevel(self._options, Root)
 
-    def _addLevel(self, _class):
-        forbidden = ['ask', 'getConnection', 'send', 'children']
-        self._options[_class.__name__] = []
-        for method in dir(_class):
-            if not method.startswith('_') and method not in forbidden:
-                self._options[_class.__name__].append(method)
-        if hasattr(_class, 'children'):
-            for children in _class.children():
-                self._options[_class.__name__].append(children.__name__)
-                self._addLevel(children)        
-        
-    def getOptions(self, text):
-        return sorted(['start', 'stop', 'list', 'print'])
-                
+        self._screenSets = ['Premier', 'Second', 'Troisieme', 'Quatrieme']
+
+        for moduleName in ['Set', 'Get', 'Reload']:
+            try:
+                lower = moduleName.lower()
+                module = importlib.import_module('....tools.protocol.' + lower, __name__)
+                self._options[lower] = {}
+                self._addLevel(self._options[lower], getattr(module, moduleName))
+            except:
+                pass
+
+    def _addLevel(self, options, _class):
+        forbidden = ['ask', 'getConnection', 'send']
+        for methodName in dir(_class):
+            if not methodName.startswith('_') and methodName not in forbidden:
+                import inspect
+                arguments = inspect.getargspec(getattr(_class, methodName))
+                arguments = arguments[0]
+                try:
+                    arguments.remove('self')
+                except:
+                    pass
+                if len(arguments) == 0:
+                    options[methodName] = None
+                else:
+                    options[methodName] = getattr(self, '_process_' + arguments[0])
+
+    def _process_screenSet(self, words):
+        try:
+            return [s
+                    for s in self._screenSets
+                    if s and s.startswith(words[0])]
+        except IndexError:
+            return self._screenSets[:]
+
+    def _process_file(self, words):
+        line = readline.get_line_buffer()
+        before_arg = line.rfind(" ", 0, readline.get_begidx())
+        if before_arg == -1:
+            return # arg not found
+
+        fixed = line[before_arg+1:readline.get_begidx()]  # fixed portion of the arg
+        arg = line[before_arg+1:readline.get_endidx()]
+        pattern = arg + '*'
+
+        completions = []
+        for path in glob.glob(pattern):
+            if path and os.path.isdir(path) and path[-1] != os.sep:
+                path += os.sep
+            completions.append(path.replace(fixed, "", 1))
+        return completions
+
+    def _getMatches(self, words, dictionary):
+        if dictionary is None:
+            return []
+        if hasattr(dictionary, '__call__'):
+            return dictionary(words)
+        if len(words) == 0:
+            return dictionary.keys()
+        key = words[0]
+        del(words[0])
+        if key in dictionary:
+            return self._getMatches(words, dictionary[key])
+        return [s + ' '
+                for s in dictionary.keys()
+                if s and s.startswith(key)]
+
     def complete(self, text, state):
         try:
             response = None
             if state == 0:
-                options = self.getOptions(text)
                 # This is the first time for this text, so build a match list.
-                if text:
-                    self.matches = [s 
-                                    for s in options
-                                    if s and s.startswith(text)]
-                else:
-                    self.matches = options[:]
-        
+                words = readline.get_line_buffer().strip().split()
+                self.matches = sorted(self._getMatches(words, self._options))
+
             # Return the state'th item from the match list,
             # if we have that many.
             try:

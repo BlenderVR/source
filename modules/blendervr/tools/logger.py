@@ -138,7 +138,6 @@ class Console:
 
     def write(self, *messages):
         elements = []
-        elements = []
         for message in messages:
             elements.append(str(message))
         for message in (' '.join(elements)).split('\n'):
@@ -150,6 +149,22 @@ class Console:
                     dest = self._mapping[message_type]
                     dest.write(self._logging_prefix + message + '\n')
                     dest.flush()
+
+class File:
+    def __init__(self, filename, msg = 'Console logger: '):
+        self._logging_prefix = msg
+        self._filename = filename
+
+    def write(self, *messages):
+        dest = open(self._filename, 'a')
+        elements = []
+        for message in messages:
+            elements.append(str(message))
+        for message in (' '.join(elements)).split('\n'):
+            message = message.rstrip(' \n\r')
+            if len(message) > 0:
+                dest.write(self._logging_prefix + message + '\n')
+                dest.flush()
 
 if not isinstance(logging.getLoggerClass(), Logger):
     logging.setLoggerClass(Logger)
