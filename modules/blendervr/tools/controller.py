@@ -35,7 +35,7 @@
 
 import socket
 import select
-from . import protocol
+from ..console import protocol
 
 class closedSocket(Exception):
     def __init__(self):

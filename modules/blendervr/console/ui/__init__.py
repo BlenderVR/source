@@ -36,8 +36,8 @@
 import os
 import sys
 import time
-from . import interpreter
 from ...tools import controller
+import importlib
 
 class UI():
     def __init__(self, port, debug = True):
@@ -58,9 +58,22 @@ class UI():
         except ConnectionRefusedError:
             self.logger.warning('Cannot find the controller on localhost:' + str(self._port))
             sys.exit()
-        self._interpreter = interpreter.Interpreter(self._controller)
-        self._quit        = False
 
+        self._commands = {}
+        for moduleName in ['root', 'set', 'get', 'reload']:
+            try:
+                _class = moduleName[0].upper() + moduleName[1:]
+                module = importlib.import_module('..protocol.' + moduleName, __name__)
+                self._commands[moduleName] = getattr(module, _class)(self._controller)
+            except:
+                self.logger.log_traceback(False)
+                pass
+        
+        self._quit = False
+
+    def getCommands(self):
+        return self._commands
+        
     def start(self):
         from ... import version
         self.logger.info('blenderVR version:', version)
@@ -69,6 +82,7 @@ class UI():
             from . import completer
             self._completer = completer.Completer(self)
         except ImportError:
+            self.logger.log_traceback(False)
             self.logger.info('Readline module not available.')
         else:
             self.logger.debug('Readline module available.')
@@ -81,8 +95,22 @@ class UI():
                 except (EOFError, KeyboardInterrupt):
                     self._quit = True
                 else:
-                    print('Dispatch %s' % line)
-                    self._quit = (line == 'exit')
+                    command = line.split()
+                    if command[0] == 'exit':
+                        self._quit = True
+                        continue
+                    if command[0] in self._commands:
+                        _class = self._commands[command[0]]
+                        del(command[0])
+                    else:
+                        _class = self._commands['root']
+                    if hasattr(_class, command[0]):
+                        if len(command) > 1:
+                            getattr(_class, command[0])(*command[1:])
+                        else:
+                            getattr(_class, command[0])()
+                    else:
+                        self.logger.info('Invalid command:', line)
         except controller.closedSocket as e:
             self.logger.warning(e)
         except (KeyboardInterrupt, SystemExit):

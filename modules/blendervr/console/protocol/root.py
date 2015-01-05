@@ -33,30 +33,16 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-from .common import Common
+from .command import Command
 
-class Interpreter(Common):
-    def __init__(self, connection = None):
-        Common.__init__(self, connection)
-        self._connection = connection
+class Root(Command):
+    def __init__(self, connection):
+        Command.__init__(self, connection)
 
-    def do_get(self, args):
-        from .get import Get
-        get_cmd = Get(self._connection)
-        get_cmd.prompt = self.prompt[:-1]+':get)'
-        get_cmd.cmdloop()
+    def ping(self):
+        print(self.ask('ping'))
 
-    def do_set(self, args):
-        from .set import Set
-        set_cmd = Set(self._connection)
-        set_cmd.prompt = self.prompt[:-1]+':set)'
-        set_cmd.cmdloop()
-
-    def do_ping(self, args):
-        self._connection.send('ping')
-        command, argument = self._connection.receive()
-        print('Retour:', command, '**', argument)
-
-    def do_state(self, args):
-        state_cmd = State(self._connection)
-        state_cmd.cmdloop()
+    def kill(self):
+        self.send('kill')
+        sys.exit()
+        

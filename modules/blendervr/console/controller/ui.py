@@ -34,7 +34,7 @@
 ##
 
 from . import base
-from ...tools.protocol import decomposeMessage
+from ..protocol import decomposeMessage
 import sys
 
 class UI(base.Client):
@@ -51,7 +51,7 @@ class UI(base.Client):
     def cb_data(self):
         result = self._client.receive()
         command, argument = result
-        if command == 'exit':
+        if command == 'kill':
             sys.exit()
         if command == 'ping':
             self.logger.debug('Ping !')

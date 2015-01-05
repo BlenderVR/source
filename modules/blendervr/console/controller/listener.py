@@ -36,7 +36,6 @@
 import socket
 import select
 import sys
-from ...tools import protocol
 from ...tools import controller
 from . import base
 

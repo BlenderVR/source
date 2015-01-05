@@ -48,19 +48,18 @@ class Completer(base.Base):
         readline.parse_and_bind('tab: complete')
 
         self._options = {}
-        from ...tools.protocol.root import Root
+        from ..protocol.root import Root
         self._addLevel(self._options, Root)
 
         self._screenSets = ['Premier', 'Second', 'Troisieme', 'Quatrieme']
 
-        for moduleName in ['Set', 'Get', 'Reload']:
-            try:
-                lower = moduleName.lower()
-                module = importlib.import_module('....tools.protocol.' + lower, __name__)
-                self._options[lower] = {}
-                self._addLevel(self._options[lower], getattr(module, moduleName))
-            except:
-                pass
+        for _module, _class in parent.getCommands().items():
+            if _module == 'root':
+                continue
+            self._options[_module] = {}
+            self._addLevel(self._options[_module], _class)
+
+        self._options['exit'] = None
 
     def _addLevel(self, options, _class):
         forbidden = ['ask', 'getConnection', 'send']
