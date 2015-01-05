@@ -38,6 +38,8 @@ import sys
 import time
 from ...tools import controller
 import importlib
+from ..protocol import composeMessage
+from ..protocol import decomposeMessage
 
 class UI():
     def __init__(self, port, debug = True):
@@ -99,16 +101,22 @@ class UI():
                     if command[0] == 'exit':
                         self._quit = True
                         continue
-                    if command[0] in self._commands:
-                        _class = self._commands[command[0]]
+                    _module = command[0]
+                    if _module in self._commands:
                         del(command[0])
                     else:
-                        _class = self._commands['root']
-                    if hasattr(_class, command[0]):
-                        if len(command) > 1:
-                            getattr(_class, command[0])(*command[1:])
+                        _module = 'root'
+                    _class  = self._commands[_module]
+                    _method = command[0]
+                    del(command[0])
+                    if hasattr(_class, _method):
+                        if len(command) > 0:
+                            result = getattr(_class, _method)(*command)
                         else:
-                            getattr(_class, command[0])()
+                            result = getattr(_class, _method)()
+                        if _module == 'get':
+                            command, argument = decomposeMessage(result[1])
+                            print(command + ': ' + argument)
                     else:
                         self.logger.info('Invalid command:', line)
         except controller.closedSocket as e:

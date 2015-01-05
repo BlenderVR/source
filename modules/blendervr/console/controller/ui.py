@@ -35,6 +35,7 @@
 
 from . import base
 from ..protocol import decomposeMessage
+from ..protocol import composeMessage
 import sys
 
 class UI(base.Client):
@@ -73,11 +74,14 @@ class UI(base.Client):
 
     def set(self, argument):
         command, argument = decomposeMessage(argument)
-        if command == 'configuration':
-            self.profile.setValue(['config', 'file'], argument[0])
-            self.controller.configuration()
+        if command in self._mappings:
+            self.profile.setValue(self._mappings[command], argument)
+            if command == 'configuration':
+                self.controller.configuration()
             return
 
-    def get(self, argument):
-        command = argument[0]
+    def get(self, command):
+        if command in self._mappings:
+            self._client.send('get', composeMessage(command, self.profile.getValue(self._mappings[command])))
+            return
         
