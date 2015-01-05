@@ -35,10 +35,13 @@
 
 import sys
 port  = sys.argv[1]
-debug = '-d' in sys.argv
+if 'debug' in sys.argv:
+    debug = True
+else:
+    debug = False
 
 import blendervr.console.ui
-application = blendervr.console.ui.UI(port)
+application = blendervr.console.ui.UI(port, debug)
 application.start()
 application.main()
 application.quit()

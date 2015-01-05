@@ -42,9 +42,9 @@ from ..protocol import composeMessage
 from ..protocol import decomposeMessage
 
 class UI():
-    def __init__(self, port, debug = True):
+    def __init__(self, port, debug = False):
         self._port  = port
-        
+
         from ...tools import logger
         self._logger = logger.getLogger('blenderVR')
 
@@ -53,7 +53,7 @@ class UI():
         if debug:
             # Define connexions until the controller is running ...
             self._logger.setLevel('debug')
-            
+
         from ...tools import controller
         try:
             self._controller = controller.Controller('localhost:' + str(self._port), 'UI')

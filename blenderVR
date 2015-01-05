@@ -103,7 +103,10 @@ try:
             process.wait()
             sys.exit()
     if environments.ui and environments.port:
-        process = subprocess.Popen([sys.executable, os.path.join(root, 'utils', 'console', 'ui.py'), environments.port], env = environment)
+        options = [environments.port]
+        if environments.debug:
+            options.append('debug')
+        process = subprocess.Popen([sys.executable, os.path.join(root, 'utils', 'console', 'ui.py')] + options, env = environment)
         process.wait()
 
 except SystemExit:
