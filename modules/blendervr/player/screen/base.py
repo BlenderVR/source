@@ -82,10 +82,6 @@ class Base(base.Base):
             raise exceptions.VirtualEnvironment('Monoscopic window but '
                                             '"middle" buffer is missing !')
 
-# Update frame_type of the scene, otherwise, there will be black borders ...
-        scene = bge.logic.getCurrentScene()
-        scene.frame_type = "scale"
-
     def getBufferUser(self, bufferName):
         if bufferName in self._buffers:
             return self._buffers[bufferName]['user']

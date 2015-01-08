@@ -67,11 +67,15 @@ class Creator:
     def process(self):
         if is_creating_loader():
             import bpy
-
             bpy.ops.wm.open_mainfile(filepath=self._input_blender_file)
 
+            scene = bpy.context.scene
+
+            # Update frame_type of the scene, otherwise, there will be black borders ...
+            scene.game_settings.frame_type = 'SCALE'
+
             # if the file has multiple cameras take only the active one
-            camera = bpy.context.scene.camera
+            camera = scene.camera
 
             if camera:
                 SENSOR = ELEMENTS_MAIN_PREFIX + 'Sensor'
