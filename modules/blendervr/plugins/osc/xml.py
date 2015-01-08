@@ -75,7 +75,7 @@ class XML(xml.XML):
             return user
 
 
-class Room(xml.alone):
+class Room(xml.mono):
     def __init__(self, parent, name, attrs):
         super(Room, self).__init__(parent, name, attrs)
         self._attribute_list += ['warmth', 'brightness', 'presence',
@@ -89,7 +89,7 @@ class Room(xml.alone):
                 setattr(self, '_' + attribute, None)
 
 
-class User(xml.alone):
+class User(xml.mono):
     def __init__(self, parent, name, attrs):
         super(User, self).__init__(parent, name, attrs)
         self._attribute_list += ['listener', 'viewer']

@@ -115,8 +115,8 @@ class Base(base.Base):
                 self._updateMatrixForBuffer('right', camera,
                                     'projection_matrix_right',
                                     'stereo_position_matrix_right', depth)
-            if 'alone' in self._buffers:
-                self._updateMatrixForBuffer('alone', camera,
+            if 'mono' in self._buffers:
+                self._updateMatrixForBuffer('mono', camera,
                                     'projection_matrix',
                                     'stereo_position_matrix', depth)
         except:

@@ -257,16 +257,16 @@ class single(XML):
     def characters(self, string):
         pass
 
-class alone(XML):
+class mono(XML):
     def __init__(self, parent, name, attrs):
-        super(alone, self).__init__(parent, name, attrs)
+        super(mono, self).__init__(parent, name, attrs)
         self._inside  = None
 
     def startElement(self, name, attrs):
         self.raise_error(self._xml_section_name + ' section must not have any children')
 
     def endElement(self, name):
-        super(alone, self).endElement(name)
+        super(mono, self).endElement(name)
 
     def characters(self,string):
         pass

@@ -81,7 +81,7 @@ class daemon(base.single):
         if self._environments is None:
             self._environments = {}
 
-class log(base.alone):
+class log(base.mono):
     def __init__(self, parent, name, attrs):
         super(log, self).__init__(parent, name, attrs)
         self._attribute_list += ['clear_previous', 'path']
@@ -103,7 +103,8 @@ class log(base.alone):
         if self._path is None:
             self._path = os.path.join(os.path.expanduser('~'), '.log', 'blender')
 
-class login(base.alone):
+
+class login(base.mono):
     def __init__(self, parent, name, attrs):
         super(login, self).__init__(parent, name, attrs)
         self._attribute_list += ['remote_command', 'python']
@@ -124,7 +125,8 @@ class login(base.alone):
             self._remote_command = ''
         if self._python is None:
             self._python = sys.executable
-    
+
+
 class XML(common_system.XML):
 
     def __init__(self, parent, name, attrs):
