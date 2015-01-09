@@ -49,7 +49,7 @@ class Completer(base.Base):
         readline.set_completer(self.complete)
         readline.parse_and_bind('tab: complete')
 
-        self._screenSets = ['Premier', 'Second', 'Troisieme', 'Quatrieme']
+        self._screenSets = []
 
         self._options = {}
 
@@ -121,6 +121,9 @@ class Completer(base.Base):
                 for s in dictionary.keys()
                 if s and s.startswith(key)]
 
+    def setScreenSets(self, screenSets):
+        self._screenSets = screenSets
+    
     def complete(self, text, state):
         try:
             response = None

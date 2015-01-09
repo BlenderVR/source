@@ -78,10 +78,15 @@ class UI(base.Client):
             self.profile.setValue(self._mappings[command], argument)
             if command == 'configuration':
                 self.controller.configuration()
+            if command == 'screen set':
+                self.controller.screenSet()
             return
 
     def get(self, command):
         if command in self._mappings:
             self._client.send('get', composeMessage(command, self.profile.getValue(self._mappings[command])))
+            return
+        if command == 'screen sets':
+            self._client.send('get', composeMessage(command, self.controller.getScreenSets()))
             return
         

@@ -116,7 +116,9 @@ class UI():
                             result = getattr(_class, _method)()
                         if _module == 'get':
                             command, argument = decomposeMessage(result[1])
-                            print(command + ': ' + argument)
+                            print(str(command) + ': ' + str(argument))
+                            if _method == 'screenSets' and hasattr(self, '_completer'):
+                                self._completer.setScreenSets(argument)
                     else:
                         self.logger.info('Invalid command:', line)
         except controller.closedSocket as e:
