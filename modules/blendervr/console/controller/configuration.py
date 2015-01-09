@@ -84,7 +84,6 @@ class Configuration(base.Base):
 
         screenSet      = self._screenSets[current]
 
-        new_screens = {}
         configuration_screens   = self._configuration['screens']
         configuration_computers = self._configuration['computers']
 
@@ -93,7 +92,7 @@ class Configuration(base.Base):
         common_processors = self._configuration['processors']
         
         masterScreen   = screenSet[0]
-        configurations = {}
+        screens = {}
         for screen_name in screenSet:
             if screen_name not in configuration_screens:
                 self.logger.warning('Cannot find ' + screen_name + ' as screen in configuration file !')
@@ -109,18 +108,18 @@ class Configuration(base.Base):
             else:
                 configuration_screens[screen_name]['keep_focus'] = False
 
-            configurations[screen_name] = { 'screen':   configuration_screens[screen_name],
+            screens[screen_name] = { 'screen':   configuration_screens[screen_name],
                                             'computer': configuration_computers[computer_name]}
             
-        complements = {'users'      : self._configuration['users'],
-                       'plugins'    : self._configuration['plugins'],
-                       'processors' : self._configuration['processors']}
-        return {'configurations': configurations,
-                'complements'   : complements,
-                'console'       : {'controller'  : starter['hostname'],
-                                   'anchor'      : starter['anchor'],
-                                   'masterScreen': masterScreen,
-                                   'port'        : self._configuration['port'],
-                                   'blender_exe' : starter['blender']
-                                   }
+        complements = {'users'     : self._configuration['users'],
+                       'plugins'   : self._configuration['plugins'],
+                       'processors': self._configuration['processors']}
+        return {'screens'    : screens,
+                'complements': complements,
+                'console'    : {'controller' : starter['hostname'],
+                                'anchor'     : starter['anchor'],
+                                'master'     : masterScreen,
+                                'port'       : self._configuration['port'],
+                                'blender_exe': starter['blender']
+                                }
                 }

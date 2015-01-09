@@ -39,3 +39,8 @@ class Screens(base.Base):
     def __init__(self, parent):
         base.Base.__init__(self, parent)
         self._screens = {}
+
+    def setConfigurations(self, configuration):
+        return
+        import pprint
+        pprint.pprint(configuration)

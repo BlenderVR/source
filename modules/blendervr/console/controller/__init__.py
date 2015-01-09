@@ -145,6 +145,10 @@ class Controller():
             return
 
         configuration = self._configuration.getConfiguration()
+        self._screens.setConfigurations(configuration['screens'])
+        del(configuration['screens'])
+        console = configuration['console']
+        self.controller = console['controller']
         import pprint
         pprint.pprint(configuration)
         return
