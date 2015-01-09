@@ -38,6 +38,8 @@ from . import base
 import importlib
 import os
 import glob
+import sys
+import inspect
     
 class Completer(base.Base):
 
@@ -47,35 +49,37 @@ class Completer(base.Base):
         readline.set_completer(self.complete)
         readline.parse_and_bind('tab: complete')
 
-        self._options = {}
-        from ..protocol.root import Root
-        self._addLevel(self._options, Root)
-
         self._screenSets = ['Premier', 'Second', 'Troisieme', 'Quatrieme']
+
+        self._options = {}
 
         for _module, _class in parent.getCommands().items():
             if _module == 'root':
-                continue
-            self._options[_module] = {}
-            self._addLevel(self._options[_module], _class)
+                options = self._options
+            else:
+                self._options[_module] = {}
+                options = self._options[_module]
+            self._addLevel(options, _class)
 
         self._options['exit'] = None
+        self.logger.debug(self._options)
 
-    def _addLevel(self, options, _class):
-        forbidden = ['ask', 'getConnection', 'send']
-        for methodName in dir(_class):
-            if not methodName.startswith('_') and methodName not in forbidden:
-                import inspect
-                arguments = inspect.getargspec(getattr(_class, methodName))
+    def _addLevel(self, options, _object):
+        _class = _object.__class__
+        for component in inspect.classify_class_attrs(_class):
+            name           = component[0]
+            defining_class = component[2]
+            if defining_class == _class and not name.startswith('_'):
+                arguments = inspect.getargspec(getattr(_object, name))
                 arguments = arguments[0]
                 try:
                     arguments.remove('self')
                 except:
                     pass
                 if len(arguments) == 0:
-                    options[methodName] = None
+                    options[name] = None
                 else:
-                    options[methodName] = getattr(self, '_process_' + arguments[0])
+                    options[name] = getattr(self, '_process_' + arguments[0])
 
     def _process_screenSet(self, words):
         try:
