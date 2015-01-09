@@ -41,7 +41,7 @@ import os
 class Configuration(base.Base):
     def __init__(self, parent):
         base.Base.__init__(self, parent)
-        self._common_processors  = []
+        self._screenSets         = None
 
     def load(self):
         try:
@@ -63,14 +63,12 @@ class Configuration(base.Base):
             config                  = xml.Configure(self, configuration_paths, configuration_file)
             self._configuration     = config.getConfiguration()
 
-            starter                 = self._configuration['starter']
-            self._net_console       = starter['hostname'] + ':' + str(self.controller.getPort())
-            self._anchor            = starter['anchor']
-            self._screenSets        = starter['configs']
-            self._blender_exe       = starter['blender']
-            self._common_processors = self._configuration['processors']
-
-            self.controller.screenSets(list(self._screenSets.keys()))
+            try:
+                self._screenSets = self._configuration['starter']['configs']
+            except:
+                self.logger.log_traceback(True)
+            if self._screenSets:
+                self.controller.screenSets(list(self._screenSets.keys()))
 
         except SystemExit:
             raise
@@ -78,3 +76,51 @@ class Configuration(base.Base):
             self.logger.error(error)
         except:
             self.logger.log_traceback(False)
+
+    def getConfiguration(self):
+        current = self.profile.getValue(['virtual environment', 'screen set'])
+        if not current or current not in self._screenSets:
+            return
+
+        screenSet      = self._screenSets[current]
+
+        new_screens = {}
+        configuration_screens   = self._configuration['screens']
+        configuration_computers = self._configuration['computers']
+
+        starter                 = self._configuration['starter']
+
+        common_processors = self._configuration['processors']
+        
+        masterScreen   = screenSet[0]
+        configurations = {}
+        for screen_name in screenSet:
+            if screen_name not in configuration_screens:
+                self.logger.warning('Cannot find ' + screen_name + ' as screen in configuration file !')
+                return
+
+            computer_name = configuration_screens[screen_name]['computer']
+            if computer_name not in configuration_computers:
+                self.logger.warning('Cannot find ' + computer_name + ' as computer in configuration file !')
+                return
+
+            if screen_name == masterScreen and self._configuration['focus_master']:
+                configuration_screens[screen_name]['keep_focus'] = True
+            else:
+                configuration_screens[screen_name]['keep_focus'] = False
+
+            configurations[screen_name] = { 'screen':   configuration_screens[screen_name],
+                                            'computer': configuration_computers[computer_name]}
+            
+        complements = {'users'      : self._configuration['users'],
+                       'plugins'    : self._configuration['plugins'],
+                       'processors' : self._configuration['processors']}
+        return {'configurations': configurations,
+                'complements'   : complements,
+                'console'       : {'controller'  : starter['hostname'],
+                                   'anchor'      : starter['anchor'],
+                                   'masterScreen': masterScreen,
+                                   'port'        : self._configuration['port'],
+                                   'blender_exe' : starter['blender']
+                                   }
+                }
