@@ -32,9 +32,18 @@ parser.add_argument('-p', '--port', dest='port', help='Set the port of the contr
 
 environments = parser.parse_args(sys.argv[1:])
 
+def checkRoot(path):
+    return (path and os.path.isdir(os.path.join(path, 'modules', 'blendervr')))
+
 def getRootPath(environment):
+    root = os.path.dirname(os.path.realpath(__file__))
+    if checkRoot(root):
+        return root
     if environment is not None:
-        return environment
+        if checkRoot(environment):
+            return environment
+        print('Invalid blenderVR root path (' + environment + '): it must contain the ' + os.path.join('modules', 'blendervr') + ' folder !')
+        sys.exit()
     try:
         import pickle
         with open(profile_file, 'rb') as node:
@@ -43,10 +52,10 @@ def getRootPath(environment):
             return configuration['root']
     except:
         pass
-    return os.path.dirname(os.path.realpath(__file__))
+    return None
 
 root = getRootPath(environments.blenderVR_root)
-if root and os.path.isdir(os.path.join(root, 'modules')):
+if checkRoot(root):
     moduleRoot = os.path.join(root, 'modules')
 else:
     print('Cannot find blenderVR root !')
