@@ -39,37 +39,41 @@ class Get(Command):
     def __init__(self, connection):
         Command.__init__(self, connection)
 
+    def _ask(self, command, arguments):
+        result = self.ask(command, arguments)
+        return result
+
     def configuration(self):
         """Get the XML configuration file
 
         :returns: path (or None)
         """
-        return self.ask('get', 'configuration')
+        return self._ask('get', 'configuration')
 
     def simulation(self):
         """Get the simulation (.blend) file
 
         :returns: path (or None)
         """
-        return self.ask('get' ,'simulation file')
+        return self._ask('get' ,'simulation file')
 
     def processor(self):
         """Get the processor (.processor.py) file
 
         :returns: path (or None)
         """
-        return self.ask('get', 'processor file')
+        return self._ask('get', 'processor file')
 
     def screenSets(self):
         """Get all the available screen sets
 
         :returns: array of strings (or None)
         """
-        return self.ask('get', 'screen sets')
+        return self._ask('get', 'screen sets')
 
     def screenSet(self):
         """Get the current screen set
 
         :returns: string (or None)
         """
-        return self.ask('get' , 'screen set')
+        return self._ask('get' , 'screen set')

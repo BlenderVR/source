@@ -109,22 +109,27 @@ class UI():
                     _class  = self._commands[_module]
                     _method = command[0]
                     del(command[0])
-                    if hasattr(_class, _method):
-                        if len(command) > 0:
-                            result = getattr(_class, _method)(*command)
-                        else:
-                            result = getattr(_class, _method)()
-                        if _module == 'get':
-                            command, argument = decomposeMessage(result[1])
-                            print(str(command) + ': ' + str(argument))
-                            if _method == 'screenSets' and hasattr(self, '_completer'):
-                                self._completer.setScreenSets(argument)
-                    else:
+                    if not self.process(_class, _method, *command):
                         self.logger.info('Invalid command:', line)
         except controller.closedSocket as e:
             self.logger.warning(e)
         except (KeyboardInterrupt, SystemExit):
             return
+
+    def process(self, _class, _method, *arguments):
+        if hasattr(_class, _method):
+            try:
+                result = getattr(_class, _method)(*arguments)
+            except TypeError:
+                print('Invalid arguments:', arguments)
+                return True
+            if result != None:
+                command, argument = decomposeMessage(result[1])
+                print(str(command) + ': ' + str(argument))
+                if _method == 'screenSets' and hasattr(self, '_completer'):
+                    self._completer.setScreenSets(argument)
+            return True
+        return False
 
     def quit(self):
         self._quit = True
