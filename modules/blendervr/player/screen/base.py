@@ -42,6 +42,8 @@ from .. import base
 from .. import exceptions
 import bgl
 
+LEFT_EYE = bge.render.LEFT_EYE
+RIGHT_EYE = bge.render.RIGHT_EYE
 
 class Base(base.Base):
     def __init__(self, parent, configuration):
@@ -107,18 +109,24 @@ class Base(base.Base):
 
             depth = (camera.near + camera.far) / 2.0
 
-            if 'left' in self._buffers:
-                self._updateMatrixForBuffer('left', camera,
-                                    'projection_matrix_left',
-                                    'stereo_position_matrix_left', depth)
-            if 'right' in self._buffers:
-                self._updateMatrixForBuffer('right', camera,
-                                    'projection_matrix_right',
-                                    'stereo_position_matrix_right', depth)
-            if 'mono' in self._buffers:
-                self._updateMatrixForBuffer('mono', camera,
-                                    'projection_matrix',
-                                    'stereo_position_matrix', depth)
+            stereo_eye = bge.render.getStereoEye()
+
+            if stereo_eye == LEFT_EYE:
+                self.logger.info("Left Eye")
+            elif stereo_eye == RIGHT_EYE:
+                self.logger.info("Right Eye")
+            else:
+                self.logger.info("Not sure which eye")
+
+            if 'left' in self._buffers and stereo_eye == LEFT_EYE:
+                self._updateMatrixForBuffer('left', camera, depth)
+
+            elif 'right' in self._buffers and stereo_eye == RIGHT_EYE:
+                self._updateMatrixForBuffer('right', camera, depth)
+
+            elif 'mono' in self._buffers:
+                self._updateMatrixForBuffer('mono', camera, depth)
+
         except:
             self.blenderVR.stopDueToError()
 
