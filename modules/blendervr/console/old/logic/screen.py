@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# file: blendervr/console/logic/screen.py
+
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
@@ -36,20 +39,21 @@
 import os
 import subprocess
 import sys
-import socket
+#import socket
 import copy
 import shlex
+
 
 class Logic:
     def __init__(self, net_console):
         self._net_console = net_console
-        self._process     = None
+        self._process = None
 
-        self._clients        = {'daemon'        : None,
-                                'blender_player': None}
+        self._clients = {'daemon': None,
+                         'blender_player': None}
 
-        self._stop           = False
-        self._state          = 'stopped'
+        self._stop = False
+        self._state = 'stopped'
 
     def __del__(self):
         pass
@@ -71,33 +75,36 @@ class Logic:
             self._clients['daemon'].send('kill daemon')
 
     def setConfiguration(self, configuration, complements):
-        screen_conf   = configuration['screen']
+        screen_conf = configuration['screen']
         computer_conf = configuration['computer']
-        system        = computer_conf['system']
- 
+        system = computer_conf['system']
+
         self._complements = complements
-        self._hostname    = computer_conf['hostname']
+        self._hostname = computer_conf['hostname']
         dev_type = screen_conf['device_type']
         if not dev_type:
             self.logger.error('Unknown device type !')
             return
-        self._screen      = {'graphic_buffer' : screen_conf['display']['graphic_buffer'],
-                             'viewport'       : screen_conf['display']['viewport'],
-                             'device_type'    : dev_type,
-                             dev_type         : screen_conf[dev_type],
-                             'keep_focus'     : screen_conf['keep_focus']}
+        self._screen = {'graphic_buffer':
+                                screen_conf['display']['graphic_buffer'],
+                         'viewport': screen_conf['display']['viewport'],
+                         'device_type': dev_type,
+                         dev_type: screen_conf[dev_type],
+                         'keep_focus': screen_conf['keep_focus']}
 
-        self._log_file    = os.path.join(system['log']['path'], 'blenderVR_' + self.getName() + '.log')
+        self._log_file = os.path.join(system['log']['path'],
+                                'blenderVR_' + self.getName() + '.log')
         if system['log']['clear_previous']:
             self._log_to_clear = self._log_file
         else:
             self._log_to_clear = ''
-        self._anchor         = system['anchor']
-        self._blender_player = {'executable'  : system['blenderplayer']['executable'],
+        self._anchor = system['anchor']
+        self._blender_player = {'executable':
+                                        system['blenderplayer']['executable'],
                                 'environments': {}}
 
-        self._daemon = { 'command'     : [],
-                         'environments': {}}
+        self._daemon = {'command': [],
+                        'environments': {}}
 
         for name, value in system['daemon']['environments'].items():
             if system['daemon']['transmit']:
@@ -114,14 +121,15 @@ class Logic:
 
         self._blender_player['options'] = screen_conf['display']['options']
 
-        login   = system['login']
+        login = system['login']
         if login['remote_command']:
             self._daemon['command'] += shlex.split(login['remote_command'])
         self._daemon['command'].append(login['python'])
-        self._daemon['command'].append(os.path.join(system['root'], 'utils', 'daemon.py'))
+        self._daemon['command'].append(os.path.join(system['root'],
+                                                    'utils', 'daemon.py'))
         self._daemon['command'].append(self._net_console)
         self._daemon['command'].append(self.getName())
-        
+
         for index, argument in enumerate(self._daemon['command']):
             if ' ' in argument:
                 self._daemon['command'][index] = '"' + argument + '"'
@@ -142,28 +150,31 @@ class Logic:
         if self._process is None:
             command = copy.copy(self._daemon['command'])
 
-            if self.profile.getValue(['debug', 'daemon']): # Debug ?
-                daemon_in   = None
-                daemon_out  = None
+            if self.profile.getValue(['debug', 'daemon']):  # Debug ?
+                daemon_in = None
+                daemon_out = None
                 command.append('debug')
             else:
-                daemon_in   = open(os.devnull, 'r')
-                daemon_out  = open(os.devnull, 'w')
+                daemon_in = open(os.devnull, 'r')
+                daemon_out = open(os.devnull, 'w')
 
             try:
                 if self.profile.getValue(['debug', 'executables']):
-                    self.logger.error('Command to run daemon:', ' '.join(command))
-                    self.logger.error('Its environment variables:', self._daemon['environments'])
+                    self.logger.error('Command to run daemon:',
+                                      ' '.join(command))
+                    self.logger.error('Its environment variables:',
+                                      self._daemon['environments'])
                 self._process = subprocess.Popen(command,
-                                                 env       = self._daemon['environments'],
-                                                 stdin     = daemon_in,
-                                                 stdout    = daemon_out,
-                                                 stderr    = daemon_out,
-                                                 close_fds = ('posix' in sys.builtin_module_names))
+                         env=self._daemon['environments'],
+                         stdin=daemon_in,
+                         stdout=daemon_out,
+                         stderr=daemon_out,
+                         close_fds=('posix' in sys.builtin_module_names))
             except:
                 self._cannot_start_daemon()
             else:
-                self._check_daemon_timeout = self.getConsole().addTimeout(500, self._cannot_start_daemon)
+                self._check_daemon_timeout = self.getConsole().addTimeout(500,
+                                                self._cannot_start_daemon)
 
     def _cannot_start_daemon(self):
         self._process = None
@@ -184,8 +195,9 @@ class Logic:
             if self._clients['daemon'] is not None:
                 self.logger.error('Too many connexions of the daemon ...')
                 return
-            self._clients['daemon']     = client
-            client.tag = self.getConsole().addListenTo(client.fileno(), self._recv_from_daemon)
+            self._clients['daemon'] = client
+            client.tag = self.getConsole().addListenTo(client.fileno(),
+                                                    self._recv_from_daemon)
             for field in ['blender_player', 'log_to_clear']:
                 client.send(field, getattr(self, '_' + field))
             self._send_loader_file()
@@ -197,10 +209,12 @@ class Logic:
             self._set_current_state('building')
             self._clients['blender_player'] = client
 
-            client.tag = self.getConsole().addListenTo(client.fileno(), self._recv_from_blender_player)
+            client.tag = self.getConsole().addListenTo(client.fileno(),
+                                            self._recv_from_blender_player)
             self._send_log_informations()
             self._send_log_to_file_information()
-            for field in ['screen', 'complements', 'network', 'blender_file', 'processor_files']:
+            for field in ['screen', 'complements', 'network', 'blender_file',
+                                                        'processor_files']:
                 client.send(field, getattr(self, '_' + field))
             client.send('base configuration ending')
             client.setCallback(self._message_from_blender_player)
@@ -232,9 +246,11 @@ class Logic:
             self._write_to_window(argument)
         elif command == 'command':
             if self.profile.getValue(['debug', 'executables']):
-                self.logger.error('Command to run blenderplayer:', ' '.join(argument['command']))
+                self.logger.error('Command to run blenderplayer:',
+                                  ' '.join(argument['command']))
                 self.logger.error('Its path:', argument['path'])
-                self.logger.error('Its environment variables:', argument['environment'])
+                self.logger.error('Its environment variables:',
+                                  argument['environment'])
         elif command == 'forked':
             self._stopDaemon()
             self.logger.debug('Daemon forked !')
@@ -250,7 +266,8 @@ class Logic:
         elif command == 'virtual_environment_to_console':
             self.getConsole().receivedFromVirtualEnvironment(argument)
         else:
-            self.logger.debug('Unkown message from blenderplayer:', command, argument)
+            self.logger.debug('Unkown message from blenderplayer:',
+                              command, argument)
         return  True
 
     def _close_network_client(self, client):
@@ -269,12 +286,12 @@ class Logic:
             self.getConsole().updateStatus('Screen ' + self._name + ' stopped')
             self.getConsole()._update_status()
 
-
 ###########################################################
     #  Misc
-    def adapt_simulation_files_to_screen(self, loader_file, blender_file, processor_files):
-        self._loader_file     = loader_file.unstrip(self._anchor)
-        self._blender_file    = blender_file.unstrip(self._anchor)
+    def adapt_simulation_files_to_screen(self, loader_file, blender_file,
+                                                            processor_files):
+        self._loader_file = loader_file.unstrip(self._anchor)
+        self._blender_file = blender_file.unstrip(self._anchor)
         self._processor_files = []
         for processor_file in processor_files:
             self._processor_files.append(processor_file.unstrip(self._anchor))
@@ -285,7 +302,8 @@ class Logic:
         self._send_loader_file()
 
     def _send_loader_file(self):
-        if (self._clients['daemon'] is not None) and (self._loader_file is not None):
+        if (self._clients['daemon'] is not None) \
+                                    and (self._loader_file is not None):
             self._clients['daemon'].send('loader_file', self._loader_file)
 
 ###########################################################
@@ -296,7 +314,7 @@ class Logic:
             if self._clients['daemon']:
                 self._clients['daemon'].send('state', state)
 
-    def send_to_blender_player(self, command, argument = ''):
+    def send_to_blender_player(self, command, argument=''):
         if self._clients['blender_player']:
             self._clients['blender_player'].send(command, argument)
 
@@ -307,8 +325,10 @@ class Logic:
         return self._state
 
     def _send_log_informations(self):
-        self.send_to_blender_player('log_level', self.profile.getValue(['screens', self._name, 'log', 'level']))
-        self.send_to_blender_player('log_to_controller', self.is_log_window_opened())
+        self.send_to_blender_player('log_level',
+            self.profile.getValue(['screens', self._name, 'log', 'level']))
+        self.send_to_blender_player('log_to_controller',
+            self.is_log_window_opened())
 
     def _send_log_to_file_information(self):
         if self.profile.getValue(['screens', self._name, 'log', 'file']):

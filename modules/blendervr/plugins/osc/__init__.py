@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# file: blendervr/plugins/osc/__init__.py
+
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
@@ -38,7 +41,8 @@ OSC Plugin
 **********
 
 This script instantiates the OSC plugin: an OSC API embedded in BlenderVR,
-used to send OSC messages (for sound control) to a third party program (e.g. PureData, MaxMSP, etc.)
+used to send OSC messages (for sound control) to a third party program
+(e.g. PureData, MaxMSP, etc.)
 """
 
 from ... import *

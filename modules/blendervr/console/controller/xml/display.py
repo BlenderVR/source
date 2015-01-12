@@ -36,7 +36,7 @@
 from . import reusable
 from . import base
 
-class graphic_buffer(base.alone):
+class graphic_buffer(base.mono):
     def __init__(self, parent, name, attrs):
         super(graphic_buffer, self).__init__(parent, name, attrs)
         self._attribute_list += ['buffer', 'user', 'eye']
@@ -44,22 +44,22 @@ class graphic_buffer(base.alone):
         if 'buffer' in attrs:
             self._buffer = attrs['buffer'].lower()
         else:
-            self._buffer = 'alone'
-        if self._buffer not in ['alone', 'right', 'left']:
-            self.raise_error('Invalid graphic_buffer buffer (' + str(self._buffer) + ') : must be one of alone, right or left')
+            self._buffer = 'mono'
+        if self._buffer not in {'mono', 'right', 'left'}:
+            self.raise_error('Invalid graphic_buffer buffer (' + str(self._buffer) + ') : must be one of mono, right or left')
 
         if 'eye' in attrs:
             self._eye = attrs['eye'].lower()
         else:
             self._eye = 'middle'
-        if self._eye not in ['middle', 'right', 'left']:
+        if self._eye not in {'middle', 'right', 'left'}:
             self.raise_error('Invalid graphic_buffer eye (' + str(self._eye) + ') : must be one of middle, right or left')
 
         if 'user' in attrs:
             self._user = attrs['user']
         else:
             self._user = None
-        
+
 
 class XML(reusable.XML):
 
@@ -79,7 +79,7 @@ class XML(reusable.XML):
         self._inside          = None
 
     def _getChildren(self, name, attrs):
-        for element in ['viewport', 'environment']:
+        for element in {'viewport', 'environment'}:
             if name == element:
                 if self._inside is not None:
                     self.raise_error('Cannot import ' + str(name) + ' inside ' + str(self._inside) + ' !')

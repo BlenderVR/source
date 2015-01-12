@@ -1,23 +1,26 @@
+# -*- coding: utf-8 -*-
+# file: utils/daemon.py
+
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
-## Laurent Pointal, Julian Adenauer, 
-## 
+## Laurent Pointal, Julian Adenauer,
+##
 ## This software is a computer program whose purpose is to distribute
 ## blender to render on Virtual Reality device systems.
-## 
+##
 ## This software is governed by the CeCILL  license under French law and
-## abiding by the rules of distribution of free software.  You can  use, 
+## abiding by the rules of distribution of free software.  You can  use,
 ## modify and/ or redistribute the software under the terms of the CeCILL
 ## license as circulated by CEA, CNRS and INRIA at the following URL
-## "http://www.cecill.info". 
-## 
+## "http://www.cecill.info".
+##
 ## As a counterpart to the access to the source code and  rights to copy,
 ## modify and redistribute granted by the license, users are provided only
 ## with a limited warranty  and the software's author,  the holder of the
 ## economic rights,  and the successive licensors  have only  limited
-## liability. 
-## 
+## liability.
+##
 ## In this respect, the user's attention is drawn to the risks associated
 ## with loading,  using,  modifying and/or developing or reproducing the
 ## software by the user in light of its specific status of free software,
@@ -25,38 +28,58 @@
 ## therefore means  that it is reserved for developers  and  experienced
 ## professionals having in-depth computer knowledge. Users are therefore
 ## encouraged to load and test the software's suitability as regards their
-## requirements in conditions enabling the security of their systems and/or 
-## data to be ensured and,  more generally, to use and operate it in the 
-## same conditions as regards security. 
-## 
+## requirements in conditions enabling the security of their systems and/or
+## data to be ensured and,  more generally, to use and operate it in the
+## same conditions as regards security.
+##
 ## The fact that you are presently reading this means that you have had
 ## knowledge of the CeCILL license and that you accept its terms.
-## 
+##
 
 """
 Daemon
 ******
 
-This script runs in the clients and is responsible for spawning the Blender Player.
+This script runs in the clients and is responsible for spawning the
+Blender Player.
 """
 
-import sys, threading, socket, tempfile, io, os, subprocess, threading
+import sys
+import threading
+import socket
+import tempfile
+import io
+import os
+import subprocess
+import threading
+
+
+debug = False
+forked = False
+
 
 class Daemon:
+    """Background management of the Blender Player and related stuff.
+
+
+    """
     def __init__(self, blenderVR_modules):
         self._blenderVR_modules = blenderVR_modules
 
-        self._controller  = sys.argv[1]
+        self._controller = sys.argv[1]
         self._screen_name = sys.argv[2].strip("'\"")
 
-        self._process_in   = subprocess.PIPE
-        self._process_out  = subprocess.PIPE
+        self._process_in = subprocess.PIPE
+        self._process_out = subprocess.PIPE
 
         import blendervr.tools.connector
-        self._client = blendervr.tools.connector.Client(self._controller, 'daemon', self._screen_name)
+        self._client = blendervr.tools.connector.Client(self._controller,
+                                                'daemon', self._screen_name)
         self._client.setCallback(self.processCommand)
         self._client.setWait(True)
 
+        #TODO: use os.name to identify Unixes (Linux, MacOS...) vs Windows
+        # Registered: 'posix', 'nt', 'ce', 'java'.
         if ('posix' in sys.builtin_module_names):
             import signal
             signal.signal(signal.SIGTERM, self._exit)
@@ -71,15 +94,15 @@ class Daemon:
         if forked:
             self._client.send('forked')
 
-        self._loader_file  = None
-        self._loader_path  = None
-        self._process      = None
+        self._loader_file = None
+        self._loader_path = None
+        self._process = None
 
     def write(self, *messages):
-        """
-        Send message to the client
+        """Send message to the client
 
-        :param messages: all the messages to send to the client (i.e., console commands)
+        :param messages: all the messages to send to the client (i.e., console
+            commands)
         :type messages: list
         """
         elements = []
@@ -92,8 +115,7 @@ class Daemon:
         self._stop_blender_player()
 
     def main(self):
-        """
-        Start the Daemon, quits any instance of BlenderPlayer running.
+        """Start the Daemon, quits any instance of BlenderPlayer running.
         """
         try:
             if not self._client.run():
@@ -109,8 +131,7 @@ class Daemon:
             self._stop_blender_player()
 
     def processCommand(self, command, argument):
-        """
-        Run the received commands
+        """Run the received commands
 
         :param command: Command to execute in the client machine
         :type command: str
@@ -118,12 +139,13 @@ class Daemon:
         """
         blenderVR_modules = self._blenderVR_modules
         if command == 'blender_player':
-            self._executable         = argument['executable']
+            self._executable = argument['executable']
             self._executable_options = argument['options']
-            self._environment        = argument['environments']
+            self._environment = argument['environments']
             if 'PYTHONPATH' in self._environment:
                 if blenderVR_modules not in self._environment['PYTHONPATH']:
-                    self._environment['PYTHONPATH'] = blenderVR_modules + os.pathsep + self._environment['PYTHONPATH']
+                    self._environment['PYTHONPATH'] = blenderVR_modules \
+                            + os.pathsep + self._environment['PYTHONPATH']
             else:
                 self._environment['PYTHONPATH'] = blenderVR_modules
         elif command == 'log_to_clear':
@@ -132,7 +154,8 @@ class Daemon:
             if argument:
                 try:
                     import compileall
-                    compileall.compile_dir(os.path.join(blenderVR_modules, 'blendervr'), quiet = True)
+                    compileall.compile_dir(os.path.join(blenderVR_modules,
+                                                'blendervr'), quiet=True)
                 except:
                     pass
                 self._start_blender_player()
@@ -176,31 +199,38 @@ class Daemon:
             command = [self._executable]
             if self._executable_options:
                 command += self._executable_options.split()
-            command += [self._loader_file, '-', self._controller, self._screen_name]
+            command += [self._loader_file, '-', self._controller,
+                        self._screen_name]
 
             for index, argument in enumerate(command):
                 if ' ' in argument:
                     command[index] = '"' + argument + '"'
 
             try:
-                self._client.send('command', {'command': command, 'environment': self._environment, 'path': self._loader_path})
+                self._client.send('command', {'command': command,
+                                              'environment': self._environment,
+                                              'path': self._loader_path})
                 self._process = subprocess.Popen(command,
-                                                 env       = self._environment,
-                                                 stdin     = self._process_in,
-                                                 stdout    = self._process_out,
-                                                 stderr    = self._process_out,
-                                                 cwd       = self._loader_path,
-                                                 universal_newlines = True,
-                                                 close_fds = ('posix' in sys.builtin_module_names))
+                             env=self._environment,
+                             stdin=self._process_in,
+                             stdout=self._process_out,
+                             stderr=self._process_out,
+                             cwd=self._loader_path,
+                             universal_newlines=True,
+                             #TODO: use os.name == 'posix'
+                             close_fds=('posix' in sys.builtin_module_names))
             except Exception as error:
-                self._client.send('stderr', 'Cannot start blenderplayer: ' + str(error))
-            threading.Thread(target=Daemon._stream_waiter, args=(self, 'stdout')).start()
-            threading.Thread(target=Daemon._stream_waiter, args=(self, 'stderr')).start()
+                self._client.send('stderr', 'Cannot start blenderplayer: '
+                                                    + str(error))
+            threading.Thread(target=Daemon._stream_waiter,
+                                        args=(self, 'stdout')).start()
+            threading.Thread(target=Daemon._stream_waiter,
+                                        args=(self, 'stderr')).start()
             self._client.send('started')
 
     def _exit(self, *args):
         self._stop_blender_player()
-        sys.exit()        
+        sys.exit()
 
     def _stream_waiter(self, stream_name):
         stream = getattr(self._process, stream_name)
@@ -216,6 +246,11 @@ class Daemon:
 
 
 def main():
+    """Main function to start the daemon.
+
+    Prepare execution (daemonize if necessary), then build a Daemon and
+    call its main() method to manage background communications.
+    """
     global debug
     global forked
 
@@ -261,11 +296,17 @@ def main():
                 pass
 
         os.open(devnull, os.O_RDWR)
+        #TODO: LPOINTAL: usage of duplicating (twice) stdin and bad dup() ?
+        # Maybe second call should be os.dup(1).
+        # And, what is done with values ? Maybe should use dup2() which
+        # close the old file and to specify if the new is inheritable
+        # or not (for dup(), its non-inheritable in Unix, inheritable on
+        # windows.
         os.dup(0)
         os.dup(0)
 
-
-    blenderVR_root    = os.path.dirname(os.path.dirname(__file__))
+    # Find the installation root, and make blender package available.
+    blenderVR_root = os.path.dirname(os.path.dirname(__file__))
     blenderVR_modules = os.path.join(blenderVR_root, 'modules')
     sys.path.append(blenderVR_modules)
 

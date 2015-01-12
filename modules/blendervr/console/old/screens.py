@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# file: blendervr/console/screens.py
+
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
@@ -36,6 +39,7 @@
 from . import base
 from .logic import screens as logic
 from .qt import screens as gui
+
 
 class Screens(base.Base, logic.Logic, gui.GUI):
     def __init__(self, parent):

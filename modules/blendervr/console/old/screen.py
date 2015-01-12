@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# file: blendervr/console/screen.py
+
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
@@ -36,17 +39,17 @@
 from . import base
 from .logic import screen as logic
 from .qt import screen as gui
-import os
+
 
 class Screen(base.Base, logic.Logic, gui.GUI):
 
     def __init__(self, screens, name, net_console):
         base.Base.__init__(self, screens)
         self._main_logger = self.getParent().logger
-        self._name        = name
+        self._name = name
 
-        self._blender_file    = None
-        self._loader_file     = None
+        self._blender_file = None
+        self._loader_file = None
         self._processor_files = []
 
         from ..tools import logger
@@ -72,7 +75,6 @@ class Screen(base.Base, logic.Logic, gui.GUI):
     def getName(self):
         return self._name
 
-
     @property
     def logger(self):
         return self._logger
@@ -80,4 +82,3 @@ class Screen(base.Base, logic.Logic, gui.GUI):
     @property
     def main_logger(self):
         return self._main_logger
-    

@@ -21,7 +21,7 @@
     <screen name="console" computer="Any">
       <display options="-w 400 400">
 	<environment>DISPLAY=:0.0</environment>
-	<graphic_buffer buffer="alone" user='user A' eye="middle"/>
+	<graphic_buffer buffer="mono" user='user A' eye="middle"/>
       </display>
       <wall>
 	<corner name="topRightCorner">1.0, 1.0, -1.0</corner>

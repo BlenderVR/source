@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# file: blendervr/plugins/osc/virtual_environment/__init__.py
+
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,

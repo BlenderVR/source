@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# file: blendervr/console/logic/screens.py
+
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
@@ -33,6 +36,7 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
+
 class Logic:
     def __init__(self):
         self._screens = {}
@@ -43,7 +47,8 @@ class Logic:
     def quit(self):
         self.set_screens({}, None, None, None, None)
 
-    def set_screens(self, configurations, net_console, master_name, port, complements):
+    def set_screens(self, configurations, net_console, master_name,
+                                                        port, complements):
         to_remove = []
         for name in list(self._screens.keys()):
             if name not in configurations:
@@ -67,10 +72,10 @@ class Logic:
 
         #TODO : remove connexion and slaves !
         self._master_name = master_name
-        self.getMaster().setHierarchy({'port' : port,
+        self.getMaster().setHierarchy({'port': port,
                                        'nodes': list(self._screens.keys())})
 
-        slave_informations = {'port'  : port,
+        slave_informations = {'port': port,
                               'master': self.getMaster().getHostname()}
         for name, obj in self._screens.items():
             if name != self._master_name:
@@ -94,17 +99,19 @@ class Logic:
         return len(self._screens)
 
     def getStates(self):
-        states = {'stopped'  : 0,
-                  'starting' : 0,
-                  'building' : 0,
-                  'running'  : 0}
+        states = {'stopped': 0,
+                  'starting': 0,
+                  'building': 0,
+                  'running': 0}
         for name, obj in self._screens.items():
             states[obj.get_blender_player_state()] += 1
         return states
 
-    def adapt_simulation_files_to_screen(self, loader_file, blender_file, processor_files):
+    def adapt_simulation_files_to_screen(self, loader_file,
+                                         blender_file, processor_files):
         for name, obj in self._screens.items():
-            obj.adapt_simulation_files_to_screen(loader_file, blender_file, processor_files)
+            obj.adapt_simulation_files_to_screen(loader_file, blender_file,
+                                                            processor_files)
 
     def start_simulation(self):
         for name, obj in self._screens.items():
@@ -118,5 +125,5 @@ class Logic:
         time.sleep(0.5)
         self.getMaster().set_blenderVR_state(False)
 
-    def send_to_blender_player(self, command, message): 
+    def send_to_blender_player(self, command, message):
         self.getMaster().send_to_blender_player(command, message)
