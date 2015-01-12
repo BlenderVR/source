@@ -54,7 +54,7 @@ class Device(base.Base):
         super(Device, self).__init__(parent, configuration)
 
         self._screens_informations = {}
-        for bufferName in ['left', 'alone', 'right']:
+        for bufferName in {'left', 'mono', 'right'}:
             if bufferName in configuration['hmd']:
                 if bufferName in self._buffers:
                     self._screens_informations[bufferName] = \
