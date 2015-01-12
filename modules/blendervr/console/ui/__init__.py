@@ -44,6 +44,7 @@ from ..protocol import decomposeMessage
 class UI():
     def __init__(self, port, debug = False):
         self._port  = port
+        self._print = lambda *args: True
 
         from ...tools import logger
         self._logger = logger.getLogger('blenderVR')
@@ -72,6 +73,11 @@ class UI():
                 pass
         
         self._quit = False
+
+        # initialize the screen sets !
+        self.process(self._commands['get'], 'screenSets')
+
+        self._print = lambda *args: print(*args)
 
     def getCommands(self):
         return self._commands
@@ -124,10 +130,9 @@ class UI():
                 print('Invalid arguments:', arguments)
                 return True
             if result != None:
-                command, argument = decomposeMessage(result[1])
-                print(str(command) + ': ' + str(argument))
+                self._print(str(_method) + ': ' + str(result))
                 if _method == 'screenSets' and hasattr(self, '_completer'):
-                    self._completer.setScreenSets(argument)
+                    self._completer.setScreenSets(result)
             return True
         return False
 

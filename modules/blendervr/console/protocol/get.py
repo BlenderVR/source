@@ -34,6 +34,7 @@
 ## 
 
 from .command import Command
+from . import decomposeMessage
 
 class Get(Command):
     def __init__(self, connection):
@@ -41,6 +42,9 @@ class Get(Command):
 
     def _ask(self, command, arguments):
         result = self.ask(command, arguments)
+        if result:
+            answer, arguments = decomposeMessage(result[1])
+            return arguments
         return result
 
     def configuration(self):
