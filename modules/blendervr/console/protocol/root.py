@@ -34,6 +34,7 @@
 ## 
 
 from .command import Command
+import sys
 
 class Root(Command):
     def __init__(self, connection):

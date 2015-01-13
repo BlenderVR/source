@@ -33,11 +33,12 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
+from . import base
 
-class PluginError(Exception):
-    def __init__(self, hasToClear=True, msg=''):
-        Exception.__init__(self, msg)
-        self._hasToClear = hasToClear
+class Screen(base.Base):
+    def __init__(self, parent, name):
+        base.Base.__init__(self, parent)
+        self._name = name
 
-    def hasToClear(self):
-        return self._hasToClear
+    def quit(self):
+        pass

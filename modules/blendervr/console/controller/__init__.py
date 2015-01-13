@@ -145,7 +145,11 @@ class Controller():
             return
 
         configuration = self._configuration.getConfiguration()
+        import pprint
+        pprint.pprint(configuration)
+        return
         self._screens.setConfigurations(configuration['screens'])
+        return
         del(configuration['screens'])
         console = configuration['console']
         self.controller = console['controller']
@@ -153,6 +157,8 @@ class Controller():
         pprint.pprint(configuration)
         return
 
+    def getCommonConfiguration(self):
+        return None
 
     @property
     def profile(self):

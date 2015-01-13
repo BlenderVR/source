@@ -53,6 +53,10 @@ class UI(base.Client):
         result = self._client.receive()
         command, argument = result
         if command == 'kill':
+            try:
+                self._client.receive()
+            except:
+                pass
             sys.exit()
         if command == 'ping':
             self.logger.debug('Ping !')

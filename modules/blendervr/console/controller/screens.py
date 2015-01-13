@@ -41,6 +41,16 @@ class Screens(base.Base):
         self._screens = {}
 
     def setConfigurations(self, configuration):
-        return
-        import pprint
-        pprint.pprint(configuration)
+        for name in list(self._screens.keys()):
+            if name not in configurations:
+                obj = self._screens[name]
+                obj.quit()
+                del(self._screens[name])
+                obj = None
+
+        from . import screen
+
+        for name, configuration in configurations.items():
+            if name not in self._screens:
+                self._screens[name] = screen.Screen(self, name)
+            self._screens[name].setConfiguration(configuration, complements)

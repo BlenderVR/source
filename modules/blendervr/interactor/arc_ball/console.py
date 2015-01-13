@@ -1,23 +1,29 @@
+# -*- coding: utf-8 -*-
+# file: blendervr/interactor/arc_ball/console.py
+
+# -*- coding: utf-8 -*-
+# file: blendervr/interactor/arc_ball/console.py
+
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
-## Laurent Pointal, Julian Adenauer, 
-## 
+## Laurent Pointal, Julian Adenauer,
+##
 ## This software is a computer program whose purpose is to distribute
 ## blender to render on Virtual Reality device systems.
-## 
+##
 ## This software is governed by the CeCILL  license under French law and
-## abiding by the rules of distribution of free software.  You can  use, 
+## abiding by the rules of distribution of free software.  You can  use,
 ## modify and/ or redistribute the software under the terms of the CeCILL
 ## license as circulated by CEA, CNRS and INRIA at the following URL
-## "http://www.cecill.info". 
-## 
+## "http://www.cecill.info".
+##
 ## As a counterpart to the access to the source code and  rights to copy,
 ## modify and redistribute granted by the license, users are provided only
 ## with a limited warranty  and the software's author,  the holder of the
 ## economic rights,  and the successive licensors  have only  limited
-## liability. 
-## 
+## liability.
+##
 ## In this respect, the user's attention is drawn to the risks associated
 ## with loading,  using,  modifying and/or developing or reproducing the
 ## software by the user in light of its specific status of free software,
@@ -25,39 +31,42 @@
 ## therefore means  that it is reserved for developers  and  experienced
 ## professionals having in-depth computer knowledge. Users are therefore
 ## encouraged to load and test the software's suitability as regards their
-## requirements in conditions enabling the security of their systems and/or 
-## data to be ensured and,  more generally, to use and operate it in the 
-## same conditions as regards security. 
-## 
+## requirements in conditions enabling the security of their systems and/or
+## data to be ensured and,  more generally, to use and operate it in the
+## same conditions as regards security.
+##
 ## The fact that you are presently reading this means that you have had
 ## knowledge of the CeCILL license and that you accept its terms.
-## 
+##
 
 from ... import *
 from .. import Interactor
 from ...tools import protocol
 
-PRESS_EVENT   = 'press'
-MOVE_EVENT    = 'move'
+PRESS_EVENT = 'press'
+MOVE_EVENT = 'move'
 RELEASE_EVENT = 'release'
-COMMON_NAME   = 'update arcballs'
+COMMON_NAME = 'update arcballs'
 
 if is_virtual_environment():
-    import copy, mathutils
+    import copy
+    import mathutils
     import bge
     from ...player.user import User
     from ...player import device
+    assert device     # avoid imported but unused
     from ...player import keyboardAndMouse
+    assert keyboardAndMouse    # avoid imported but unused
 
     class Console(Interactor):
 
-        def __init__(self, parent, name = COMMON_NAME):
+        def __init__(self, parent, name=COMMON_NAME):
             Interactor.__init__(self, parent)
-            self._name           = name
-            self._object         = None
+            self._name = name
+            self._object = None
             self._objectPosition = mathutils.Matrix()
-            self._grabbed        = False
-            users                = self.blenderVR.getScreenUsers()
+            self._grabbed = False
+            users = self.blenderVR.getScreenUsers()
 
         def selectObject(self, _object):
             if not self._grabbed:
@@ -69,16 +78,20 @@ if is_virtual_environment():
             command, argument = protocol.decomposeMessage(argument)
             if command == PRESS_EVENT:
                 if isinstance(self._object, bge.types.KX_GameObject):
-                    self._objectPosition = copy.copy(self._object.localTransform)
+                    self._objectPosition = copy.copy(
+                                            self._object.localTransform)
                     self._grabbed = True
                 elif isinstance(self._object, User):
                     self._objectPosition = self._object.getVehiclePosition(True)
                     self._grabbed = True
             else:
                 if isinstance(self._object, bge.types.KX_GameObject):
-                    self._object.localTransform = self._objectPosition * mathutils.Matrix(argument).to_4x4()
+                    self._object.localTransform = self._objectPosition \
+                                        * mathutils.Matrix(argument).to_4x4()
                 if isinstance(self._object, User):
-                    self._object.setVehiclePosition(mathutils.Matrix(argument).to_4x4().inverted() * self._objectPosition)
+                    self._object.setVehiclePosition(
+                            mathutils.Matrix(argument).to_4x4().inverted()
+                            * self._objectPosition)
                 if command == RELEASE_EVENT:
                     self._grabbed = False
             return True
@@ -90,11 +103,12 @@ elif is_console():
 
     from OpenGL.GL import *
     from OpenGL.GLU import *
-    import numpy, os
+    import numpy
+    import os
 
     class Console(Interactor, QtOpenGL.QGLWidget):
 
-        def __init__(self, parent, name = COMMON_NAME):
+        def __init__(self, parent, name=COMMON_NAME):
             Interactor.__init__(self, parent)
             QtOpenGL.QGLWidget.__init__(self)
 
@@ -103,7 +117,8 @@ elif is_console():
             geometry = self.geometry()
             self._arcBall = ArcBall(geometry.width(), geometry.height())
 
-            sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+            sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding,
+                                           QtGui.QSizePolicy.Expanding)
             sizePolicy.setHorizontalStretch(0)
             sizePolicy.setVerticalStretch(0)
             sizePolicy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
@@ -115,7 +130,8 @@ elif is_console():
             from ...tools import getModulePath
             self._suzanne = Reader(os.path.join(getModulePath(), 'suzanne.obj'))
 
-            # Under MACOS X, QtCore.Qt.MouseButton.LeftButton is not defined ! So we use 1 as button
+            # Under MACOS X, QtCore.Qt.MouseButton.LeftButton is not defined !
+            # So we use 1 as button
             try:
                 self._active_button = QtCore.Qt.MouseButton.LeftButton
             except:
@@ -127,14 +143,14 @@ elif is_console():
 
         def start(self):
             self._draging = False
-            self._startOrientation   = numpy.identity(3)
+            self._startOrientation = numpy.identity(3)
             self._currentOrientation = self._startOrientation
-            self._transformation     = numpy.identity(4)
+            self._transformation = numpy.identity(4)
 
         def initializeGL(self):
             glClearColor(0.0, 0.0, 0.0, 1.0)
-            glEnable (GL_DEPTH_TEST)
-            glEnable (GL_POLYGON_SMOOTH)
+            glEnable(GL_DEPTH_TEST)
+            glEnable(GL_POLYGON_SMOOTH)
             self.setOrientation(False)
 
         def setOrientation(self, object):
@@ -165,7 +181,8 @@ elif is_console():
             if event.button() == self._active_button:
                 self._arcBall.click((event.x(), event.y()))
                 self._draging = True
-                self.sendToVirtualEnvironment(self._name, protocol.composeMessage(PRESS_EVENT))
+                self.sendToVirtualEnvironment(self._name,
+                                    protocol.composeMessage(PRESS_EVENT))
             QtOpenGL.QGLWidget.mousePressEvent(self, event)
 
         def mouseMoveEvent(self, event):
@@ -173,14 +190,17 @@ elif is_console():
                 update = self._arcBall.drag((event.x(), event.y()))
                 self._currentOrientation = self._startOrientation.dot(update)
                 self.updateGL()
-                self.sendToVirtualEnvironment(self._name, protocol.composeMessage(MOVE_EVENT, update.tolist()))
+                self.sendToVirtualEnvironment(self._name,
+                        protocol.composeMessage(MOVE_EVENT, update.tolist()))
             QtOpenGL.QGLWidget.mouseMoveEvent(self, event)
 
         def mouseReleaseEvent(self, event):
             if event.button() == self._active_button:
                 update = self._arcBall.drag((event.x(), event.y()))
-                self._startOrientation = removeScale(self._startOrientation.dot(update))
-                self.sendToVirtualEnvironment(self._name, protocol.composeMessage(RELEASE_EVENT, update.tolist()))
+                self._startOrientation = removeScale(
+                                        self._startOrientation.dot(update))
+                self.sendToVirtualEnvironment(self._name,
+                    protocol.composeMessage(RELEASE_EVENT, update.tolist()))
                 self._draging = False
             QtOpenGL.QGLWidget.mouseReleaseEvent(self, event)
 
@@ -194,7 +214,7 @@ elif is_console():
         def paintGL(self):
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-            self._transformation [0:3,0:3] = self._currentOrientation
+            self._transformation[0:3, 0:3] = self._currentOrientation
 
             glLoadIdentity()
             glMultMatrixf(self._transformation)
@@ -205,7 +225,7 @@ elif is_console():
                 gluDeleteQuadric(quadric)
             else:
                 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-                glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (0.5, 0.5, 0.5)) 
+                glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (0.5, 0.5, 0.5))
                 glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, (0.0, 0.0, 0.0))
                 glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, (0.7, 0.0, 0.0))
                 self._suzanne.draw()

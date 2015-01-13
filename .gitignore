@@ -2,10 +2,9 @@
 *.swp
 .DS_Store
 __pycache__
-_build
-build
-/docs/modules/rst/*
-/docs/utils/rst/*
+/docs/html
+/docs/manual/modules/rst/*
+/docs/manual/utils/rst/*
 /env
 /venv
 *~
