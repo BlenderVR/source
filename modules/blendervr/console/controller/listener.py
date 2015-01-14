@@ -52,8 +52,11 @@ class Client(controller.Common):
     def __str__(self):
         return str(self._peername[0])
 
-    def getClientInformation(self):
-        return (self._module, self._complement)
+    def getType(self):
+        return self._module
+    
+    def getName(self):
+        return self._complement
 
 class Listener(base.Base):
     def __init__(self, parent):
@@ -96,6 +99,8 @@ class Listener(base.Base):
         conn, addr = self._socket.accept()
         client = Client(conn)
         peer = self.getMainRunningModule()._create_client(client)
+        if not peer:
+            return
         self._sockets.append(conn)
         self._peers[conn] = peer
         peer._listenet_required_client = client

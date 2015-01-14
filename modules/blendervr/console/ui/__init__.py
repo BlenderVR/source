@@ -63,11 +63,15 @@ class UI():
             sys.exit()
 
         self._commands = {}
-        for moduleName in ['root', 'set', 'get', 'reload']:
+        for moduleName in ['root', 'set', 'get', 'reload', 'action']:
             try:
                 _class = moduleName[0].upper() + moduleName[1:]
                 module = importlib.import_module('..protocol.' + moduleName, __name__)
-                self._commands[moduleName] = getattr(module, _class)(self._controller)
+                if moduleName == 'action':
+                    self._commands['start'] = getattr(module, _class)(self._controller, 'start')
+                    self._commands['stop'] = getattr(module, _class)(self._controller, 'stop')
+                else:
+                    self._commands[moduleName] = getattr(module, _class)(self._controller)
             except:
                 self.logger.log_traceback(False)
                 pass

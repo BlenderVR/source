@@ -34,66 +34,23 @@
 ##
 
 from . import base
-from ..protocol import decomposeMessage
-from ..protocol import composeMessage
 import sys
 
-class UI(base.Client):
+class Daemon(base.Client):
     def __init__(self, parent, client):
         base.Client.__init__(self, parent, client)
-        self._mappings = {'configuration': ['config', 'file'],
-                          'simulation file': ['simulation', 'blender', 'file'],
-                          'processor file': ['simulation', 'processor', 'file'],
-                          'screen set':['virtual environment', 'screen set']}
 
+    def getName(self):
+        return self._client.getName()
+        
     def cb_connect(self):
-        self.logger.debug('Connexion of a user interface:', self._client)
+        self.logger.debug('Connexion of a daemon:', self._client)
 
     def cb_data(self):
         result = self._client.receive()
         command, argument = result
-        if command == 'kill':
-            try:
-                self._client.receive()
-            except:
-                pass
-            sys.exit()
-        if command == 'ping':
-            self.logger.debug('Ping !')
-            self._client.send(command, argument)
-            return
-        if command == 'set':
-            self.set(argument)
-            return
-        if command == 'get':
-            self.get(argument)
-            return
-        if command == 'start' or command == 'stop':
-            self.controller.runAction(command, argument)
-            return
-        if command == 'reload configuration':
-            self.controller.configuration()
-            return
-        self.logger.debug('unknown command:', command, '(', argument, ')')
+        print('Yop:', command, argument)
 
     def cb_disconnect(self):
-        self.logger.debug('Disconnexion of a user interface:', self._client)
-
-    def set(self, argument):
-        command, argument = decomposeMessage(argument)
-        if command in self._mappings:
-            self.profile.setValue(self._mappings[command], argument)
-            if command == 'configuration':
-                self.controller.configuration()
-            if command == 'screen set':
-                self.controller.screenSet()
-            return
-
-    def get(self, command):
-        if command in self._mappings:
-            self._client.send('get', composeMessage(command, self.profile.getValue(self._mappings[command])))
-            return
-        if command == 'screen sets':
-            self._client.send('get', composeMessage(command, self.controller.getScreenSets()))
-            return
+        self.logger.debug('Disconnexion of a daemon:', self._client)
         

@@ -72,11 +72,11 @@ class Daemon:
         self._process_in = subprocess.PIPE
         self._process_out = subprocess.PIPE
 
-        import blendervr.tools.connector
-        self._client = blendervr.tools.connector.Client(self._controller,
-                                                'daemon', self._screen_name)
-        self._client.setCallback(self.processCommand)
-        self._client.setWait(True)
+        import blendervr.tools.controller
+        self._client = blendervr.tools.controller.Controller(self._controller,
+                                                             'daemon', self._screen_name)
+        #self._client.setCallback(self.processCommand)
+        #self._client.setWait(True)
 
         #TODO: use os.name to identify Unixes (Linux, MacOS...) vs Windows
         # Registered: 'posix', 'nt', 'ce', 'java'.
@@ -118,8 +118,12 @@ class Daemon:
         """Start the Daemon, quits any instance of BlenderPlayer running.
         """
         try:
-            if not self._client.run():
-                self._stop_blender_player()
+            while True:
+                msg = self._client.receive()
+                if msg:
+                    self.processCommand(*msg)
+                else:
+                    self._stop_blender_player()
         except socket.error:
             self._stop_blender_player()
         except SystemExit:

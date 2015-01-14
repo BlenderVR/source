@@ -34,11 +34,131 @@
 ##
 
 from . import base
+import os
+import copy
+import subprocess
+import sys
+from . import daemon
 
 class Screen(base.Base):
     def __init__(self, parent, name):
         base.Base.__init__(self, parent)
-        self._name = name
+        self._name    = name
+        self._process = None
 
+        self._clients        = {'daemon'        : None,
+                                'blender_player': None}
+
+    def getName(self):
+        return self._name
+        
+    def setConfiguration(self, configuration):
+        screen_conf   = configuration['screen']
+        computer_conf = configuration['computer']
+        system        = computer_conf['system']
+
+        self._hostname    = computer_conf['hostname']
+        dev_type = screen_conf['device_type']
+        if not dev_type:
+            self.logger.error('Unknown device type !')
+            return
+        self._screen      = {'graphic_buffer' : screen_conf['display']['graphic_buffer'],
+                             'viewport'       : screen_conf['display']['viewport'],
+                             'device_type'    : dev_type,
+                             dev_type         : screen_conf[dev_type],
+                             'keep_focus'     : screen_conf['keep_focus']}
+
+        self._log_file    = os.path.join(system['log']['path'], 'blenderVR_' + self.getName() + '.log')
+        if system['log']['clear_previous']:
+            self._log_to_clear = self._log_file
+        else:
+            self._log_to_clear = ''
+        self._anchor         = system['anchor']
+        self._blender_player = {'executable'  : system['blenderplayer']['executable'],
+                                'environments': {}}
+
+        self._daemon = { 'command'     : [],
+                         'environments': {}}
+
+        for name, value in system['daemon']['environments'].items():
+            if system['daemon']['transmit']:
+                self._blender_player['environments'][name] = str(value)
+            self._daemon['environments'][name] = str(value)
+
+        if hasattr(system['blenderplayer']['environments'], 'items'):
+            for name, value in system['blenderplayer']['environments'].items():
+                self._blender_player['environments'][name] = str(value)
+
+        if hasattr(screen_conf['display']['environments'], 'items'):
+            for name, value in screen_conf['display']['environments'].items():
+                self._blender_player['environments'][name] = str(value)
+
+        self._blender_player['options'] = screen_conf['display']['options']
+
+        login   = system['login']
+        if login['remote_command']:
+            self._daemon['command'] += shlex.split(login['remote_command'])
+        self._daemon['command'].append(login['python'])
+        self._daemon['command'].append(os.path.join(system['root'], 'utils', 'daemon.py'))
+        self._daemon['command'].append(self.controller.getControllerAddress())
+        self._daemon['command'].append(self.getName())
+        
+        for index, argument in enumerate(self._daemon['command']):
+            if ' ' in argument:
+                self._daemon['command'][index] = '"' + argument + '"'
+        
     def quit(self):
         pass
+
+    def runAction(self, action, element):
+        if element == 'daemon':
+            if action == 'start':
+                self._startDaemon()
+
+    def _startDaemon(self):
+        if self._process is None:
+            command = copy.copy(self._daemon['command'])
+
+            if self.profile.getValue(['debug', 'daemon']): # Debug ?
+                daemon_in   = None
+                daemon_out  = None
+                command.append('debug')
+            else:
+                daemon_in   = open(os.devnull, 'r')
+                daemon_out  = open(os.devnull, 'w')
+
+            try:
+                if self.profile.getValue(['debug', 'executables']):
+                    self.logger.debug('Command to run daemon:', ' '.join(command))
+                    self.logger.debug('Its environment variables:', self._daemon['environments'])
+                self._process = subprocess.Popen(command,
+                                                 env       = self._daemon['environments'],
+                                                 stdin     = daemon_in,
+                                                 stdout    = daemon_out,
+                                                 stderr    = daemon_out,
+                                                 close_fds = ('posix' in sys.builtin_module_names))
+                print('Process:', self._process)
+            except:
+                self._cannot_start_daemon()
+            else:
+                pass
+                #self._check_daemon_timeout = self.getConsole().addTimeout(500, self._cannot_start_daemon)
+
+    def appendClient(self, client):
+        if isinstance(client, daemon.Daemon):
+            if hasattr(self, '_check_daemon_timeout'):
+                del(self._check_daemon_timeout)
+            if self._clients['daemon'] is not None:
+                self.logger.error('Too many connexions of the daemon ...')
+                return
+            self._clients['daemon'] = client
+            self.logger.info("Daemon for screen '" + self._name + "' started")
+            for field in ['blender_player', 'log_to_clear']:
+                client.send(field, getattr(self, '_' + field))
+            self._send_loader_file()
+            client.setCallback(self._message_from_daemon)
+        
+                
+    def _cannot_start_daemon(self):
+        self._process = None
+        self.logger.warning("Cannot start daemon for screen '" + self._name)

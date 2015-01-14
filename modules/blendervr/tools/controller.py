@@ -35,7 +35,8 @@
 
 import socket
 import select
-from ..console import protocol
+from ..console.protocol import composeMessage
+from ..console.protocol import decomposeMessage
 
 class closedSocket(Exception):
     def __init__(self):
@@ -73,7 +74,7 @@ class Common:
     def send(self, command, argument = ''):
         if self._socket is None:
             return
-        message = protocol.composeMessage(command, argument)
+        message = composeMessage(command, argument)
         size = str(len(message)).zfill(self.SIZE_LEN)
         try:
             self._send_chunk(size.encode())
@@ -103,7 +104,7 @@ class Common:
                 return False
         try:
             size = int(self._receive_chunk(self.SIZE_LEN))
-            return protocol.decomposeMessage(self._receive_chunk(size))
+            return decomposeMessage(self._receive_chunk(size))
         except closedSocket:
             self.close()
             raise

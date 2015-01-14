@@ -36,6 +36,7 @@
 import os
 import sys
 from . import ui
+from . import daemon
 
 class Controller():
     def __init__(self, profile_file, debug):
@@ -55,6 +56,8 @@ class Controller():
         
         self._processor          = None
 
+        self._controller_address = None
+
         from ...tools import getRootPath
         self._update_loader_script = os.path.join(getRootPath(), 'utils', 'update_loader.py')
 
@@ -63,12 +66,14 @@ class Controller():
 
         from ...tools import logger
         self._logger = logger.getLogger('blenderVR')
-
+        
         if self._debug:
             # Define connexions until the controller is running ...
             console_logger = logger.Console()
             self._default_logger = self._logger.addLoginWindow(console_logger, True)
             self._logger.setLevel('debug')
+            self.profile.setValue(['debug', 'daemon'], True)
+            self.profile.setValue(['debug', 'executables'], True)
 
         from . import screens
         self._screens = screens.Screens(self)
@@ -92,6 +97,9 @@ class Controller():
     def getPort(self):
         return self._listener.getPort()
 
+    def getControllerAddress(self):
+        return self._controller_address
+    
     def main(self):
         while True:
             try:
@@ -103,11 +111,15 @@ class Controller():
         pass
 
     def _create_client(self, client):
-        type, name = client.getClientInformation()
+        type = client.getType()
         if type == 'UI':
             userInterface = ui.UI(self, client)
             self._uis.append(userInterface)
             return userInterface
+        if type == 'daemon':
+            daemonClient = daemon.Daemon(self, client)
+            self._screens.appendClient(daemonClient)
+            return daemonClient
         # if module == 'daemon' or module == 'blender_player':
         #     screen = self._screens.getScreen(complement)
         #     if screen:
@@ -140,22 +152,20 @@ class Controller():
         return self._screenSets
             
     def screenSet(self):
-        current = self.profile.getValue(['virtual environment', 'screen set'])
-        if not current or current not in self._screenSets:
-            return
+        self.updateConfiguration()
 
+    def updateConfiguration(self):
         configuration = self._configuration.getConfiguration()
-        import pprint
-        pprint.pprint(configuration)
-        return
-        self._screens.setConfigurations(configuration['screens'])
-        return
+
+        self._controller_address = configuration['console']['controller'] + ':' + str(self.getPort())
+        self._screens.setConfiguration(configuration['screens'])
         del(configuration['screens'])
-        console = configuration['console']
-        self.controller = console['controller']
-        import pprint
-        pprint.pprint(configuration)
-        return
+        #import pprint
+        #pprint.pprint(configuration)
+
+
+
+        self.runAction('start', 'daemon')
 
     def getCommonConfiguration(self):
         return None
@@ -171,3 +181,6 @@ class Controller():
     @property
     def plugins(self):
         return self._plugins
+
+    def runAction(self, action, element):
+        self._screens.runAction(action, element)

@@ -80,7 +80,7 @@ class Configuration(base.Base):
     def getConfiguration(self):
         current = self.profile.getValue(['virtual environment', 'screen set'])
         if not current or current not in self._screenSets:
-            return
+            return False
 
         screenSet      = self._screenSets[current]
 
