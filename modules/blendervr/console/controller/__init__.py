@@ -217,23 +217,25 @@ class Controller():
 
     def addTimeout(self, time, callback):
         """
-        Add a timeout for a method
+        Add a timeout for a method. Return an index that can be use to del the timeout.
 
         :param time: the time for the timeout in seconds
         :type time: integer
         :param callback: the method to call when the timemout occurs
         :type time: method
+        :rtype: timeout index
         """
-        self._listener.addTimeout(time, callback)
+        return self._listener.addTimeout(time, callback)
         
-    def delTimeout(self, callback):
+    def delTimeout(self, index):
         """
-        Del a timeout for a method
+        Del a timeout.
 
-        :param callback: the method to remove
-        :type time: method
+        :param index: the index given by addTimeout or the method to remove
+        :type time: index or method
+        :rtype: boolean
         """
-        self._listener.delTimeout(callback)
+        return self._listener.delTimeout(index)
         
     @property
     def profile(self):

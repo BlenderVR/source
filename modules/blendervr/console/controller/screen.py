@@ -140,11 +140,12 @@ class Screen(base.Base):
             except:
                 self._cannot_start_daemon()
             else:
-                self.controller.addTimeout(5, self._cannot_start_daemon)
+                self._check_daemon_timeout = self.controller.addTimeout(5, self._cannot_start_daemon)
 
     def appendClient(self, client):
         if isinstance(client, daemon.Daemon):
             if hasattr(self, '_check_daemon_timeout'):
+                self.controller.delTimeout(self._check_daemon_timeout)
                 del(self._check_daemon_timeout)
             if self._clients['daemon'] is not None:
                 self.logger.error('Too many connexions of the daemon ...')
@@ -156,11 +157,6 @@ class Screen(base.Base):
             self._send_loader_file()
 
     def _cannot_start_daemon(self):
-        print('_cannot_start_daemon !')
-        return
-        if self._process:
-            print(dir(self._process))
-        return
         self._process = None
         self.logger.warning("Cannot start daemon for screen '" + self._name)
 

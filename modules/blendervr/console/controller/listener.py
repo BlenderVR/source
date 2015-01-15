@@ -142,10 +142,16 @@ class Listener(base.Base):
             timeout += 0.001
         self._timeouts[timeout] = callback
         # TODO: order the timeouts !
+        return timeout
 
-    def delTimeout(self, callback):
+    def delTimeout(self, index):
+        if index in self._timeouts:
+            del(self._timeouts[index])
+            return True
         for key, value in self._timeouts.items():
-            if value == callback:
+            if value == index:
                 break
-        if self._timeouts[key] == callback:
+        if self._timeouts[key] == index:
             del(self._timeouts[key])
+            return True
+        return False
