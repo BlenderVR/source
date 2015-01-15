@@ -46,7 +46,6 @@ import pprint
 
 verbosities = ['debug', 'info', 'warning', 'error', 'critical']
 
-
 class Logger(logging.getLoggerClass()):
 
     def __init__(self, name):
@@ -91,12 +90,14 @@ class Logger(logging.getLoggerClass()):
         return 'File "' + element[1] + '", line ' + str(element[2]) \
                                                     + ', in', element[3]
 
-    def log_position(self):
+    def log_position(self, *messages):
         import inspect
         stack = inspect.stack()
         element = stack[1]
-        self.debug('File "' + element[1] + '", line ' + str(element[2])
-                                                    + ', in', element[3])
+        position = 'File "' + element[1] + '", line ' + str(element[2]) + ', in' + element[3]
+        if len(messages) > 0:
+            position += ': '
+        self.debug(position, *messages)
 
     def _process(self, verbosity, *messages):
         elements = []
