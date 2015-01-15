@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Blender VR documentation build configuration file, created by
@@ -24,8 +25,8 @@ def generate_rst():
 
     # NOTE it may need OS specific file separation, need to test in Windows
     # generate the rst files
-    os.system("sphinx-apidoc -o modules/rst/ --force --separate --maxdepth=1 ../modules/blendervr/")
-    os.system("sphinx-apidoc -o utils/rst --force --no-headings --separate --maxdepth=1 ../utils/")
+    os.system("sphinx-apidoc -o modules/rst/ --force --separate --maxdepth=1 ../../modules/blendervr/")
+    os.system("sphinx-apidoc -o utils/rst --force --no-headings --separate --maxdepth=1 ../../utils/")
 
     # remote the unused files
     os.remove("modules/rst/modules.rst")
@@ -39,9 +40,9 @@ os.environ.setdefault('READTHEDOCS', 'True')
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('../utils'))
-sys.path.insert(0, os.path.abspath('../modules'))
-sys.path.insert(0, os.path.abspath('exts'))
+sys.path.insert(0, os.path.abspath('../../utils'))
+sys.path.insert(0, os.path.abspath('../../modules'))
+sys.path.insert(0, os.path.abspath('../exts'))
 
 # -- General configuration ------------------------------------------------
 
@@ -68,11 +69,33 @@ source_suffix = '.rst'
 #source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'index'
+if 1:
+    exclude_patterns = []
+    master_doc = 'index'
+else:
+    # Call quicky_index_gen.from_chapters()
+    # and use the QUICKY_CHAPTERS env var if its set
+    import os
+
+    def exec_file(fn):
+        code = compile(open(fn, 'r').read(), fn, 'exec')
+        namespace = {"__file__": fn}
+        exec(code, namespace, namespace)
+        return namespace
+
+    mod_path = os.path.join(os.path.dirname(__file__), "quicky_index_gen.py")
+    namespace = exec_file(mod_path)
+    del mod_path
+
+    master_doc, exclude_patterns = namespace["from_chapters"]()
+    del namespace
+
+print("Using Index:", master_doc)
+
 
 # General information about the project.
-project = u'Blender VR'
-copyright = u'2014, Damien Touraine, David Poirier-Quinot, Dalai Felinto'
+project = u'Blender-VR API'
+copyright = u'Creative Commons Zero'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -216,28 +239,31 @@ html_show_copyright = False
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'BlenderVRdoc'
+htmlhelp_basename = 'Blender-VRAPIdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
 # The paper size ('letterpaper' or 'a4paper').
-#'papersize': 'letterpaper',
+  'papersize': 'a4',
 
 # The font size ('10pt', '11pt' or '12pt').
-#'pointsize': '10pt',
+  'pointsize': '10pt',
 
 # Additional stuff for the LaTeX preamble.
-#'preamble': '',
+  'preamble': r'\usepackage[left=0.75in, right=0.75in, top=1.0in, bottom=1.0in]{geometry}',
+
+  'classoptions': ',openany,oneside',
+  'babel': '\\usepackage[english]{babel}',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'BlenderVR.tex', u'Blender VR Documentation',
-   u'Damien Touraine, David Poirier-Quinot, Dalai Felinto', 'manual'),
+  ('index', 'blender-vr-api.tex', u'Blender-VR API',
+   u'Blender-VR Team', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -266,8 +292,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'blendervr', u'Blender VR Documentation',
-     [u'Damien Touraine, David Poirier-Quinot, Dalai Felinto'], 1)
+    ('index', 'blender-vr api', 'Blender-VR API Documentation',
+     ['Blender-VR Team'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -280,8 +306,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'BlenderVR', u'Blender VR Documentation',
-   u'Damien Touraine, David Poirier-Quinot, Dalai Felinto', 'BlenderVR', 'One line description of project.',
+  ('index', 'Blender-VR API', u'Blender-VR API Documentation',
+   'Blender-VR Team', 'Blender-VRManual', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -304,7 +330,7 @@ autoclass_content = 'both'
 import imp
 def import_dummy():
     name = 'dummy'
-    path = os.path.abspath('.')
+    path = os.path.abspath('../')
     module_info = imp.find_module(name, [path])
     module = imp.load_module(name, *module_info)
     sys.modules[name] = module

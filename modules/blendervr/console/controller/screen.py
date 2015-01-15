@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# file: blendervr/console/logic/screen.py
+
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
@@ -46,8 +49,8 @@ class Screen(base.Base):
         self._name    = name
         self._process = None
 
-        self._clients        = {'daemon'        : None,
-                                'blender_player': None}
+        self._clients = {'daemon': None,
+                         'blender_player': None}
 
     def getName(self):
         return self._name
@@ -62,23 +65,26 @@ class Screen(base.Base):
         if not dev_type:
             self.logger.error('Unknown device type !')
             return
-        self._screen      = {'graphic_buffer' : screen_conf['display']['graphic_buffer'],
-                             'viewport'       : screen_conf['display']['viewport'],
-                             'device_type'    : dev_type,
-                             dev_type         : screen_conf[dev_type],
-                             'keep_focus'     : screen_conf['keep_focus']}
+        self._screen = {'graphic_buffer':
+                                screen_conf['display']['graphic_buffer'],
+                         'viewport': screen_conf['display']['viewport'],
+                         'device_type': dev_type,
+                         dev_type: screen_conf[dev_type],
+                         'keep_focus': screen_conf['keep_focus']}
 
-        self._log_file    = os.path.join(system['log']['path'], 'blenderVR_' + self.getName() + '.log')
+        self._log_file = os.path.join(system['log']['path'],
+                                'blenderVR_' + self.getName() + '.log')
         if system['log']['clear_previous']:
             self._log_to_clear = self._log_file
         else:
             self._log_to_clear = ''
-        self._anchor         = system['anchor']
-        self._blender_player = {'executable'  : system['blenderplayer']['executable'],
+        self._anchor = system['anchor']
+        self._blender_player = {'executable':
+                                        system['blenderplayer']['executable'],
                                 'environments': {}}
 
-        self._daemon = { 'command'     : [],
-                         'environments': {}}
+        self._daemon = {'command': [],
+                        'environments': {}}
 
         for name, value in system['daemon']['environments'].items():
             if system['daemon']['transmit']:
@@ -95,14 +101,14 @@ class Screen(base.Base):
 
         self._blender_player['options'] = screen_conf['display']['options']
 
-        login   = system['login']
+        login = system['login']
         if login['remote_command']:
             self._daemon['command'] += shlex.split(login['remote_command'])
         self._daemon['command'].append(login['python'])
         self._daemon['command'].append(os.path.join(system['root'], 'utils', 'daemon.py'))
         self._daemon['command'].append(self.controller.getControllerAddress())
         self._daemon['command'].append(self.getName())
-        
+
         for index, argument in enumerate(self._daemon['command']):
             if ' ' in argument:
                 self._daemon['command'][index] = '"' + argument + '"'
@@ -119,24 +125,24 @@ class Screen(base.Base):
         if self._process is None:
             command = copy.copy(self._daemon['command'])
 
-            if self.profile.getValue(['debug', 'daemon']): # Debug ?
-                daemon_in   = None
-                daemon_out  = None
+            if self.profile.getValue(['debug', 'daemon']):  # Debug ?
+                daemon_in = None
+                daemon_out = None
                 command.append('debug')
             else:
-                daemon_in   = open(os.devnull, 'r')
-                daemon_out  = open(os.devnull, 'w')
+                daemon_in = open(os.devnull, 'r')
+                daemon_out = open(os.devnull, 'w')
 
             try:
                 if self.profile.getValue(['debug', 'executables']):
                     self.logger.debug('Command to run daemon:', ' '.join(command))
                     self.logger.debug('Its environment variables:', self._daemon['environments'])
                 self._process = subprocess.Popen(command,
-                                                 env       = self._daemon['environments'],
-                                                 stdin     = daemon_in,
-                                                 stdout    = daemon_out,
-                                                 stderr    = daemon_out,
-                                                 close_fds = ('posix' in sys.builtin_module_names))
+                         env=self._daemon['environments'],
+                         stdin=daemon_in,
+                         stdout=daemon_out,
+                         stderr=daemon_out,
+                         close_fds=('posix' in sys.builtin_module_names))
             except:
                 self._cannot_start_daemon()
             else:
@@ -162,9 +168,10 @@ class Screen(base.Base):
 
 ###########################################################
     #  Misc
-    def adapt_simulation_files_to_screen(self, loader_file, blender_file, processor_files):
-        self._loader_file     = loader_file.unstrip(self._anchor)
-        self._blender_file    = blender_file.unstrip(self._anchor)
+    def adapt_simulation_files_to_screen(self, loader_file, blender_file,
+                                                            processor_files):
+        self._loader_file = loader_file.unstrip(self._anchor)
+        self._blender_file = blender_file.unstrip(self._anchor)
         self._processor_files = []
         for processor_file in processor_files:
             self._processor_files.append(processor_file.unstrip(self._anchor))
@@ -175,5 +182,6 @@ class Screen(base.Base):
         self._send_loader_file()
 
     def _send_loader_file(self):
-        if (self._clients['daemon'] is not None) and (self._loader_file is not None):
+        if (self._clients['daemon'] is not None) \
+                                    and (self._loader_file is not None):
             self._clients['daemon'].send('loader_file', self._loader_file)

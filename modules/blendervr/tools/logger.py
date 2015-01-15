@@ -46,6 +46,7 @@ import pprint
 
 verbosities = ['debug', 'info', 'warning', 'error', 'critical']
 
+
 class Logger(logging.getLoggerClass()):
 
     def __init__(self, name):
