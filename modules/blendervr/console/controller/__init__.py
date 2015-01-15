@@ -94,7 +94,7 @@ class Controller():
         self.logger.info('blenderVR version:', version)
         self.configuration()
         self.runAction('start', 'daemon')
-                
+        
     def getPort(self):
         return self._listener.getPort()
 
@@ -226,7 +226,15 @@ class Controller():
         """
         self._listener.addTimeout(time, callback)
         
-            
+    def delTimeout(self, callback):
+        """
+        Del a timeout for a method
+
+        :param callback: the method to remove
+        :type time: method
+        """
+        self._listener.delTimeout(callback)
+        
     @property
     def profile(self):
         return self._profile

@@ -82,6 +82,7 @@ class Listener(base.Base):
         # Manage timeouts !
         if len(self._timeouts) > 0:
             timeouts = list(self._timeouts.keys())
+            timeouts.sort()
             timeout = timeouts[0] - time.time()
             if timeout < 0:
                 timeout = 0
@@ -110,9 +111,6 @@ class Listener(base.Base):
             if timeout < now:
                 self._timeouts[timeout]()
                 del(self._timeouts[timeout])
-            else:
-                # Don't need to go further: all are later ! 
-                break
 
     def _connect_peer(self):
         conn, addr = self._socket.accept()
@@ -143,5 +141,11 @@ class Listener(base.Base):
         while (timeout in self._timeouts):
             timeout += 0.001
         self._timeouts[timeout] = callback
+        # TODO: order the timeouts !
 
-        
+    def delTimeout(self, callback):
+        for key, value in self._timeouts.items():
+            if value == callback:
+                break
+        if self._timeouts[key] == callback:
+            del(self._timeouts[key])
