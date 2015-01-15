@@ -83,13 +83,6 @@ class Logger(logging.getLoggerClass()):
                                             element[4][0].rstrip())
             self.debug('***************************')
 
-    def get_position(self):
-        import inspect
-        stack = inspect.stack()
-        element = stack[1]
-        return 'File "' + element[1] + '", line ' + str(element[2]) \
-                                                    + ', in', element[3]
-
     def log_position(self, *messages):
         import inspect
         stack = inspect.stack()
