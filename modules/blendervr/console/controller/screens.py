@@ -60,7 +60,12 @@ class Screens(base.Base):
         name = client.getName()
         if name in self._screens:
             self._screens[name].appendClient(client)
-            
+
     def runAction(self, action, element):
         for name, obj in self._screens.items():
             obj.runAction(action, element)
+
+    def adapt_simulation_files_to_screen(self, loader_file, blender_file, processor_files):
+        for name, obj in self._screens.items():
+            obj.adapt_simulation_files_to_screen(loader_file, blender_file, processor_files)
+

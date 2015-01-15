@@ -44,6 +44,7 @@ class Daemon(base.Client):
         return self._client.getName()
         
     def cb_connect(self):
+        return
         self.logger.debug('Connexion of a daemon:', self._client)
 
     def cb_data(self):
@@ -52,5 +53,5 @@ class Daemon(base.Client):
         print('Yop:', command, argument)
 
     def cb_disconnect(self):
+        return
         self.logger.debug('Disconnexion of a daemon:', self._client)
-        

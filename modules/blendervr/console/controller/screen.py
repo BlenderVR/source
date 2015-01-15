@@ -137,7 +137,6 @@ class Screen(base.Base):
                                                  stdout    = daemon_out,
                                                  stderr    = daemon_out,
                                                  close_fds = ('posix' in sys.builtin_module_names))
-                print('Process:', self._process)
             except:
                 self._cannot_start_daemon()
             else:
@@ -156,9 +155,25 @@ class Screen(base.Base):
             for field in ['blender_player', 'log_to_clear']:
                 client.send(field, getattr(self, '_' + field))
             self._send_loader_file()
-            client.setCallback(self._message_from_daemon)
-        
-                
+
     def _cannot_start_daemon(self):
         self._process = None
         self.logger.warning("Cannot start daemon for screen '" + self._name)
+
+###########################################################
+    #  Misc
+    def adapt_simulation_files_to_screen(self, loader_file, blender_file, processor_files):
+        self._loader_file     = loader_file.unstrip(self._anchor)
+        self._blender_file    = blender_file.unstrip(self._anchor)
+        self._processor_files = []
+        for processor_file in processor_files:
+            self._processor_files.append(processor_file.unstrip(self._anchor))
+        if self._blender_file is None:
+            self._blender_file = ''
+        if self._loader_file is None:
+            self._loader_file = ''
+        self._send_loader_file()
+
+    def _send_loader_file(self):
+        if (self._clients['daemon'] is not None) and (self._loader_file is not None):
+            self._clients['daemon'].send('loader_file', self._loader_file)

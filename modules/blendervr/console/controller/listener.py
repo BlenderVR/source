@@ -38,6 +38,7 @@ import select
 import sys
 from ...tools import controller
 from . import base
+import time
 
 class Client(controller.Common):
     def __init__(self, sock):
@@ -75,9 +76,19 @@ class Listener(base.Base):
 
         self._socket.listen(100)
         self._sockets.append(self._socket)
+        self._timeouts           = {}
 
     def select(self):
-        inputready, outputready, exceptready = select.select(self._sockets, [], [])
+        # Manage timeouts !
+        if len(self._timeouts) > 0:
+            timeouts = list(self._timeouts.keys())
+            timeout = timeouts[0] - time.time()
+            if timeout < 0:
+                timeout = 0
+        else:
+            timeouts = []
+            timeout  = None
+        inputready, outputready, exceptready = select.select(self._sockets, [], [], timeout)
         for sock in inputready:
             if sock == self._socket:
                 self._connect_peer()
@@ -94,6 +105,14 @@ class Listener(base.Base):
                     sys.exit()
                 except:
                     self.logger.log_traceback(False)
+        now = time.time()
+        for timeout in timeouts:
+            if timeout < now:
+                self._timeouts[timeout]()
+                del(self._timeouts[timeout])
+            else:
+                # Don't need to go further: all are later ! 
+                break
 
     def _connect_peer(self):
         conn, addr = self._socket.accept()
@@ -118,6 +137,11 @@ class Listener(base.Base):
     def getPort(self):
         return self._port
 
-        
-                
+    def addTimeout(self, timeout, callback):
+        timeout += time.time()
+        # To be sure that timeouts occurs twice, we increment it !
+        while (timeout in self._timeouts):
+            timeout += 0.001
+        self._timeouts[timeout] = callback
+
         

@@ -73,7 +73,7 @@ class Controller():
             self._default_logger = self._logger.addLoginWindow(console_logger, True)
             self._logger.setLevel('debug')
             self.profile.setValue(['debug', 'daemon'], True)
-            self.profile.setValue(['debug', 'executables'], True)
+            self.profile.setValue(['debug', 'executables'], False)
 
         from . import screens
         self._screens = screens.Screens(self)
@@ -93,7 +93,8 @@ class Controller():
         from ... import version
         self.logger.info('blenderVR version:', version)
         self.configuration()
-        
+        self.runAction('start', 'daemon')
+                
     def getPort(self):
         return self._listener.getPort()
 
@@ -156,6 +157,8 @@ class Controller():
 
     def updateConfiguration(self):
         configuration = self._configuration.getConfiguration()
+        if not configuration:
+            return
 
         self._controller_address = configuration['console']['controller'] + ':' + str(self.getPort())
         self._screens.setConfiguration(configuration['screens'])
@@ -163,13 +166,67 @@ class Controller():
         #import pprint
         #pprint.pprint(configuration)
 
-
-
         self.runAction('start', 'daemon')
+        self.update_user_files()
 
     def getCommonConfiguration(self):
         return None
 
+    def update_user_files(self, force = False):
+        blender_file = self.profile.getValue(['files','blender'])
+
+        processor_files = [self.profile.getValue(['files', 'processor'])] + self._common_processors
+        if self._processor_files != processor_files:
+            if self._processor:
+                self._processor.quit()
+                del(self._processor)
+            try:
+                from ...processor import _getProcessor
+                processor = _getProcessor(processor_files, self.logger, self.profile.getValue(['debug', 'processor']))
+                self._processor = processor(self) 
+            except:
+                if self.profile.getValue(['debug', 'processor']):
+                    self.logger.log_traceback(False)
+                self._processor = None
+                processor_files = []
+
+        if self._processor and self._processor.useLoader():
+            command = [sys.executable, self._update_loader_script, '--', blender_file]
+            if self.profile.getValue(['debug', 'executables']):
+                self.logger.error('Get loader script name:', ' '.join(command))
+            process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            process.wait()
+            for line in process.stdout:
+                loader_file = line.decode('UTF-8').rstrip()
+                break
+        else:
+            loader_file = blender_file
+
+        if loader_file != self._loader_file or blender_file != self._blender_file or processor_files != self._processor_files or force:
+            self._loader_file     = loader_file
+            self._blender_file    = blender_file
+            self._processor_files = processor_files
+
+            from . import file_name
+            loader_file     = file_name.FileName(self._loader_file, self._anchor)
+            blender_file    = file_name.FileName(self._blender_file, self._anchor)
+            processor_files = []
+            for processor_file in self._processor_files:
+                processor_files.append(file_name.FileName(processor_file, self._anchor))
+            self._screens.adapt_simulation_files_to_screen(loader_file, blender_file, processor_files)
+
+    def addTimeout(self, time, callback):
+        """
+        Add a timeout for a method
+
+        :param time: the time for the timeout in seconds
+        :type time: integer
+        :param callback: the method to call when the timemout occurs
+        :type time: method
+        """
+        self._listener.addTimeout(time, callback)
+        
+            
     @property
     def profile(self):
         return self._profile

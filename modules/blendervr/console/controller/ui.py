@@ -47,6 +47,7 @@ class UI(base.Client):
                           'screen set':['virtual environment', 'screen set']}
 
     def cb_connect(self):
+        return
         self.logger.debug('Connexion of a user interface:', self._client)
 
     def cb_data(self):
@@ -77,6 +78,7 @@ class UI(base.Client):
         self.logger.debug('unknown command:', command, '(', argument, ')')
 
     def cb_disconnect(self):
+        return
         self.logger.debug('Disconnexion of a user interface:', self._client)
 
     def set(self, argument):
