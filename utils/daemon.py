@@ -97,6 +97,11 @@ class Daemon:
         self._loader_path = None
         self._process = None
 
+        from blendervr.tools import logger
+        self._logger = logger.getLogger('daemon')
+        logger.Network(self._logger, self._client, 'logger')
+        self._logger.debug('Salut, monde !')
+        
     def write(self, *messages):
         """Send message to the client
 

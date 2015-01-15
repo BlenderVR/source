@@ -130,6 +130,24 @@ class Logger(logging.getLoggerClass()):
         self.addHandler(handler)
         return handler
 
+class Network:
+    def __init__(self, logger, connection, prefix):
+        self._connection = connection
+        self._prefix     = connection
+        handler = logging.StreamHandler(self)
+        handler.setFormatter(logging.Formatter('%(levelname)s|%(asctime)s|%(message)s'))
+        logger.addHandler(handler)
+        print('Cela devrait fonctionner !')
+
+    def write(self, *messages):
+        print('Daemon:', messages)
+        for message in messages:
+            if message != "\n":
+                message = message.split('|')
+                message = {'level':   message[0],
+                           'time':    message[1],
+                           'message': message[2:].join('|')}
+                self._connection.send(self._prefix, message)
 
 class Console:
     def __init__(self, msg='Console logger: '):
@@ -141,6 +159,10 @@ class Console:
         self._logging_prefix = msg
 
     def write(self, *messages):
+        for message in messages:
+            if message != "\n":
+                print(message)
+        return
         elements = []
         for message in messages:
             elements.append(str(message))
@@ -155,7 +177,7 @@ class Console:
                     dest.flush()
 
 class File:
-    def __init__(self, filename, msg = 'Console logger: '):
+    def __init__(self, filename, msg = 'File logger: '):
         self._logging_prefix = msg
         self._filename = filename
 

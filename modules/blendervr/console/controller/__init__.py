@@ -163,8 +163,7 @@ class Controller():
         self._controller_address = configuration['console']['controller'] + ':' + str(self.getPort())
         self._screens.setConfiguration(configuration['screens'])
         del(configuration['screens'])
-        #import pprint
-        #pprint.pprint(configuration)
+        #self.logger.debug(configuration)
 
         self.runAction('start', 'daemon')
         self.update_user_files()
