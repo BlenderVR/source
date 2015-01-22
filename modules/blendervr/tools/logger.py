@@ -131,24 +131,30 @@ class Logger(logging.getLoggerClass()):
         self.addHandler(handler)
         return handler
 
-class Network:
-    def __init__(self, logger, connection, prefix):
+class Network(logging.Handler):
+    def __init__(self, logger, connection, context):
+        logging.Handler.__init__(self)
         self._connection = connection
-        self._prefix     = connection
-        handler = logging.StreamHandler(self)
-        handler.setFormatter(logging.Formatter('%(levelname)s|%(asctime)s|%(message)s'))
-        logger.addHandler(handler)
-        print('Cela devrait fonctionner !')
+        self._context    = context
+        self.setFormatter(logging.Formatter('%(levelname)s|%(asctime)s|%(message)s'))
+        logger.addHandler(self)
 
-    def write(self, *messages):
-        print('Daemon:', messages)
-        for message in messages:
-            if message != "\n":
-                message = message.split('|')
-                message = {'level':   message[0],
-                           'time':    message[1],
-                           'message': message[2:].join('|')}
-                self._connection.send(self._prefix, message)
+        # TODO: implement flush element
+    def flush(self):
+        pass
+
+    def emit(self, record):
+        try:
+            message = self.format(record)
+            message = message.split('|')
+            message = {'level':   message[0],
+                        'time':    message[1],
+                        'context': self._context,
+                        'message': '|'.join(message[2:])}
+            self._connection.send('logger', message)
+            self.flush()
+        except Exception:
+            self.handleError(record)
 
 class Console:
     def __init__(self, msg='Console logger: '):
