@@ -100,7 +100,6 @@ class Daemon:
         from blendervr.tools import logger
         self._logger = logger.getLogger('daemon')
         logger.Network(self._logger, self._client, 'logger')
-        self._logger.debug('Salut, monde !')
         
     def write(self, *messages):
         """Send message to the client
@@ -128,9 +127,7 @@ class Daemon:
                     self.processCommand(*msg)
                 else:
                     self._stop_blender_player()
-        except socket.error:
-            self._stop_blender_player()
-        except SystemExit:
+        except (socket.error, SystemExit, KeyboardInterrupt):
             self._stop_blender_player()
         except:
             if debug:

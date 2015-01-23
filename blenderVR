@@ -99,6 +99,9 @@ parser.add_argument("-c", "--controller", dest="controller",
 parser.add_argument("-u", "--user-interface", dest="ui",
                     help="Open the user interface",
                     action="store_true", default=False)
+parser.add_argument("-l", "--logger", dest="logger",
+                    help="Open the logger",
+                    action="store_true", default=False)
 parser.add_argument("-a", "--all", dest="all",
                     help="Start the controller and Open the user interface",
                     action="store_true", default=False)
@@ -171,6 +174,7 @@ except FileNotFoundError:
 if environments.all:
     environments.ui         = True
     environments.controller = True
+    environments.logger     = True
     environments.all        = False
 
 # Start main() function from utils/blenderVR.py module.
@@ -199,14 +203,29 @@ try:
             port = process.stdout.readline().decode().strip()
             print('port:', port)
         else:
-            process.wait()
+            try:
+                process.wait()
+            except KeyboardInterrupt:
+                pass
             sys.exit()
     if environments.ui and environments.port:
         options = [environments.port]
         if environments.debug:
             options.append('debug')
-        process = subprocess.Popen([sys.executable, os.path.join(root, 'utils', 'console', 'ui.py')] + options, env = environment)
-        process.wait()
+        try:
+            process = subprocess.Popen([sys.executable, os.path.join(root, 'utils', 'console', 'ui.py')] + options, env = environment)
+            process.wait()
+        except KeyboardInterrupt:
+            pass
+    if environments.logger and environments.port:
+        options = [environments.port]
+        if environments.debug:
+            options.append('debug')
+        try:
+            process = subprocess.Popen([sys.executable, os.path.join(root, 'utils', 'console', 'logger.py')] + options, env = environment)
+            process.wait()
+        except KeyboardInterrupt:
+            pass
 
 except SystemExit:
     pass

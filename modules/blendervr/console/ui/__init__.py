@@ -35,7 +35,6 @@
 
 import os
 import sys
-import time
 from ...tools import controller
 import importlib
 from ..protocol import composeMessage
