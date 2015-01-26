@@ -37,6 +37,7 @@ import os
 import sys
 from . import ui
 from . import daemon
+from ...tools import logger
 
 class Controller():
     def __init__(self, profile_file, debug):
@@ -64,14 +65,13 @@ class Controller():
         from . import profile
         self._profile = profile.Profile(profile_file)
 
-        from ...tools import logger
         self._logger = logger.getLogger('blenderVR')
-        
+
         if self._debug:
             # Define connexions until the controller is running ...
             console_logger = logger.Console(self._logger)
             self._logger.setLevel('debug')
-            self.profile.setValue(['debug', 'daemon'], True)
+            self.profile.setValue(['debug', 'daemon'], False)
             self.profile.setValue(['debug', 'executables'], False)
 
         from . import screens
@@ -87,7 +87,7 @@ class Controller():
         from . import listener
         self._listener = listener.Listener(self)
 
-        sys.stdout.write(str(self.getPort()) + "\n")
+        sys.stdout.write('blenderVR controller port: ' + str(self.getPort()) + "\n")
         sys.stdout.flush()
         from ... import version
         self.logger.info('blenderVR version:', version)
@@ -119,20 +119,12 @@ class Controller():
             daemonClient = daemon.Daemon(self, client)
             self._screens.appendClient(daemonClient)
             return daemonClient
-        # if module == 'daemon' or module == 'blender_player':
-        #     screen = self._screens.getScreen(complement)
-        #     if screen:
-        #         screen.setNetworkClient(module, client, addr)
         self.logger.error('Cannot understand client type :', type)
 
     def _delete_client(self, client):
         if client in self._uis:
             self._uis.remove(client)
             return
-        # if module == 'daemon' or module == 'blender_player':
-        #     screen = self._screens.getScreen(complement)
-        #     if screen:
-        #         screen.setNetworkClient(module, client, addr)
 
     def configuration(self):
         """
@@ -161,7 +153,6 @@ class Controller():
         self._controller_address = configuration['console']['controller'] + ':' + str(self.getPort())
         self._screens.setConfiguration(configuration['screens'])
         del(configuration['screens'])
-        #self.logger.debug(configuration)
 
         self.runAction('start', 'daemon')
         self.update_user_files()

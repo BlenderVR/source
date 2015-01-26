@@ -52,7 +52,6 @@ class Daemon(base.Client):
 
     def cb_data(self):
         result = self._client.receive()
-        self.logger.log_position(result)
 
     def cb_disconnect(self):
         return

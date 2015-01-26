@@ -59,12 +59,13 @@ forked = False
 
 class Daemon:
     """Background management of the Blender Player and related stuff.
-
-
     """
     def __init__(self, blenderVR_modules):
         self._blenderVR_modules = blenderVR_modules
 
+        from blendervr.tools import logger
+        self._logger = logger.getLogger('daemon')
+        
         self._controller = sys.argv[1]
         self._screen_name = sys.argv[2].strip("'\"")
 
@@ -97,11 +98,8 @@ class Daemon:
         self._loader_path = None
         self._process = None
 
-        from blendervr.tools import logger
-        self._logger = logger.getLogger('daemon')
         logger.Network(self._logger, self._client, 'logger')
-        self._logger.error('Yop, world')
-                
+
     def write(self, *messages):
         """Send message to the client
 
