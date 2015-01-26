@@ -140,5 +140,5 @@ class Completer(base.Base):
                 response = None
             return response
         except:
-            self.logger.log_traceback(True)
+            self.logger.error(self.logger.EXCEPTION)
 

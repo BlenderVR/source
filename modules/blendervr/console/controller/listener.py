@@ -105,7 +105,7 @@ class Listener(base.Base):
                         sock.close()
                     sys.exit()
                 except:
-                    self.logger.log_traceback(False)
+                    self.logger.warning(self.logger.EXCEPTION)
         now = time.time()
         for timeout in timeouts:
             if timeout < now:

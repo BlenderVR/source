@@ -168,7 +168,7 @@ class Main:
                             if plugin_error.hasToClear():
                                 plugins_to_remove.append(plugin)
                         except:
-                            self.logger.log_traceback(False)
+                            self.logger.warning(self.logger.EXCEPTION)
                 for plugin_to_remove in plugins_to_remove:
                     self._plugins.remove(plugin_to_remove)
                 del(plugins_to_remove)
@@ -217,7 +217,7 @@ class Main:
         except:
             self.stopDueToError()
 
-    def _plugin_hook(self, method, log_traceback=False):
+    def _plugin_hook(self, method, debug_plugin=False):
         plugins_to_remove = []
         for plugin in self._plugins:
             if not hasattr(plugin, method):
@@ -228,8 +228,8 @@ class Main:
                 if plugin_error.hasToClear():
                     plugins_to_remove.append(plugin)
             except:
-                if log_traceback:
-                    self.logger.log_traceback(False)
+                if debug_plugin:
+                    self.logger.warning(self.logger.EXCEPTION)
         for plugin_to_remove in plugins_to_remove:
             self.logger.info('removing plugin:', plugin_to_remove.getName())
             self._plugins.remove(plugin_to_remove)
@@ -376,7 +376,7 @@ class Main:
         return self._connector.getNumberOfNodes()
 
     def stopDueToError(self):
-        self.logger.log_traceback(True)
+        self.logger.error(self.logger.EXCEPTION)
         self.logger.error('Due to previous error, we cannot continue '
                           'to run blenderVR !')
         self._stopAll()

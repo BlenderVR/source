@@ -28,4 +28,4 @@ try:
     creator.process()
 
 except:
-    logger.log_traceback(True)
+    logger.error(logger.EXCEPTION)

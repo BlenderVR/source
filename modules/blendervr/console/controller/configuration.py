@@ -66,7 +66,7 @@ class Configuration(base.Base):
             try:
                 self._screenSets = self._configuration['starter']['configs']
             except:
-                self.logger.log_traceback(True)
+                self.logger.error(self.logger.EXCEPTION)
             if self._screenSets:
                 self.controller.screenSets(list(self._screenSets.keys()))
 
@@ -75,7 +75,7 @@ class Configuration(base.Base):
         except exceptions.Main as error:
             self.logger.error(error)
         except:
-            self.logger.log_traceback(False)
+            self.logger.warning(self.logger.EXCEPTION)
 
     def getConfiguration(self):
         current = self.profile.getValue(['virtual environment', 'screen set'])

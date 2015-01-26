@@ -123,7 +123,7 @@ class Master(Base):
             self._addToBuffer(self.OBJECT, id(self._objects),
                               self._objects.checkItems())
         except:
-            self.logger.log_traceback()
+            self.logger.error(self.logger.EXCEPTION)
 
         # Then update objects attributs
         for objects_id, object in self._synchronizedObjects.items():

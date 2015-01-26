@@ -60,7 +60,7 @@ if is_virtual_environment():
             try:
                 self.sendToConsole(self._interactor_name, objects)
             except:
-                self.logger.log_traceback(False)
+                self.logger.warning(self.logger.EXCEPTION)
 
 elif is_console():
 

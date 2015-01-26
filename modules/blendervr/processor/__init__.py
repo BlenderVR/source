@@ -50,8 +50,8 @@ import copy
 from .base import Processor
 
 _processor_files = []
-_logger = None
-_log_traceback = False
+_main_logger = None
+_debug_processor = False
 
 
 def getProcessor():
@@ -60,7 +60,7 @@ def getProcessor():
 
     :rtype: ``Processor``
     """
-    global _processor_files, _logger, _log_traceback
+    global _processor_files, _main_logger, _debug_processor
     import os
 
     if not _processor_files:
@@ -68,12 +68,12 @@ def getProcessor():
     processor_file = _processor_files.pop(0)
 
     if processor_file is None:
-        _logger.warning('Empty processor file')
+        _main_logger.warning('Empty processor file')
         return Processor
 
     module_path = os.path.dirname(processor_file)
     if not os.path.isdir(module_path):
-        _logger.warning('Invalid path for processor: ', module_path)
+        _main_logger.warning('Invalid path for processor: ', module_path)
         return Processor
 
     module_name = os.path.splitext(os.path.basename(processor_file))[0]
@@ -81,30 +81,30 @@ def getProcessor():
         import imp
         (file, file_name, data) = imp.find_module(module_name, [module_path])
     except:
-        _logger.warning('Cannot import "' + module_name + '" module from "'
+        _main_logger.warning('Cannot import "' + module_name + '" module from "'
                         + module_path + '"')
-        if _log_traceback:
-            _logger.log_traceback(False)
+        if _debug_processor:
+            _main_logger.debug_processor(False)
         return Processor
 
     try:
         module = imp.load_module('processor_'
                 + str(random.randrange(268431360)), file, file_name, data)
     except:
-        _logger.warning('Invalid import of module "' + processor_file + '"')
-        if _log_traceback:
-            _logger.log_traceback(False)
+        _main_logger.warning('Invalid import of module "' + processor_file + '"')
+        if _debug_processor:
+            _main_logger.debug_processor(False)
         return Processor
 
     import inspect
     for name in dir(module):
         element = getattr(module, name)
         if inspect.isclass(element) and issubclass(element, Processor):
-            _logger.info('Loading "' + name + '" class from "' + file_name
+            _main_logger.info('Loading "' + name + '" class from "' + file_name
                          + '" as main processor')
             return element
 
-    _logger.warning('Cannot import "' + str(Processor.__name__)
+    _main_logger.warning('Cannot import "' + str(Processor.__name__)
                     + '" class for logger from "' + file_name + '"')
     return Processor
 
@@ -121,18 +121,18 @@ def appendProcessor(processor_file):
     _processor_files.insert(0, processor_file)
 
 
-def _getProcessor(processor_files, logger, log_traceback):
+def _getProcessor(processor_files, main_logger, debug_processor):
     """
     Function called by the main process (Virtual environment or Console)
     Don't call it !
     """
-    global _processor_files, _logger, _log_traceback
+    global _processor_files, _main_logger, _debug_processor
 
     random.seed()
 
     _processor_files = copy.copy(processor_files)
-    _logger = logger
-    _log_traceback = log_traceback
+    _main_logger = main_logger
+    _debug_processor = debug_processor
 
     return getProcessor()
 

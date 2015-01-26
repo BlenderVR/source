@@ -174,7 +174,7 @@ class Controller():
                 self._processor = processor(self) 
             except:
                 if self.profile.getValue(['debug', 'processor']):
-                    self.logger.log_traceback(False)
+                    self.logger.debug(self.logger.EXCEPTION)
                 self._processor = None
                 processor_files = []
 

@@ -177,7 +177,7 @@ class Master(Connector):
                     client.close()
                     del(self._clients[client])
                 except:
-                    self.logger.log_traceback(False)
+                    self.logger.warning(self.logger.EXCEPTION)
                     pass
                 client = None
             del(clients)
@@ -210,8 +210,7 @@ class Master(Connector):
                 client.shutdown(socket.SHUT_RDWR)
                 client.close()
             except:
-                self.logger.log_traceback(False)
-                pass
+                self.logger.warning(self.logger.EXCEPTION)
             message = 'Loosed connexion to "' + \
                                     self._clients[client]['name'] + '"'
             del(self._clients[client])
@@ -301,7 +300,7 @@ class Slave(Connector):
                 self._socket.close()
                 del(self._socket)
             except:
-                self.logger.log_traceback(False)
+                self.logger.warning(self.logger.EXCEPTION)
                 pass
             self.blenderVR._quitByNetwork(reason)
 

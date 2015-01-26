@@ -68,35 +68,6 @@ class Logger(logging.getLoggerClass()):
     def setLevel(self, verbosity):
         super(Logger, self).setLevel(self._getVerbosity(verbosity))
 
-    def log_traceback(self, error):
-        if error:
-            method = self.error
-        else:
-            method = self.warning
-        message = "***************************\n"
-        try:
-            import traceback
-            result = traceback.format_exc()
-            message += result
-        except:
-            stack = inspect.stack()
-            stack.reverse()
-            for element in stack:
-                message += 'File "' + element[1] + '", '
-                message += 'line ' + str(element[2]) + ', '
-                message += 'in' + element[3] + "\n" + element[4][0].rstrip() + "\n"
-        message += "***************************"
-        method(message)
-            
-    def log_position(self, *messages):
-        import inspect
-        stack = inspect.stack()
-        element = stack[1]
-        position = 'File "' + element[1] + '", line ' + str(element[2]) + ', in' + element[3]
-        if len(messages) > 0:
-            position += ': '
-        self.debug(position, *messages)
-
     def _process(self, verbosity, *messages):
         elements = []
         for message in messages:

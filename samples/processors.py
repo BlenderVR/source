@@ -132,7 +132,7 @@ if blendervr.is_virtual_environment():
             except (KeyError, SystemExit):
                 pass
             except:
-                self.logger.log_traceback(False)
+                self.logger.error(self.logger.EXCEPTION)
             super(Common, self).keyboardAndMouse(info)
 
 elif blendervr.is_creating_loader():

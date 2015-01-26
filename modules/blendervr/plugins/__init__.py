@@ -63,5 +63,5 @@ def getPlugins(parent, logger):
                         plugins.append(plugin)
                         break
             except:
-                logger.log_traceback(False)
+                logger.warning(logger.EXCEPTION)
     return plugins
