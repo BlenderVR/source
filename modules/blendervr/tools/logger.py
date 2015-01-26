@@ -43,12 +43,17 @@ Handle all the errors, warnings and debug info
 import logging
 import sys
 import pprint
+import inspect
 
 verbosities = ['debug', 'info', 'warning', 'error', 'critical']
 
 
 class Logger(logging.getLoggerClass()):
 
+    TRACEBACK = "traceback of the logger class"
+    EXCEPTION = "exception of the logger class"
+    POSITION = "position of the logger class"
+    
     def __init__(self, name):
         super(Logger, self).__init__(name)
 
@@ -67,23 +72,21 @@ class Logger(logging.getLoggerClass()):
             method = self.error
         else:
             method = self.warning
+        message = "***************************\n"
         try:
             import traceback
             result = traceback.format_exc()
-            method('***************************')
-            method(result)
-            method('***************************')
+            message += result
         except:
-            import inspect
-            self.debug('***************************')
             stack = inspect.stack()
             stack.reverse()
             for element in stack:
-                self.debug('File "' + element[1] + '", line ' +
-                        str(element[2]) + ', in', element[3], "\n",
-                                            element[4][0].rstrip())
-            self.debug('***************************')
-
+                message += 'File "' + element[1] + '", '
+                message += 'line ' + str(element[2]) + ', '
+                message += 'in' + element[3] + "\n" + element[4][0].rstrip() + "\n"
+        message += "***************************"
+        method(message)
+            
     def log_position(self, *messages):
         import inspect
         stack = inspect.stack()
@@ -96,12 +99,28 @@ class Logger(logging.getLoggerClass()):
     def _process(self, verbosity, *messages):
         elements = []
         for message in messages:
+            if (message == self.TRACEBACK) or (message == self.POSITION):
+                stack = inspect.stack()
+                if message == self.POSITION:
+                    stack = [stack[1]]
+                else:
+                    stack.reverse()
+                    stack = stack[:-1]
+                entries = []
+                for element in stack:
+                    entry = 'File "' + element[1] + '", '
+                    entry += 'line ' + str(element[2]) + ', '
+                    entry += 'in ' + element[3]
+                    if message != self.POSITION:
+                        entry += "\n\t" + element[4][0].strip()
+                    entries.append(entry)
+                elements.append("\n".join(entries))
+                continue
             if isinstance(message, (dict, tuple, list)):
                 elements.append(pprint.pformat(message))
-            else:
-                elements.append(str(message))
-        for message in (' '.join(elements)).rsplit('\n'):
-            getattr(super(Logger, self), verbosity)(message)
+                continue
+            elements.append(str(message))
+        getattr(super(Logger, self), verbosity)(' '.join(elements))
 
     def _getVerbosity(self, verbosity):
         if verbosity is not None:
@@ -120,17 +139,6 @@ class Logger(logging.getLoggerClass()):
 
         return logging.WARNING
 
-    def addLoginWindow(self, login_window, addName=False):
-        handler = logging.StreamHandler(login_window)
-        if addName:
-            handler.setFormatter(logging.Formatter('%(levelname)s> %(asctime)s'
-                                                ' [%(name)s] %(message)s'))
-        else:
-            handler.setFormatter(logging.Formatter('%(levelname)s> %(asctime)s'
-                                                ' %(message)s'))
-        self.addHandler(handler)
-        return handler
-
 class Handler(logging.Handler):
     def __init__(self, logger):
         logging.Handler.__init__(self)
@@ -142,7 +150,7 @@ class Handler(logging.Handler):
 
     def emit(self, record):
         try:
-            self.process(self.format(record))
+            self.write(self.format(record))
             self.flush()
         except Exception:
             self.handleError(record)
@@ -152,57 +160,41 @@ class Network(Handler):
         Handler.__init__(self, logger)
         self._connection = connection
         self._context    = context
-        self.setFormatter(logging.Formatter('%(levelname)s|%(asctime)s|%(message)s'))
 
-    def process(self, message):
-        message = message.split('|')
-        self._connection.send('logger', {'level':   message[0],
-                                         'time':    message[1],
+    def emit(self, record):
+        self._connection.send('logger', {'level':   record.levelno,
+                                         'time':    record.created,
                                          'context': self._context,
-                                         'message': '|'.join(message[2:])})
+                                         'message': record.msg})
 
-class Console:
-    def __init__(self, msg='Console logger: '):
+# Minimal logger on the screen. We can add formatter later, if we wish ...
+class Console(Handler):
+    def __init__(self, logger):
+        Handler.__init__(self, logger)
         self._mapping = {'DEBUG': sys.stdout,
                          'INFO': sys.stdout,
                          'WARNING': sys.stderr,
                          'ERROR': sys.stderr,
                          'CRITICAL': sys.stderr}
-        self._logging_prefix = msg
 
-    def write(self, *messages):
-        for message in messages:
-            if message != "\n":
-                print(message)
-        return
-        elements = []
-        for message in messages:
-            elements.append(str(message))
-        for message in (' '.join(elements)).split('\n'):
-            message = message.rstrip(' \n\r')
-            if len(message) > 0:
-                message_type = message.split('>')
-                message_type = message_type[0]
-                if message_type in self._mapping:
-                    dest = self._mapping[message_type]
-                    dest.write(self._logging_prefix + message + '\n')
-                    dest.flush()
-
-class File:
-    def __init__(self, filename, msg = 'File logger: '):
-        self._logging_prefix = msg
-        self._filename = filename
-
-    def write(self, *messages):
-        dest = open(self._filename, 'a')
-        elements = []
-        for message in messages:
-            elements.append(str(message))
-        for message in (' '.join(elements)).split('\n'):
-            message = message.rstrip(' \n\r')
-            if len(message) > 0:
-                dest.write(self._logging_prefix + message + '\n')
-                dest.flush()
+    def emit(self, record):
+        if record.levelname in self._mapping:
+            stream = self._mapping[record.levelname]
+        else:
+            stream = sys.stdout
+        nb_return = record.msg.count("\n")
+        if nb_return > 3:
+            message = '***********************************************\n'
+        else:
+            message = ''
+        message += record.levelname + ' : '
+        if nb_return > 0:
+            message += "\n"
+        message += record.msg + "\n"
+        if nb_return > 3:
+            message += "***********************************************\n"
+        stream.write(message)
+        stream.flush()
 
 if not isinstance(logging.getLoggerClass(), Logger):
     logging.setLoggerClass(Logger)

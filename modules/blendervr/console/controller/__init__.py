@@ -69,8 +69,7 @@ class Controller():
         
         if self._debug:
             # Define connexions until the controller is running ...
-            console_logger = logger.Console()
-            self._default_logger = self._logger.addLoginWindow(console_logger, True)
+            console_logger = logger.Console(self._logger)
             self._logger.setLevel('debug')
             self.profile.setValue(['debug', 'daemon'], True)
             self.profile.setValue(['debug', 'executables'], False)
@@ -93,8 +92,7 @@ class Controller():
         from ... import version
         self.logger.info('blenderVR version:', version)
         self.configuration()
-        self.runAction('start', 'daemon')
-        
+
     def getPort(self):
         return self._listener.getPort()
 

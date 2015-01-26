@@ -100,7 +100,8 @@ class Daemon:
         from blendervr.tools import logger
         self._logger = logger.getLogger('daemon')
         logger.Network(self._logger, self._client, 'logger')
-        
+        self._logger.error('Yop, world')
+                
     def write(self, *messages):
         """Send message to the client
 
