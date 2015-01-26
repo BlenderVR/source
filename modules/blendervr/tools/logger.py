@@ -44,15 +44,16 @@ import logging
 import sys
 import pprint
 import inspect
+import traceback
 
 verbosities = ['debug', 'info', 'warning', 'error', 'critical']
 
 
 class Logger(logging.getLoggerClass()):
 
-    TRACEBACK = "traceback of the logger class"
-    EXCEPTION = "exception of the logger class"
-    POSITION = "position of the logger class"
+    STACK = "csdvkcjldsqkfhvkdsjb nkjsfdvsqkljhfvlkqd kjhxdf"
+    EXCEPTION = "dcljnqsdlfkjncvqsljnvl ksdjnvlqjwncvlqnfdv"
+    POSITION = "cklnfslkjhfdmc, dnlskdjhvlqkjfkvj"
     
     def __init__(self, name):
         super(Logger, self).__init__(name)
@@ -99,7 +100,10 @@ class Logger(logging.getLoggerClass()):
     def _process(self, verbosity, *messages):
         elements = []
         for message in messages:
-            if (message == self.TRACEBACK) or (message == self.POSITION):
+            if message == self.EXCEPTION:
+                elements.append(traceback.format_exc().strip())
+                continue
+            if (message == self.STACK) or (message == self.POSITION):
                 stack = inspect.stack()
                 if message == self.POSITION:
                     stack = [stack[1]]
@@ -183,7 +187,7 @@ class Console(Handler):
         else:
             stream = sys.stdout
         nb_return = record.msg.count("\n")
-        if nb_return > 3:
+        if nb_return > 2:
             message = '***********************************************\n'
         else:
             message = ''
@@ -191,7 +195,7 @@ class Console(Handler):
         if nb_return > 0:
             message += "\n"
         message += record.msg + "\n"
-        if nb_return > 3:
+        if nb_return > 2:
             message += "***********************************************\n"
         stream.write(message)
         stream.flush()
