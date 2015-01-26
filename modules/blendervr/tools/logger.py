@@ -48,9 +48,9 @@ import traceback
 
 verbosities = ['debug', 'info', 'warning', 'error', 'critical']
 
-
 class Logger(logging.getLoggerClass()):
 
+    # "Random" string to be sure that it will not be displayed by error
     STACK = "csdvkcjldsqkfhvkdsjb nkjsfdvsqkljhfvlkqd kjhxdf"
     EXCEPTION = "dcljnqsdlfkjncvqsljnvl ksdjnvlqjwncvlqnfdv"
     POSITION = "cklnfslkjhfdmc, dnlskdjhvlqkjfkvj"
@@ -123,13 +123,12 @@ class Handler(logging.Handler):
     def flush(self):
         pass
 
-    def emit(self, record):
-        try:
-            self.write(self.format(record))
-            self.flush()
-        except Exception:
-            self.handleError(record)
-    
+    def _getLogFromRecord(self, record, context):
+        return {'level':   record.levelno,
+                'time':    record.created,
+                'context': context,
+                'message': record.msg}
+
 class Network(Handler):
     def __init__(self, logger, connection, context):
         Handler.__init__(self, logger)
@@ -137,43 +136,41 @@ class Network(Handler):
         self._context    = context
 
     def emit(self, record):
-        self._connection.send('logger', {'level':   record.levelno,
-                                         'time':    record.created,
-                                         'context': self._context,
-                                         'message': record.msg})
+        self._connection.send('logger', self._getLogFromRecord(record, self._context))
 
 # Minimal logger on the screen. We can add formatter later, if we wish ...
 class Console(Handler):
     def __init__(self, logger):
         Handler.__init__(self, logger)
-        self._mapping = {'DEBUG': sys.stdout,
-                         'INFO': sys.stdout,
-                         'WARNING': sys.stderr,
-                         'ERROR': sys.stderr,
-                         'CRITICAL': sys.stderr}
 
     def emit(self, record):
-        if record.levelname in self._mapping:
-            stream = self._mapping[record.levelname]
-        else:
-            stream = sys.stdout
-        nb_return = record.msg.count("\n")
-        if nb_return > 2:
-            message = '***********************************************\n'
-        else:
-            message = ''
-        message += record.levelname + ' : '
-        if nb_return > 0:
-            message += "\n"
-        message += record.msg + "\n"
-        if nb_return > 2:
-            message += "***********************************************\n"
-        stream.write(message)
-        stream.flush()
+        printLogOnConsole(record.levelno, record.msg)
+
+streamMapping = {'DEBUG': sys.stdout,
+                 'INFO': sys.stdout,
+                 'WARNING': sys.stderr,
+                 'ERROR': sys.stderr,
+                 'CRITICAL': sys.stderr}
+
+def printLogOnConsole(level, message):
+    levelname = logging.getLevelName(level)
+    if levelname in streamMapping:
+        stream = streamMapping[levelname]
+    else:
+        stream = sys.stdout
+    nb_return = message.count("\n")
+    if nb_return > 2:
+        stream.write('***********************************************\n')
+    stream.write(levelname + ': ')
+    if nb_return > 0:
+        stream.write('\n')
+    stream.write(message + '\n')
+    if nb_return > 2:
+        stream.write('***********************************************\n')
+    stream.flush()
 
 if not isinstance(logging.getLoggerClass(), Logger):
     logging.setLoggerClass(Logger)
-
 
 def getLogger(name):
     return logging.getLogger(name)

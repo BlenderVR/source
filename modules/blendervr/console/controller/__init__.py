@@ -41,7 +41,6 @@ from ...tools import logger
 
 class Controller():
     def __init__(self, profile_file, debug):
-
         self._debug = debug
         
         # Simulation informations
@@ -59,17 +58,20 @@ class Controller():
 
         self._controller_address = None
 
-        from ...tools import getRootPath
-        self._update_loader_script = os.path.join(getRootPath(), 'utils', 'update_loader.py')
-
         from . import profile
         self._profile = profile.Profile(profile_file)
 
         self._logger = logger.getLogger('blenderVR')
 
+        from ...tools import getRootPath
+        self._update_loader_script = os.path.join(getRootPath(), 'utils', 'update_loader.py')
+
+        from . import logs
+        self._logs = logs.Logs(self)
+
         if self._debug:
             # Define connexions until the controller is running ...
-            console_logger = logger.Console(self._logger)
+            #console_logger = logger.Console(self._logger)
             self._logger.setLevel('debug')
             self.profile.setValue(['debug', 'daemon'], False)
             self.profile.setValue(['debug', 'executables'], False)
@@ -82,7 +84,7 @@ class Controller():
 
         from . import configuration
         self._configuration = configuration.Configuration(self)
-
+        
     def start(self):
         from . import listener
         self._listener = listener.Listener(self)
@@ -92,6 +94,8 @@ class Controller():
         from ... import version
         self.logger.info('blenderVR version:', version)
         self.configuration()
+        if self._debug:
+            self._logs.display()
 
     def getPort(self):
         return self._listener.getPort()
