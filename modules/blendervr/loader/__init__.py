@@ -56,70 +56,91 @@ class Creator:
         self._logger.setLevel('debug')
 
         self._input_blender_file = sys.argv[(sys.argv.index('--') + 1)]
-        self._output_blender_file = self._input_blender_file.split('.')
-        self._output_blender_file.insert(-1, 'vr')
-        self._output_blender_file = '.'.join(self._output_blender_file)
-        if not sys.platform.startswith('win'):
-            self._output_blender_file = os.path.join(
-                        os.path.dirname(self._output_blender_file),
-                        '.' + os.path.basename(self._output_blender_file))
+        self._processed_files = []
 
     def process(self):
         if is_creating_loader():
-            import bpy
-            bpy.ops.wm.open_mainfile(filepath=self._input_blender_file)
-
-            scene = bpy.context.scene
-
-            # Update frame_type of the scene, otherwise, there will be black borders ...
-            scene.game_settings.frame_type = 'SCALE'
-
-            # if the file has multiple cameras take only the active one
-            camera = scene.camera
-
-            if camera:
-                SENSOR = ELEMENTS_MAIN_PREFIX + 'Sensor'
-                bpy.ops.logic.sensor_add(type='ALWAYS', name=SENSOR,
-                                                        object=camera.name)
-                sensor = camera.game.sensors.get(SENSOR)
-                sensor.use_pulse_true_level = True
-
-                CONTROLLER = ELEMENTS_MAIN_PREFIX + 'Controller'
-                bpy.ops.logic.controller_add(type='PYTHON', name=CONTROLLER,
-                                                        object=camera.name)
-                controller = camera.game.controllers.get(CONTROLLER)
-                controller.mode = 'MODULE'
-                controller.module = 'blendervr.run'
-
-                ACTUATOR = ELEMENTS_MAIN_PREFIX + 'Occulus:Filter'
-                bpy.ops.logic.actuator_add(type='FILTER_2D', name=ACTUATOR,
-                                                        object=camera.name)
-                actuator = camera.game.actuators.get(ACTUATOR)
-                actuator.mode = 'CUSTOMFILTER'
-
-                TEXT = ELEMENTS_MAIN_PREFIX + 'Occulus:GLSL'
-                shader = bpy.data.texts.new(TEXT)
-                actuator.glsl_shader = shader
-                shader.from_string(SHADER_PROGRAM)
-
-                controller.link(sensor=sensor)
-                controller.link(actuator=actuator)
-
-                processor_files = sys.argv[(sys.argv.index('--') + 2):]
-
-                from blendervr.processor import _getProcessor
-                processor_class = _getProcessor(processor_files,
-                                                self._logger, True)
-                processor = processor_class(self)
-
-                processor.process(controller)
-
-                bpy.ops.wm.save_as_mainfile(copy=True,
-                                    filepath=self._output_blender_file,
-                                    relative_remap=True)
+            self._process(self._input_blender_file)
 
         elif is_console():
-            print(self._output_blender_file)
+            print(get_output_blender_file(self._input_blender_file))
+
+    def _process(self, filepath):
+            import bpy
+
+            # avoid infinite recursion
+            if filepath in self._processed_files:
+                return
+            else:
+                self._processed_files.append(filepath)
+
+            bpy.ops.wm.open_mainfile(filepath=filepath)
+            for scene in bpy.data.scenes:
+
+                # Update frame_type of the scene, otherwise, there will be black borders ...
+                scene.game_settings.frame_type = 'SCALE'
+
+                # if the file has multiple cameras take only the active one
+                camera = scene.camera
+
+                if camera:
+                    SENSOR = ELEMENTS_MAIN_PREFIX + 'Sensor'
+                    bpy.ops.logic.sensor_add(type='ALWAYS', name=SENSOR,
+                                                            object=camera.name)
+                    sensor = camera.game.sensors.get(SENSOR)
+                    sensor.use_pulse_true_level = True
+
+                    CONTROLLER = ELEMENTS_MAIN_PREFIX + 'Controller'
+                    bpy.ops.logic.controller_add(type='PYTHON', name=CONTROLLER,
+                                                            object=camera.name)
+                    controller = camera.game.controllers.get(CONTROLLER)
+                    controller.mode = 'MODULE'
+                    controller.module = 'blendervr.run'
+
+                    ACTUATOR = ELEMENTS_MAIN_PREFIX + 'Occulus:Filter'
+                    bpy.ops.logic.actuator_add(type='FILTER_2D', name=ACTUATOR,
+                                                            object=camera.name)
+                    actuator = camera.game.actuators.get(ACTUATOR)
+                    actuator.mode = 'CUSTOMFILTER'
+
+                    TEXT = ELEMENTS_MAIN_PREFIX + 'Occulus:GLSL'
+                    shader = bpy.data.texts.new(TEXT)
+                    actuator.glsl_shader = shader
+                    shader.from_string(SHADER_PROGRAM)
+
+                    controller.link(sensor=sensor)
+                    controller.link(actuator=actuator)
+
+                    # we call the same processor file for all the files
+                    # and all the scenes, it is up to the processor file
+                    # to internally handle them differently
+
+                    processor_files = sys.argv[(sys.argv.index('--') + 2):]
+
+                    from blendervr.processor import _getProcessor
+                    processor_class = _getProcessor(processor_files,
+                                                    self._logger, True)
+                    processor = processor_class(self)
+
+                    processor.process(controller)
+
+                    bpy.ops.wm.save_as_mainfile(copy=True,
+                                        filepath=get_output_blender_file(filepath),
+                                        relative_remap=True)
+
+
+def get_output_blender_file(filepath):
+    """Get the filepath of the processed .blend file"""
+    output_blender_file = filepath.split('.')
+    output_blender_file.insert(-1, 'vr')
+    output_blender_file = '.'.join(output_blender_file)
+
+    if not sys.platform.startswith('win'):
+        output_blender_file = os.path.join(
+              os.path.dirname(output_blender_file),
+              '.' + os.path.basename(output_blender_file))
+
+    return output_blender_file
 
 
 SHADER_PROGRAM = """uniform sampler2D bgl_RenderedTexture;
