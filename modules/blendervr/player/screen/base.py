@@ -111,13 +111,6 @@ class Base(base.Base):
 
             stereo_eye = bge.render.getStereoEye()
 
-            if stereo_eye == LEFT_EYE:
-                self.logger.info("Left Eye")
-            elif stereo_eye == RIGHT_EYE:
-                self.logger.info("Right Eye")
-            else:
-                self.logger.info("Not sure which eye")
-
             if 'left' in self._buffers and stereo_eye == LEFT_EYE:
                 self._updateMatrixForBuffer('left', camera, depth)
 
