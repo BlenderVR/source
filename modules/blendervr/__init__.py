@@ -94,7 +94,9 @@ def main():
         try:
             import bge
             from .player import Main
-            bge.logic.blenderVR = Main()
+
+            if not hasattr(bge.logic, "blenderVR"):
+                bge.logic.blenderVR = Main()
         except:
             pass
 
