@@ -64,7 +64,6 @@ class Main:
     def __init__(self):
         """ Constructor : load all necessary elements """
         self.run = lambda *args: None
-        self._scene = bge.logic.getCurrentScene()
 
         self._is_stereo = ('-s' in sys.argv)
 
@@ -118,7 +117,10 @@ class Main:
 
             # Suspend the scene before getting the network because in
             # standalone screen, resume can occure inside the constructor ...
-            self._scene.suspend()
+
+            scenes = self._get_scenes()
+            for scene in scenes:
+                scene.suspend()
 
             # Configure the network connexions: deals with network
             from . import network
@@ -208,7 +210,10 @@ class Main:
             self.getProcessor().start()
 
             self.run = lambda *args: None
-            self._scene.pre_draw.append(self.wait_for_everybody)
+
+            scenes = self._get_scenes()
+            for scene in scenes:
+                scene.pre_draw.append(self.wait_for_everybody)
 
         except exceptions.Common as error:
             self.logger.error(error)
@@ -216,6 +221,9 @@ class Main:
             self.logger.error(error)
         except:
             self.stopDueToError()
+
+    def _get_scenes(self):
+        return bge.logic.getSceneList()
 
     def _plugin_hook(self, method, log_traceback=False):
         plugins_to_remove = []
@@ -240,12 +248,19 @@ class Main:
             self._connector.wait_for_everybody()
             if self._connector.isReady():
                 self._previous_pre_draw = True
-                self._scene.pre_draw.remove(self.wait_for_everybody)
+
+                scenes = self._get_scenes()
+                for scene in scenes:
+                    scene.pre_draw.remove(self.wait_for_everybody)
+
                 if self.isMaster():
                     self.run = self._run_master
                 else:
                     self.run = self._run_slave
-                self._scene.pre_draw.append(self._pre_draw)
+
+                for scene in scenes:
+                    scene.pre_draw.append(self._pre_draw)
+
                 self._startSimulation()
         except SystemExit:
             pass
@@ -267,7 +282,9 @@ class Main:
             self.stopDueToError()
 
     def _run_slave(self):
-        self._scene.suspend()
+        scenes = self._get_scenes()
+        for scene in scenes:
+            scene.suspend()
 
     def _run_default(self):
         try:
@@ -400,20 +417,25 @@ class Main:
     def _stopAll(self):
         """Internal stop: do not use"""
         self.run = lambda *args: None
-        if hasattr(self, '_pre_draw') and \
-                            self._pre_draw in self._scene.pre_draw:
-            self._scene.pre_draw.remove(self._pre_draw)
+        if hasattr(self, '_pre_draw'):
+            scenes = self._get_scenes()
+            for scene in scenes:
+                if self._pre_draw in scene.pre_draw:
+                    scene.pre_draw.remove(self._pre_draw)
 
     def _suspendResumeInternal(self):
         """Internal method to pause and resume the scene"""
+        scenes = self._get_scenes()
         if self._connector.isReady() and not self.isPaused():
             # On doit demarrer la scene !
             if self.isMaster():
-                self._scene.resume()
+                for scene in scenes:
+                    scene.resume()
             self._splash.stop()
         else:  # No network for the moment or pause !
             # We must stop the scene.
-            self._scene.suspend()
+            for scene in scenes:
+                scene.suspend()
             self._splash.start()
             if self._connector.isReady():
                 self._splash.setMessage(self._paused)
