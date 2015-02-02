@@ -81,7 +81,22 @@ def is_console():
     return not is_virtual_environment() and not is_creating_loader()
 
 
-def run():
+def init():
+    """
+    Run once per loaded scene, called from the ``.blend`` files
+    """
+    if is_virtual_environment():
+        import bge
+        scene = bge.logic.getCurrentScene()
+        bge.logic.blenderVR.init(scene)
+    else:
+        pass
+
+
+def loop():
+    """
+    Run once per loop, called from the ``.blend`` files
+    """
     if is_virtual_environment():
         import bge
         bge.logic.blenderVR.run()

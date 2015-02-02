@@ -89,23 +89,9 @@ class Base(base.Base):
             return self._buffers[bufferName]['user']
         return None
 
-    def run(self):
+    def _pre_draw(self, scene):
         try:
-            # Force the window to keep the focus by setting mouse position
-            # in the middle of the window ...
-            if self._focus:
-                bge.render.setMousePosition(bge.render.getWindowWidth() // 2,
-                                            bge.render.getWindowHeight() // 2)
-
-            scene = bge.logic.getCurrentScene()
             camera = scene.active_camera
-
-            if hasattr(self, '_viewport'):
-                camera.useViewport = True
-                camera.setViewport(self._viewport[0], self._viewport[1],
-                                   self._viewport[2], self._viewport[3])
-            else:
-                camera.useViewport = False
 
             depth = (camera.near + camera.far) / 2.0
 
@@ -122,6 +108,30 @@ class Base(base.Base):
 
         except:
             self.blenderVR.stopDueToError()
+
+    def init(self, scene):
+        """Setup the scene for the screens (add callbacks)"""
+        def closure():
+            self._pre_draw(scene)
+
+        scene.pre_draw.append(closure)
+
+    def run(self):
+        # Force the window to keep the focus by setting mouse position
+        # in the middle of the window ...
+        if self._focus:
+            bge.render.setMousePosition(bge.render.getWindowWidth() // 2,
+                                        bge.render.getWindowHeight() // 2)
+
+        for scene in bge.logic.getSceneList():
+            camera = scene.active_camera
+
+            if hasattr(self, '_viewport'):
+                camera.useViewport = True
+                camera.setViewport(self._viewport[0], self._viewport[1],
+                                   self._viewport[2], self._viewport[3])
+            else:
+                camera.useViewport = False
 
     def getUsers(self):
         return self._users

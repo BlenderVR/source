@@ -84,18 +84,36 @@ class Creator:
                 camera = scene.camera
 
                 if camera:
-                    SENSOR = ELEMENTS_MAIN_PREFIX + 'Sensor'
+                    # init
+                    SENSOR = ELEMENTS_MAIN_PREFIX + 'SensorInit'
+                    bpy.ops.logic.sensor_add(type='ALWAYS', name=SENSOR,
+                                                            object=camera.name)
+                    sensor = camera.game.sensors.get(SENSOR)
+                    sensor.use_pulse_true_level = False
+
+                    CONTROLLER = ELEMENTS_MAIN_PREFIX + 'ControllerInit'
+                    bpy.ops.logic.controller_add(type='PYTHON', name=CONTROLLER,
+                                                            object=camera.name)
+                    controller = camera.game.controllers.get(CONTROLLER)
+                    controller.use_priority = True
+                    controller.mode = 'MODULE'
+                    controller.module = 'blendervr.init'
+
+                    controller.link(sensor=sensor)
+
+                    # loop
+                    SENSOR = ELEMENTS_MAIN_PREFIX + 'SensorLoop'
                     bpy.ops.logic.sensor_add(type='ALWAYS', name=SENSOR,
                                                             object=camera.name)
                     sensor = camera.game.sensors.get(SENSOR)
                     sensor.use_pulse_true_level = True
 
-                    CONTROLLER = ELEMENTS_MAIN_PREFIX + 'Controller'
+                    CONTROLLER = ELEMENTS_MAIN_PREFIX + 'ControllerLoop'
                     bpy.ops.logic.controller_add(type='PYTHON', name=CONTROLLER,
                                                             object=camera.name)
                     controller = camera.game.controllers.get(CONTROLLER)
                     controller.mode = 'MODULE'
-                    controller.module = 'blendervr.run'
+                    controller.module = 'blendervr.loop'
 
                     ACTUATOR = ELEMENTS_MAIN_PREFIX + 'Occulus:Filter'
                     bpy.ops.logic.actuator_add(type='FILTER_2D', name=ACTUATOR,

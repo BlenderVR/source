@@ -54,6 +54,7 @@ if not is_virtual_environment():
     sys.exit()
 
 import bge
+LEFT_EYE = bge.render.LEFT_EYE
 
 
 class Main:
@@ -66,6 +67,7 @@ class Main:
         self.run = lambda *args: None
 
         self._is_stereo = ('-s' in sys.argv)
+        self._scenes = []
 
         import builtins
         from ..tools import getModulePath
@@ -211,9 +213,8 @@ class Main:
 
             self.run = lambda *args: None
 
-            scenes = self._get_scenes()
-            for scene in scenes:
-                scene.pre_draw.append(self.wait_for_everybody)
+            self._scene = bge.logic.getCurrentScene()
+            self._scene.pre_draw.append(self.wait_for_everybody)
 
         except exceptions.Common as error:
             self.logger.error(error)
@@ -223,7 +224,13 @@ class Main:
             self.stopDueToError()
 
     def _get_scenes(self):
-        return bge.logic.getSceneList()
+        scenes = bge.logic.getSceneList()
+
+        if scenes != self._scenes:
+            self._scenes = scenes
+            # run some global update?
+
+        return scenes
 
     def _plugin_hook(self, method, log_traceback=False):
         plugins_to_remove = []
@@ -242,6 +249,17 @@ class Main:
             self.logger.info('removing plugin:', plugin_to_remove.getName())
             self._plugins.remove(plugin_to_remove)
 
+    def init(self, scene):
+        """
+        Run once per scene, at the init, add all the required callbacks
+        """
+        self._screen.init(scene)
+
+        def closure():
+            self._pre_draw(scene)
+
+        scene.pre_draw.append(closure)
+
     def wait_for_everybody(self):
         try:
             self._controller.run()
@@ -249,17 +267,13 @@ class Main:
             if self._connector.isReady():
                 self._previous_pre_draw = True
 
-                scenes = self._get_scenes()
-                for scene in scenes:
-                    scene.pre_draw.remove(self.wait_for_everybody)
+                self._scene.pre_draw.remove(self.wait_for_everybody)
+                del self._scene
 
                 if self.isMaster():
                     self.run = self._run_master
                 else:
                     self.run = self._run_slave
-
-                for scene in scenes:
-                    scene.pre_draw.append(self._pre_draw)
 
                 self._startSimulation()
         except SystemExit:
@@ -282,9 +296,8 @@ class Main:
             self.stopDueToError()
 
     def _run_slave(self):
-        scenes = self._get_scenes()
-        for scene in scenes:
-            scene.suspend()
+        scene = bge.logic.getCurrentScene()
+        scene.suspend()
 
     def _run_default(self):
         try:
@@ -294,7 +307,23 @@ class Main:
         except:
             self.stopDueToError()
 
-    def _pre_draw(self):
+    def _run_pre_draw(self, scene):
+        """Make sure pre_draw runs only once for all scene/eyes involved"""
+
+        if hasattr(self, '_scene'):
+            return False
+
+        if bge.render.getStereoEye() == LEFT_EYE:
+            if scene == bge.logic.getSceneList()[0]:
+                return True
+        return False
+
+    def _pre_draw(self, scene):
+        # Ensure that it runs only once per render (regardless of the number of eyes or scenes)
+
+        if not self._run_pre_draw(scene):
+            return
+
         try:
             self._controller.run()
             self._connector.run()
@@ -418,10 +447,13 @@ class Main:
         """Internal stop: do not use"""
         self.run = lambda *args: None
         if hasattr(self, '_pre_draw'):
+            """
             scenes = self._get_scenes()
             for scene in scenes:
-                if self._pre_draw in scene.pre_draw:
-                    scene.pre_draw.remove(self._pre_draw)
+                for callback in scene.pre_draw:
+                    if callback.__doc__ == self._pre_draw.__doc__:
+                        scene.pre_draw.remove(callback)
+            """
 
     def _suspendResumeInternal(self):
         """Internal method to pause and resume the scene"""
