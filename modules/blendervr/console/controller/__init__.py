@@ -53,6 +53,7 @@ class Controller():
         self._common_processors  = []
 
         self._uis                = []
+        self._loggers            = []
         
         self._processor          = None
 
@@ -71,7 +72,7 @@ class Controller():
 
         if self._debug:
             # Define connexions until the controller is running ...
-            #console_logger = logger.Console(self._logger)
+            logger.Console(self._logger)
             self._logger.setLevel('debug')
             self.profile.setValue(['debug', 'daemon'], False)
             self.profile.setValue(['debug', 'executables'], False)
@@ -123,6 +124,10 @@ class Controller():
             daemonClient = daemon.Daemon(self, client)
             self._screens.appendClient(daemonClient)
             return daemonClient
+        if type == 'logger':
+            loggerClient = logger.Logger(self, client)
+            self._loggers.append(loggerClient)
+            return loggerClient
         self.logger.error('Cannot understand client type :', type)
 
     def _delete_client(self, client):

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-# file: blendervr/console/logic/screen.py
-
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
@@ -37,40 +34,27 @@
 ##
 
 from . import base
-from ...tools import logger
+from ..protocol import decomposeMessage
+from ..protocol import composeMessage
+import sys
 
-class Logs(base.Base, logger.Handler):
-    def __init__(self, parent):
-        base.Base.__init__(self, parent)
-        logger.Handler.__init__(self, self.logger)
-        self._callbacks = []
-        self.clear()
+class Logger(base.Client):
+    def __init__(self, parent, client):
+        base.Client.__init__(self, parent, client)
 
-    def addCallback(self, callback):
-        if callback not in self._callbacks:
-            self._callbacks.append(callback)
+    def cb_connect(self):
+        return
+        self.logger.debug('Connexion of a user interface:', self._client)
+
+    def cb_data(self):
+        result = self._client.receive()
+        command, argument = result
+        self.logger.debug('unknown command:', command, '(', argument, ')')
+
+    def cb_disconnect(self):
+        return
+        self.logger.debug('Disconnexion of a user interface:', self._client)
         
-    def removeCallback(self, callback):
-        if callback in self._callbacks:
-            self._callbacks.remove(callback)
+    def data(self, message):
+        print(message)
         
-    def emit(self, record):
-        try:
-            self.addMessage(self._getLogFromRecord(record, 'controller'))
-        except Exception:
-            self.handleError(record)
-
-    def addMessage(self, message):
-        self._messages.append(message)
-        for callback in self._callbacks:
-            callback(message)
-
-    def getAllMessages(self):
-        return self._messages
-
-    def display(self):
-        for message in self._messages:
-            logger.sendLogToStream(message['level'], '[' + message['context'] + '] ' + message['message'])
-
-    def clear(self):
-        self._messages = []

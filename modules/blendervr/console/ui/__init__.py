@@ -47,7 +47,6 @@ class UI():
 
         from ...tools import logger
         self._logger = logger.getLogger('blenderVR')
-
         logger.File(self._logger, '/tmp/output.ui.log')
         if debug:
             # Define connexions until the controller is running ...

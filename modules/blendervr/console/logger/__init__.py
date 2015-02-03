@@ -46,8 +46,21 @@ class Logger:
         self._port = port
         self._quit = False
 
-        from ...tools import logger as commonLogger
-        self._logger = commonLogger.getLogger('blenderVR')
+        from ...tools import logger as logger
+        self._logger = logger.getLogger('blenderVR')
+        logger.File(self._logger, '/tmp/output.logger.log')
+        if debug:
+            # Define connexions until the controller is running ...
+            self._logger.setLevel('debug')
+
+        print('Connexion !')
+        from ...tools import controller
+        try:
+            self._controller = controller.Controller('localhost:' + str(self._port), 'logger')
+            print('Apres la connexion !')
+        except ConnectionRefusedError:
+            self.logger.warning('Cannot find the controller on localhost:' + str(self._port))
+            sys.exit()
 
     def start(self):
         from ... import version
