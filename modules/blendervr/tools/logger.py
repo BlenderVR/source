@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+7# -*- coding: utf-8 -*-
 # file: blendervr/tools/logger.py
 
 ## Copyright (C) LIMSI-CNRS (2014)
@@ -144,20 +144,30 @@ class Console(Handler):
         Handler.__init__(self, logger)
 
     def emit(self, record):
-        printLogOnConsole(record.levelno, record.msg)
+        sendLogToStream(record.levelno, record.msg)
 
+class File(Handler):
+    def __init__(self, logger, filename):
+        Handler.__init__(self, logger)
+        self._filename = filename
+
+    def emit(self, record):
+        with open(self._filename, 'a') as node:
+            sendLogToStream(record.levelno, record.msg, node)
+        
 streamMapping = {'DEBUG': sys.stdout,
                  'INFO': sys.stdout,
                  'WARNING': sys.stderr,
                  'ERROR': sys.stderr,
                  'CRITICAL': sys.stderr}
 
-def printLogOnConsole(level, message):
+def sendLogToStream(level, message, stream = None):
     levelname = logging.getLevelName(level)
-    if levelname in streamMapping:
-        stream = streamMapping[levelname]
-    else:
-        stream = sys.stdout
+    if not stream:
+        if levelname in streamMapping:
+            stream = streamMapping[levelname]
+        else:
+            stream = sys.stdout
     nb_return = message.count("\n")
     if nb_return > 2:
         stream.write('***********************************************\n')

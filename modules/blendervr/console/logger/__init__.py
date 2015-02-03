@@ -46,14 +46,8 @@ class Logger:
         self._port = port
         self._quit = False
 
-        from ...tools import logger
-        self._logger = logger.getLogger('blenderVR')
-
-        output_logger = logger.File('/tmp/output.log')
-        self._default_logger = self._logger.addLoginWindow(output_logger, True)
-        if debug:
-            # Define connexions until the controller is running ...
-            self._logger.setLevel('debug')
+        from ...tools import logger as commonLogger
+        self._logger = commonLogger.getLogger('blenderVR')
 
     def start(self):
         from ... import version
