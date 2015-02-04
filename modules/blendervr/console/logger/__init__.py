@@ -37,9 +37,7 @@ import os
 import sys
 import time
 from ...tools import controller
-import importlib
-from ..protocol import composeMessage
-from ..protocol import decomposeMessage
+import logging
 
 class Logger:
     def __init__(self, port, debug = False):
@@ -53,23 +51,31 @@ class Logger:
             # Define connexions until the controller is running ...
             self._logger.setLevel('debug')
 
-        print('Connexion !')
         from ...tools import controller
         try:
             self._controller = controller.Controller('localhost:' + str(self._port), 'logger')
-            print('Apres la connexion !')
         except ConnectionRefusedError:
             self.logger.warning('Cannot find the controller on localhost:' + str(self._port))
             sys.exit()
-
+            
+        self._colors = {'DEBUG': '\033[94m',
+                        'INFO': '\033[92m',
+                        'WARNING': '\033[93m',
+                        'ERROR': '\033[91m',
+                        'CRITICAL': '\033[1m\033[91m'}
+            
     def start(self):
         from ... import version
         self.logger.info('blenderVR version:', version)
 
     def main(self):
         try:
-            while not self._quit:
-                time.sleep(1)
+            while True:
+                message = self._controller.receive()
+                if message:
+                    command, argument = message
+                    if command == 'log':
+                        self.process(argument)
         except controller.closedSocket as e:
             self.logger.warning(e)
         except (KeyboardInterrupt, SystemExit):
@@ -78,8 +84,13 @@ class Logger:
     def quit(self):
         self._quit = True
 
-    def display(self, message):
-        print(message)
+    def process(self, record):
+        levelname = logging.getLevelName(record['level'])
+        message = '[' + record['context'] + ']: ' + record['message']
+        if levelname in self._colors:
+            print(self._colors[levelname] + message + '\033[0m')
+        else:
+            print(message)
         
     @property
     def logger(self):

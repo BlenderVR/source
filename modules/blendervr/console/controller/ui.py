@@ -46,10 +46,6 @@ class UI(base.Client):
                           'processor file': ['simulation', 'processor', 'file'],
                           'screen set':['virtual environment', 'screen set']}
 
-    def cb_connect(self):
-        return
-        self.logger.debug('Connexion of a user interface:', self._client)
-
     def cb_data(self):
         result = self._client.receive()
         command, argument = result
@@ -76,10 +72,6 @@ class UI(base.Client):
             self.controller.configuration()
             return
         self.logger.debug('unknown command:', command, '(', argument, ')')
-
-    def cb_disconnect(self):
-        return
-        self.logger.debug('Disconnexion of a user interface:', self._client)
 
     def set(self, argument):
         command, argument = decomposeMessage(argument)

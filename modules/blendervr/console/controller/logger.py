@@ -43,18 +43,18 @@ class Logger(base.Client):
         base.Client.__init__(self, parent, client)
 
     def cb_connect(self):
-        return
-        self.logger.debug('Connexion of a user interface:', self._client)
+        self.controller._logs.addCallback(self.data)
+        for message in self.controller._logs.getAllMessages():
+            self.data(message)
 
     def cb_data(self):
         result = self._client.receive()
         command, argument = result
-        self.logger.debug('unknown command:', command, '(', argument, ')')
+        self.logger.debug(self.logger.POSITION, ': unknown command:', command, '(', argument, ')')
 
     def cb_disconnect(self):
-        return
-        self.logger.debug('Disconnexion of a user interface:', self._client)
+        self.controller._logs.removeCallback(self.data)
         
     def data(self, message):
-        print(message)
+        self._client.send('log', message)
         

@@ -37,12 +37,13 @@ import os
 import sys
 from . import ui
 from . import daemon
-from ...tools import logger
+from . import logger
+from ...tools import logger as tool_logger
 
 class Controller():
     def __init__(self, profile_file, debug):
         self._debug = debug
-        
+
         # Simulation informations
         self._blender_file       = None 
         self._loader_file        = None
@@ -62,7 +63,7 @@ class Controller():
         from . import profile
         self._profile = profile.Profile(profile_file)
 
-        self._logger = logger.getLogger('blenderVR')
+        self._logger = tool_logger.getLogger('blenderVR')
 
         from ...tools import getRootPath
         self._update_loader_script = os.path.join(getRootPath(), 'utils', 'update_loader.py')
@@ -72,7 +73,7 @@ class Controller():
 
         if self._debug:
             # Define connexions until the controller is running ...
-            logger.Console(self._logger)
+            tool_logger.Console(self._logger)
             self._logger.setLevel('debug')
             self.profile.setValue(['debug', 'daemon'], False)
             self.profile.setValue(['debug', 'executables'], False)
@@ -90,7 +91,9 @@ class Controller():
         from . import listener
         self._listener = listener.Listener(self)
 
-        sys.stdout.write('blenderVR controller port: ' + str(self.getPort()) + "\n")
+        sys.stdout.write("***********\n")
+        sys.stdout.write("***" + str(self.getPort()) + "***\n")
+        sys.stdout.write("***********\n")
         sys.stdout.flush()
         from ... import version
         self.logger.info('blenderVR version:', version)
