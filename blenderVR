@@ -200,8 +200,12 @@ try:
             stdout_stream = subprocess.PIPE
         process = subprocess.Popen([sys.executable, os.path.join(root, 'utils', 'console', 'controller.py')] + options, env = environment, shell = False, stdout = stdout_stream)
         if not environments.debug:
-            port = process.stdout.readline().decode().strip()
-            print('port:', port)
+            port = None
+            while not port:
+                line = process.stdout.readline().decode().strip()
+                if line.startswith('***') and line.endswith('***'):
+                    port = line[3:-3]
+            print('Port:', port)
         else:
             try:
                 process.wait()

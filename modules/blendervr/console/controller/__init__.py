@@ -91,9 +91,7 @@ class Controller():
         from . import listener
         self._listener = listener.Listener(self)
 
-        sys.stdout.write("***********\n")
         sys.stdout.write("***" + str(self.getPort()) + "***\n")
-        sys.stdout.write("***********\n")
         sys.stdout.flush()
         from ... import version
         self.logger.info('blenderVR version:', version)
