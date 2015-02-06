@@ -62,6 +62,7 @@ class Master(Object, item_base.Master):
         self._previousScale = mathutils.Vector()
         self._previousVisibility = True
 
+
     def getSynchronizerBuffer(self):
         buff = Buffer()
 
@@ -93,19 +94,23 @@ class Slave(Object, item_base.Slave):
         Object.__init__(self)
         item_base.Slave.__init__(self, parent, item)
 
-    def processSynchronizerBuffer(self, buff):
 
+    def _processCommand(self, command, buff):
+        if command == self.POSITION:
+            self._item.worldPosition = buff.vector_3()
+
+        if command == self.ORIENTATION:
+            self._item.worldOrientation = buff.matrix_3x3()
+
+        if command == self.SCALE:
+            self._item.worldScale = buff.vector_3()
+
+        if command == self.VISIBILITY:
+            self._item.setVisible(buff.boolean())
+
+
+    def processSynchronizerBuffer(self, buff):
         while len(buff) > 0:
             command = buff.command()
+            self._processCommand(command, buff)
 
-            if command == self.POSITION:
-                self._item.worldPosition = buff.vector_3()
-
-            if command == self.ORIENTATION:
-                self._item.worldOrientation = buff.matrix_3x3()
-
-            if command == self.SCALE:
-                self._item.worldScale = buff.vector_3()
-
-            if command == self.VISIBILITY:
-                self._item.setVisible(buff.boolean())

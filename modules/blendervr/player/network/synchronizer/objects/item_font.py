@@ -42,16 +42,34 @@ from . import item_object
 
 
 class Font:
-    pass
+    TEXT = b't'
 
 
 class Master(Font, item_object.Master):
     def __init__(self, parent, item):
         Font.__init__(self)
         item_object.Master.__init__(self, parent, item)
+        self._previousText = ""
+
+    def getSynchronizerBuffer(self):
+        buff = item_object.Master.getSynchronizerBuffer(self)
+
+        if self._previousText != self._item.text:
+            self_previousText = self._item.text
+            buff.command(self.TEXT)
+            buff.string(self_previousText)
+
+        return buff
 
 
 class Slave(Font, item_object.Slave):
     def __init__(self, parent, item):
         Font.__init__(self)
         item_object.Slave.__init__(self, parent, item)
+
+    def _processCommand(self, command, buff):
+        item_object.Slave._processCommand(self, command, buff)
+
+        if command == self.TEXT:
+            self._item.text = buff.string()
+
