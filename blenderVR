@@ -60,11 +60,17 @@ import builtins
 
 if sys.platform.startswith('win'): # Windows
     path = os.path.join(os.environ['APPDATA'])
+    window = ['start', '/wait']
+    window_shell = True
 elif sys.platform == 'darwin': # MacOSX
     path = os.path.join(os.path.expanduser('~'), 'Library',
                         'Application Support')
+    window = ['open', '-W', '-a', 'Terminal.app']
+    window_shell = False
 else: # Unix ...
     path = os.path.join(os.path.expanduser('~'), '.config')
+    window = ['mrxvt', '-e']
+    window_shell = False
 path = os.path.join(path, 'blender')
 
 if not os.path.isdir(path): os.makedirs(path)
@@ -199,34 +205,42 @@ try:
         else:
             stdout_stream = subprocess.PIPE
         process = subprocess.Popen([sys.executable, os.path.join(root, 'utils', 'console', 'controller.py')] + options, env = environment, shell = False, stdout = stdout_stream)
-        if not environments.debug:
+        if environments.debug:
+            try:
+                process.wait()
+            except KeyboardInterrupt:
+                pass
+            sys.exit()
+        else:
             port = None
             while not port:
                 line = process.stdout.readline().decode().strip()
                 if line.startswith('***') and line.endswith('***'):
                     port = line[3:-3]
             print('Port:', port)
-        else:
-            try:
-                process.wait()
-            except KeyboardInterrupt:
-                pass
-            sys.exit()
-    if environments.ui and environments.port:
-        options = [environments.port]
-        if environments.debug:
-            options.append('debug')
+            environments.port = port
+        use_window = True
+    else:
+        use_window = True
+    if use_window:
+        base = window + [sys.executable]
+    else:
+        base = [sys.executable]
+        window_shell = False
+    if not environments.port:
+        print('Port is missing !')
+        sys.exit()
+    options = [environments.port]
+    if environments.debug:
+        options.append('debug')
+    if environments.ui:
         try:
-            process = subprocess.Popen([sys.executable, os.path.join(root, 'utils', 'console', 'ui.py')] + options, env = environment)
-            process.wait()
+            process = subprocess.Popen(base + [os.path.join(root, 'utils', 'console', 'ui.py')] + options, env = environment, shell = window_shell)
         except KeyboardInterrupt:
             pass
-    if environments.logger and environments.port:
-        options = [environments.port]
-        if environments.debug:
-            options.append('debug')
+    if environments.logger:
         try:
-            process = subprocess.Popen([sys.executable, os.path.join(root, 'utils', 'console', 'logger.py')] + options, env = environment)
+            process = subprocess.Popen(base + [os.path.join(root, 'utils', 'console', 'logger.py')] + options, env = environment, shell = window_shell)
             process.wait()
         except KeyboardInterrupt:
             pass
