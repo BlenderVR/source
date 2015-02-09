@@ -85,37 +85,56 @@ if not os.path.isdir(blenderVR_profilePath):
 # Prepare command-line arguments parsing, then parse it.
 import argparse
 parser = argparse.ArgumentParser()
+
 parser.add_argument("-v", "--version", dest="d_version",
                     help="Current version of blender player",
                     action="store_true", default=False)
-parser.add_argument("--blenderVR-root", dest="blenderVR_root",
-                    help="Modify the blenderVR root")
-parser.add_argument("--display-console", dest="dis_console",
-                    help="Display current configuration of the console",
-                    action="store_true", default=False)
-parser.add_argument("--delete-console", dest="del_console",
-                    help="Delete current configuration of the console",
-                    action="store_true", default=False)
-parser.add_argument("-d", "--debug", dest="debug",
-                    help="Debug blenderVR application",
-                    action="store_true", default=False)
-parser.add_argument("-c", "--controller", dest="controller",
-                    help="Start the controller",
-                    action="store_true", default=False)
-parser.add_argument("-u", "--user-interface", dest="ui",
-                    help="Open the user interface",
-                    action="store_true", default=False)
-parser.add_argument("-l", "--logger", dest="logger",
-                    help="Open the logger",
-                    action="store_true", default=False)
-parser.add_argument("-a", "--all", dest="all",
-                    help="Start the controller and Open the user interface",
-                    action="store_true", default=False)
-parser.add_argument("-p", "--port", dest="port",
-                    help="Set the port of the controller")
 
-environments = parser.parse_args(sys.argv[1:])
 
+subparsers = parser.add_subparsers(dest='current')
+
+# Configuration part for the console
+p_configuration = subparsers.add_parser('configuration', help='Configuration of the console')
+p_configuration.add_argument('-r', '--root', dest='root',
+                    help='Modify the blenderVR root')
+p_configuration.add_argument('-d', '--display', dest='display',
+                    help='Display current configuration of the controller',
+                    action='store_true', default=False)
+p_configuration.add_argument('-c', '--clear', dest='clear',
+                    help='Clear current configuration of the controller',
+                    action='store_true', default=False)
+p_configuration.add_argument('-s', '--set', dest='set',
+                    help='Set current configuration')
+
+p_common = argparse.ArgumentParser(add_help=False)
+p_common.add_argument('-d', '--debug', dest='debug',
+                        help='Debug blenderVR application',
+                        action='store_true', default=False)
+
+p_controller = subparsers.add_parser('controller', help='Controller daemon', parents = [p_common])
+p_controller.add_argument('-f', '--foreground', dest='foreground',
+                            help='Run the console in foreground',
+                            action='store_true', default=False)
+
+p_port = argparse.ArgumentParser(add_help=False)
+p_port.add_argument('-p', '--port', dest='port',
+                    help='Set the port of the controller')
+p_windowed = argparse.ArgumentParser(add_help=False)
+p_windowed.add_argument('-w', '--windowed', dest='windowed',
+                        help='Run in independant window',
+                        action='store_true', default=False)
+
+p_logger = subparsers.add_parser('logger', help='Logger', parents = [p_common, p_port, p_windowed])
+p_ui = subparsers.add_parser('UI', help='User interface', parents = [p_common, p_port, p_windowed])
+
+
+try: # Autocomplet from bash
+    import argcomplete
+    argcomplete.autocomplete(parser)
+except:
+    pass
+    
+environments = parser.parse_args()
 
 def checkRoot(path):
     """Check if a given path is valid as blenderVR root.
@@ -129,6 +148,42 @@ def checkRoot(path):
     :rtype: bool
     """
     return (path and os.path.isdir(os.path.join(path, 'modules', 'blendervr')))
+
+# First, process the configuration part of the console
+if environments.current == 'configuration':
+    import pickle
+    configuration = None
+    with open(profile_file, 'rb') as node:
+        configuration = pickle.load(node)
+    if environments.display:
+        import pprint
+        if not configuration:
+            print('Empty profile file:', profile_file)
+            configuration = []
+        else:
+            import pprint
+            print("Configuration:")
+            pprint.pprint(configuration)
+            profile_file = None
+    if environments.set:
+        configuration = eval(environments.set)
+    if environments.clear:
+        configuration = []
+    if environments.root:
+        if checkRoot(environments.root):
+            configuration['root'] = environments.root
+        else:
+            print('Invalid root path !')
+            profile_file = None
+    if profile_file:
+        with open(profile_file, 'wb') as node:
+            pickle.dump(configuration, node)
+    sys.exit()
+    
+    
+import pprint
+pprint.pprint(environments)
+sys.exit()
 
 
 def getRootPath(environment):
