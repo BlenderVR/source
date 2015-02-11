@@ -45,10 +45,10 @@ used to send OSC messages (for sound control) to a third party program
 (e.g. PureData, MaxMSP, etc.)
 """
 
-from ... import *
+from .. import *
 from .. import exceptions
 
-if is_virtual_environment():
+if base.is_virtual_environment():
     class Base(base.Base):
         def __init__(self, parent):
             base.Base.__init__(self, parent)
@@ -63,7 +63,7 @@ if is_virtual_environment():
             self.run = self._main.run
             self._main.start()
 
-elif is_console():
+elif base.is_console():
     class Base(base.Base):
         def __init__(self, parent):
             base.Base.__init__(self, parent)
