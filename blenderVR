@@ -89,6 +89,7 @@ p_configuration.add_argument('-s', '--set', dest='set', help='Set the configurat
 p_common = argparse.ArgumentParser(add_help=False)
 p_common.add_argument('-d', '--debug', dest='debug', help='Debug blenderVR application', action='store_true', default=False)
 p_common.add_argument('-f', '--foreground', dest='foreground', help='Run the console in foreground', action='store_true', default=None)
+p_common.add_argument('-b', '--background', dest='foreground', help='Run the console in background', action='store_false', default=None)
 
 p_controller = subparsers.add_parser('controller', help='Controller daemon', parents = [p_common])
 
@@ -225,7 +226,7 @@ def start(element, options = []):
         import traceback
         traceback.print_exc()
         sys.exit()
-        
+
     if environments.foreground:
         try:
             process.wait()
