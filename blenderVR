@@ -200,8 +200,10 @@ def start(element, options = []):
     use_Shell = False
     command = []
     if environments.foreground:
+        options.append('foreground')
         stream = None
     else:
+        options.append('background')
         stream = subprocess.PIPE
         if element != 'controller':
             if sys.platform.startswith('win'): # Windows
@@ -213,8 +215,8 @@ def start(element, options = []):
                 command = ['/usr/bin/mrxvt', '-e']
     command += [sys.executable, os.path.join(root, 'utils', 'console', element + '.py')]
 
-    if environments.debug: options.append('base_log_level=debug')
-    else:                  options.append('base_log_level=warn')
+    if environments.debug: options.append('min_log_level=debug')
+    else:                  options.append('min_log_level=warn')
 
     try:
         process = subprocess.Popen(command + options, env = environment, shell = False,

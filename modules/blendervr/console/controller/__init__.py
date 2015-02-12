@@ -41,8 +41,9 @@ from . import logger
 from ...tools import logger as tool_logger
 
 class Controller():
-    def __init__(self, profile_file, debug):
-        self._debug = debug
+    def __init__(self, profile_file, min_log_level, foreground):
+        self._min_log_level = min_log_level
+        self._foreground = foreground
 
         # Simulation informations
         self._blender_file       = None 
@@ -71,10 +72,10 @@ class Controller():
         from . import logs
         self._logs = logs.Logs(self)
 
-        if self._debug:
+        self._logger.setLevel(self._min_log_level)
+        if self._foreground:
             # Define connexions until the controller is running ...
             tool_logger.Console(self._logger)
-            self._logger.setLevel('debug')
             self.profile.setValue(['debug', 'daemon'], False)
             self.profile.setValue(['debug', 'executables'], False)
 
@@ -96,8 +97,6 @@ class Controller():
         from ... import version
         self.logger.info('blenderVR version:', version)
         self.configuration()
-        if self._debug:
-            self._logs.display()
 
     def getPort(self):
         return self._listener.getPort()
