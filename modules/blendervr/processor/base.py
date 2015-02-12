@@ -136,6 +136,7 @@ elif is_console():
 
             self._main_profile = parent.profile
             try:
+                # TODO: think of defining a profile per processor !
                 from . import profile
                 self._profile = profile.Profile(
                             os.path.join(blenderVR_profilePath, 'processor',
