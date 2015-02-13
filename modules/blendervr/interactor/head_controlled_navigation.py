@@ -240,6 +240,13 @@ if is_virtual_environment():
             self.sendToConsole(self._interactor_name, self.getNavigationState())
 
         def setHeadLocation(self, user, info):
+            """Update the viewer location based on the tracker position.
+
+            :param user: who is using this head tracker
+            :type user: :class:`blendervr.player.user.User`
+            :param info: data from the tracker device
+            :type info: dict with 'matrix' (a 4x4 :class:`mathutils.Matrix`)
+            """
             if hasattr(self, '_local'):
                 self._local.setHeadLocation(info['matrix'], info)
                 return
