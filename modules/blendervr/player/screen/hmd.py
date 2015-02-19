@@ -71,8 +71,7 @@ class Device(base.Base):
                                 "try it with caution.")
             warning_for_unsure_projection_displayed = True
 
-    def _updateMatrixForBuffer(self, bufferName, camera,
-                    projection_matrix_name, post_camera_matrix_name, depth):
+    def _updateMatrixForBuffer(self, bufferName, camera, depth):
 
         scale = self.blenderVR.getScale()
         user = self._buffers[bufferName]['user']
@@ -136,7 +135,6 @@ class Device(base.Base):
             screen_configuration['fromScreensOriginToLocalScreen'] \
             * user.getPosition() * user.getVehiclePosition()
 
-        setattr(camera, post_camera_matrix_name,
-            mathutils.Matrix.Translation(
-                viewPointPositionInScreenReferenceFrame) * screen_position)
-        setattr(camera, projection_matrix_name, projection_matrix)
+        #camera.position_matrix = mathutils.Matrix.Translation(
+        #        viewPointPositionInScreenReferenceFrame) * screen_position
+        camera.projection_matrix = projection_matrix

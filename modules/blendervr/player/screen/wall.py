@@ -54,8 +54,7 @@ class Device(base.Base):
         self._screen_informations = self.computeScreenRegardingCorners(
                             configuration['wall']['corners'])
 
-    def _updateMatrixForBuffer(self, bufferName,
-            camera, projection_matrix_name, post_camera_matrix_name, depth):
+    def _updateMatrixForBuffer(self, bufferName, camera, depth):
 
         user = self._buffers[bufferName]['user']
         scale = self.blenderVR.getScale()
@@ -125,6 +124,6 @@ class Device(base.Base):
         projection_matrix[3][2] = - 1.0
         projection_matrix[3][3] = 0.0
 
-        setattr(camera, post_camera_matrix_name, user.getVehiclePosition())
-        setattr(camera, projection_matrix_name, projection_matrix
-                    * from_vehicule_to_eye_by_screen * scaleToApplyToTheScene)
+        #camera.position_matrix = user.getVehiclePosition()
+        camera.projection_matrix = projection_matrix * \
+                from_vehicule_to_eye_by_screen * scaleToApplyToTheScene

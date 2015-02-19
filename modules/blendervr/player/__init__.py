@@ -208,7 +208,7 @@ class Main:
             self.getProcessor().start()
 
             self.run = lambda *args: None
-            self._scene.pre_render.append(self.wait_for_everybody)
+            self._scene.pre_draw.append(self.wait_for_everybody)
 
         except exceptions.Common as error:
             self.logger.error(error)
@@ -239,13 +239,13 @@ class Main:
             self._controller.run()
             self._connector.wait_for_everybody()
             if self._connector.isReady():
-                self._previous_pre_render = True
-                self._scene.pre_render.remove(self.wait_for_everybody)
+                self._previous_pre_draw = True
+                self._scene.pre_draw.remove(self.wait_for_everybody)
                 if self.isMaster():
                     self.run = self._run_master
                 else:
                     self.run = self._run_slave
-                self._scene.pre_render.append(self._pre_render)
+                self._scene.pre_draw.append(self._pre_draw)
                 self._startSimulation()
         except SystemExit:
             pass
@@ -254,9 +254,9 @@ class Main:
 
     def _run_master(self):
         # Ensure that run is call only once per frame ...
-        if not self._previous_pre_render:
+        if not self._previous_pre_draw:
             return
-        self._previous_pre_render = False
+        self._previous_pre_draw = False
         try:
             self._processor.run()
             self._keyboardAndMouse.run()
@@ -277,7 +277,7 @@ class Main:
         except:
             self.stopDueToError()
 
-    def _pre_render(self):
+    def _pre_draw(self):
         try:
             self._controller.run()
             self._connector.run()
@@ -288,7 +288,7 @@ class Main:
             pass
         except:
             self.stopDueToError()
-        self._previous_pre_render = True
+        self._previous_pre_draw = True
 
     def getController(self):
         return self._controller
@@ -400,9 +400,9 @@ class Main:
     def _stopAll(self):
         """Internal stop: do not use"""
         self.run = lambda *args: None
-        if hasattr(self, '_pre_render') and \
-                            self._pre_render in self._scene.pre_render:
-            self._scene.pre_render.remove(self._pre_render)
+        if hasattr(self, '_pre_draw') and \
+                            self._pre_draw in self._scene.pre_draw:
+            self._scene.pre_draw.remove(self._pre_draw)
 
     def _suspendResumeInternal(self):
         """Internal method to pause and resume the scene"""
