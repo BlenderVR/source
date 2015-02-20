@@ -45,65 +45,73 @@ class OcculusRift(base.Base):
         super(OcculusRift, self).__init__(parent)
 
         self._devices = []
-        """
-        self._devices = []
-        self._display_processors = configuration['display_processors']
-
-        try:
-            from game_engine_rift.rift import PyRift
-            assert PyRift     # avoid import unused
-        except ImportError:
-            self.logger.info('No Occulus Rift python module available')
-            self._available = False
-            return
-
-        """
-        """
-        try:
-            device_types = {'button': button.Button,
-                            'analog': analog.Analog,
-                            'tracker': tracker.Tracker,
-                            'text': text.Text}
-        except NameError:
-            pass
-        else:
-            for key, className in device_types.items():
-                if (key in configuration) and configuration[key] is not None:
-                    for element in configuration[key]:
-                        try:
-                            self._devices.append(className(self, element))
-                        except exceptions.Processor_Invalid_Device_Method \
-                                                                as method:
-                            if self._display_processors:
-                                self.logger.warning(method)
-                        except exceptions.Processor_Invalid_Device as other:
-                            self.logger.warning(other)
-        self._available = True
-        """
-
-    """
-    def checkMethods(self):
-        if not self._available:
-            self.logger.info('Occulus Rift python module not available !')
-            return False
-        invalid = []
-        for device in self._devices:
-            if not device.checkMethod(self._display_processors):
-                invalid.append(device)
-        for device in invalid:
-            self._devices.remove(device)
-        if len(self._devices) == 0:
-            self.logger.info('No Occulus Rift processor method available !')
-            return False
-        return True
-    """
+        self._configuration = configuration
 
     def start(self):
-        self.logger.debug('Hi')
-        for device in self._devices:
-            device.start()
+        import bge
+
+        width = bge.render.getWindowWidth()
+        height = bge.render.getWindowHeight()
+
+        """
+        self.logger.debug('screen [width,height]:', width, ',', height)
+        """
+
+        cont = bge.logic.getCurrentController()
+
+        cont.owner["screen_width"] = width
+        cont.owner["screen_height"] = height
+
+        ELEMENTS_MAIN_PREFIX = 'blenderVR:'
+        ACTUATOR = ELEMENTS_MAIN_PREFIX + 'Occulus:Filter'
+
+        actuator = cont.actuators.get(ACTUATOR)
+        if not actuator:
+            self.logger.error('Error: Occulus Rift 2D Filter Actuator not found ({0})'.format(ACTUATOR))
+        else:
+            cont.activate(actuator)
 
     def run(self):
-        self.logger.debug('run')
-        for device in self._devices:
-            device.run()
+        import bge
+        from mathutils import Euler
+        from math import pi
+
+        import sys
+
+        library_path = self._configuration['plugins']
+
+        if library_path not in sys.path:
+            sys.path.append(library_path)
+
+        from game_engine_rift.rift import PyRift
+
+
+        if not hasattr(bge.logic, 'rift'):
+            bge.logic.rift = PyRift()
+            euler = Euler((0, 0, 0), 'XYZ')
+        else:
+            self._poll(bge.logic.rift)
+            euler = bge.logic.rotation.to_euler()
+
+        """
+        TODO: the following is the part we need to change later
+        so it uses our internal classes to access the navigation
+        (instead of by passing it entirely)
+        """
+        scene = bge.logic.getCurrentScene()
+        cam = scene.active_camera
+        fix = Euler((-pi/2, 0, 0), 'XYZ')
+
+        rot = Euler((-euler.z, euler.y, -euler.x), 'XYZ')
+        rot.rotate(fix)
+        camera.worldOrientation = rot
+
+    def _poll(self, rift):
+        from mathutils import Quaternion
+
+        rift.poll()
+        bge.logic.rotation = Quaternion((rift.rotation[0],
+                rift.rotation[1],
+                rift.rotation[2],
+                rift.rotation[3]))
+
