@@ -34,8 +34,9 @@
 ## 
 
 import sys
-profile_file = sys.argv[1]
+profile_file  = sys.argv[1]
 min_log_level = 'warn'
+foreground    = False
 for argument in sys.argv[2:]:
     if argument.startswith('min_log_level='):
         name, min_log_level = argument.split('=')
@@ -50,4 +51,3 @@ application.start()
 application.main()
 application.quit()
 del(application)
-sys.exit()

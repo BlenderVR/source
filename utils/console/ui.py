@@ -35,13 +35,18 @@
 
 import sys
 port  = sys.argv[1]
-if 'debug' in sys.argv:
-    debug = True
-else:
-    debug = False
+min_log_level = 'warn'
+foreground    = False
+for argument in sys.argv[2:]:
+    if argument.startswith('min_log_level='):
+        name, min_log_level = argument.split('=')
+    if argument == 'foreground':
+        foreground = True
+    if argument == 'background':
+        foreground = False
 
 import blendervr.console.ui
-application = blendervr.console.ui.UI(port, debug)
+application = blendervr.console.ui.UI(port, min_log_level, foreground)
 application.start()
 application.main()
 application.quit()
