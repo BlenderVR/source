@@ -39,7 +39,18 @@ class Device(base.Base):
 
     def __init__(self, parent, name, attrs):
         super(Device, self).__init__(parent, name, attrs)
+        self._supported_models = {'occulus_rift',}
+        self._attribute_list += ['model']
+        self._model = None
 
+        if 'model' in attrs:
+            model = attrs['model']
+            if model in self._supported_models:
+                self._model = model
+            else:
+                self.raise_error("HMD model not supported ({0}) !"
+                        " Leave the attribute blank or pick one of those: {1}"
+                        .format(model, self._supported_models))
 
     def _getChildren(self, name, attrs):
         if name in {'left', 'mono', 'right'}:
