@@ -45,68 +45,96 @@ class OcculusRift(base.Base):
         super(OcculusRift, self).__init__(parent)
 
         self._devices = []
-        self._configuration = configuration
+
+        try:
+            import sys
+            library_folder = configuration['library']['folder']
+
+            if library_folder not in sys.path:
+                sys.path.append(library_folder)
+
+            from game_engine_rift.rift import PyRift
+            assert PyRift     # avoid import unused
+
+        except ImportError:
+            self.logger.info('No Occulus Rift python module available')
+            self._available = False
+            return
+
+        except Exception as err:
+            self.logger.error(err)
+            self._available = False
+            return
+
+        self._available = True
+
+    def isAvailable(self):
+        if not self._available:
+            self.logger.info('Occulus Rift python module not available !')
+            return False
+        return True
 
     def start(self):
-        import bge
+        try:
+            import bge
 
-        width = bge.render.getWindowWidth()
-        height = bge.render.getWindowHeight()
+            width = bge.render.getWindowWidth()
+            height = bge.render.getWindowHeight()
 
-        """
-        self.logger.debug('screen [width,height]:', width, ',', height)
-        """
+            """
+            self.logger.debug('screen [width,height]:', width, ',', height)
+            """
 
-        cont = bge.logic.getCurrentController()
+            cont = bge.logic.getCurrentController()
 
-        cont.owner["screen_width"] = width
-        cont.owner["screen_height"] = height
+            cont.owner["screen_width"] = width
+            cont.owner["screen_height"] = height
 
-        ELEMENTS_MAIN_PREFIX = 'blenderVR:'
-        ACTUATOR = ELEMENTS_MAIN_PREFIX + 'Occulus:Filter'
+            ELEMENTS_MAIN_PREFIX = 'blenderVR:'
+            ACTUATOR = ELEMENTS_MAIN_PREFIX + 'Occulus:Filter'
 
-        actuator = cont.actuators.get(ACTUATOR)
-        if not actuator:
-            self.logger.error('Error: Occulus Rift 2D Filter Actuator not found ({0})'.format(ACTUATOR))
-        else:
-            cont.activate(actuator)
+            actuator = cont.actuators.get(ACTUATOR)
+            if not actuator:
+                self.logger.error('Error: Occulus Rift 2D Filter Actuator not found ({0})'.format(ACTUATOR))
+            else:
+                cont.activate(actuator)
+
+        except Exception as err:
+            self.logger.error(err)
 
     def run(self):
-        import bge
-        from mathutils import Euler
-        from math import pi
+        try:
+            import bge
+            from mathutils import Euler
+            from math import pi
 
-        import sys
+            from game_engine_rift.rift import PyRift
 
-        library_path = self._configuration['plugins']
+            if not hasattr(bge.logic, 'rift'):
+                bge.logic.rift = PyRift()
+                euler = Euler((0, 0, 0), 'XYZ')
+            else:
+                self._poll(bge.logic.rift)
+                euler = bge.logic.rotation.to_euler()
 
-        if library_path not in sys.path:
-            sys.path.append(library_path)
+            """
+            TODO: the following is the part we need to change later
+            so it uses our internal classes to access the navigation
+            (instead of by passing it entirely)
+            """
+            scene = bge.logic.getCurrentScene()
+            camera = scene.active_camera
+            fix = Euler((-pi/2, 0, 0), 'XYZ')
 
-        from game_engine_rift.rift import PyRift
+            rot = Euler((-euler.z, euler.y, -euler.x), 'XYZ')
+            rot.rotate(fix)
+            camera.worldOrientation = rot
 
-
-        if not hasattr(bge.logic, 'rift'):
-            bge.logic.rift = PyRift()
-            euler = Euler((0, 0, 0), 'XYZ')
-        else:
-            self._poll(bge.logic.rift)
-            euler = bge.logic.rotation.to_euler()
-
-        """
-        TODO: the following is the part we need to change later
-        so it uses our internal classes to access the navigation
-        (instead of by passing it entirely)
-        """
-        scene = bge.logic.getCurrentScene()
-        cam = scene.active_camera
-        fix = Euler((-pi/2, 0, 0), 'XYZ')
-
-        rot = Euler((-euler.z, euler.y, -euler.x), 'XYZ')
-        rot.rotate(fix)
-        camera.worldOrientation = rot
+        except Exception as err:
+            self.logger.error(err)
 
     def _poll(self, rift):
+        import bge
         from mathutils import Quaternion
 
         rift.poll()
