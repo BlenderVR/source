@@ -49,7 +49,7 @@ if base.is_virtual_environment():
             self._main = virtual_environment.OcculusRift(self, configuration)
 
         def start(self):
-            if not hasattr(self, '_main'):
+            if not hasattr(self, '_main') or not self._main.isAvailable():
                 raise exceptions.PluginError()
             self.run = self._main.run
             self._main.start()
