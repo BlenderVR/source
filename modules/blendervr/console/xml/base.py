@@ -218,13 +218,16 @@ class XML(xml.sax.handler.ContentHandler, Base):
                 result[class_name] = getattr(self, '_' + class_name).getConfiguration()
         return result
 
+    def is_exe(self, filename):
+        return os.path.isfile(filename) and os.access(filename, os.X_OK)
+
     def which(self, filename):
         if os.environ.get("PATH") is not None:
             locations = os.environ.get("PATH").split(os.pathsep)
             candidates = []
             for location in locations:
                 candidate = os.path.join(location, filename)
-                if os.path.isfile(candidate) and os.access(candidate, os.X_OK):
+                if self.is_exe(candidate):
                     return candidate
         return None
 

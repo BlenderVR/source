@@ -54,14 +54,22 @@ class blenderplayer(base.single):
 
     def _default(self):
         super(blenderplayer, self)._default()
+        if self._environments is None:
+            self._environments = {}
+
         if self._executable is None:
             if sys.platform.startswith('win'):
                 blender_program = "blenderplayer.exe"
             else:
                 blender_program = "blenderplayer"
             self._executable = self.which(blender_program)
-        if self._environments is None:
-            self._environments = {}
+
+            if not self._executable:
+                self.raise_error('Error : \'executable\' attribute missing, and executable fallback not available ({0})'.format(blender_program))
+        else:
+            if not self.is_exe(self._executable):
+                self.raise_error('Error : invalid blenderplayer path ({0})'.format(self._executable))
+
 
 class daemon(base.single):
     def __init__(self, parent, name, attrs):

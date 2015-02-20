@@ -77,9 +77,17 @@ class XML(common_system.XML):
         if self._hostname is None:
             import socket
             self._hostname = socket.gethostname()
+
         if self._blender is None:
             if sys.platform.startswith('win'):
-                self._blender = "blender.exe"
+                blender_exe = "blender.exe"
             else:
-                self._blender = "blender"
-            
+                blender_exe = "blender"
+            self._blender = self.which(blender_exe)
+
+            if not self._blender:
+                self.raise_error('Error : \'blender\' attribute missing, and executable fallback not available ({0})'.format(blender_exe))
+
+        else:
+            if not self.is_exe(self._blender):
+                self.raise_error('Error : invalid blender path ({0})'.format(self._blender))
