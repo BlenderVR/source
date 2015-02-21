@@ -52,9 +52,18 @@ class Screen(base.Base):
         self._clients = {'daemon': None,
                          'blender_player': None}
 
+    def __del__(self):
+        self.kill()
+        
+    def kill(self):
+        if self._clients['blender_player']:
+            self._clients['blender_player'].kill()
+        if self._clients['daemon']:
+            self._clients['daemon'].kill()
+
     def getName(self):
         return self._name
-        
+
     def setConfiguration(self, configuration):
         screen_conf   = configuration['screen']
         computer_conf = configuration['computer']
@@ -113,11 +122,13 @@ class Screen(base.Base):
             if ' ' in argument:
                 self._daemon['command'][index] = '"' + argument + '"'
         
-    def quit(self):
-        pass
-
     def runAction(self, action, element):
-        if element == 'daemon':
+        if action == 'kill':
+            self.kill()
+        elif element == 'daemon':
+            if action == 'start':
+                self._startDaemon()
+        elif element == 'simulation':
             if action == 'start':
                 self._startDaemon()
 

@@ -41,7 +41,7 @@ from ..protocol import composeMessage
 from ..protocol import decomposeMessage
 
 class UI():
-    def __init__(self, port, min_log_level, foreground):
+    def __init__(self, port, min_log_level):
         self._port  = port
         self._print = lambda *args: True
 
@@ -58,7 +58,7 @@ class UI():
             sys.exit()
 
         self._commands = {}
-        for moduleName in ['root', 'set', 'get', 'reload', 'action']:
+        for moduleName in ['root', 'set', 'get', 'reload', 'status', 'action']:
             try:
                 _class = moduleName[0].upper() + moduleName[1:]
                 module = importlib.import_module('..protocol.' + moduleName, __name__)
@@ -112,8 +112,11 @@ class UI():
                     else:
                         _module = 'root'
                     _class  = self._commands[_module]
-                    _method = command[0]
-                    del(command[0])
+                    try:
+                        _method = command[0]
+                        del(command[0])
+                    except IndexError:
+                        _method = '_default'
                     if not self.process(_class, _method, *command):
                         self.logger.info('Invalid command:', line)
         except controller.closedSocket as e:

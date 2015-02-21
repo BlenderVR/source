@@ -48,3 +48,6 @@ class Action(Command):
     def daemon(self):
         self.send(self._action, 'daemon')
         
+    # def simulation(self):
+    #     self.send(self._action, 'simulation')
+        

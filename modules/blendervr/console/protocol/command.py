@@ -33,6 +33,8 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
+from . import decomposeMessage
+
 class Command:
     def __init__(self, connection):
         self._connection = connection
@@ -43,7 +45,10 @@ class Command:
     def send(self, command, argument = None):
         self._connection.send(command, argument)
 
-    def ask(self, command, argument = None):
+    def ask(self, command, argument = None, decompose = False):
         self._connection.send(command, argument)
-        return self._connection.receive()
-        
+        result = self._connection.receive()
+        if decompose and result:
+            answer, arguments = decomposeMessage(result[1])
+            return arguments
+        return result

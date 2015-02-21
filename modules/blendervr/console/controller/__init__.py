@@ -41,9 +41,9 @@ from . import logger
 from ...tools import logger as tool_logger
 
 class Controller():
-    def __init__(self, profile_file, min_log_level, foreground):
+    def __init__(self, profile_file, min_log_level, background):
         self._min_log_level = min_log_level
-        self._foreground = foreground
+        self._background = background
 
         # Simulation informations
         self._blender_file       = None 
@@ -73,7 +73,7 @@ class Controller():
         self._logs = logs.Logs(self)
 
         self._logger.setLevel(self._min_log_level)
-        if self._foreground:
+        if not self._background:
             # Define connexions until the controller is running ...
             tool_logger.Console(self._logger)
             self.profile.setValue(['debug', 'daemon'], False)
@@ -87,13 +87,33 @@ class Controller():
 
         from . import configuration
         self._configuration = configuration.Configuration(self)
-        
+
+        if os.name == "nt":
+            try:
+                import win32api
+                win32api.SetConsoleCtrlHandler(self.stop, True)
+            except ImportError:
+                version = '.'.join(map(str, sys.version_info[:2]))
+                raise Exception('pywin32 not installed for Python ' + version)
+        else:
+            import signal
+            for signal_name in ['SIGTERM', 'SIGQUIT']:
+                try:
+                    signum = getattr(signal, signal_name)
+                    signal.signal(signum, self._clean_quit)
+                except:
+                    self.logger.info('Invalid signal:', signal_name, ': ', signum)
+                    self.logger.debug(self.logger.EXCEPTION)
+                else:
+                    self.logger.debug('Activated signal:', signal_name)
+
     def start(self):
         from . import listener
         self._listener = listener.Listener(self)
 
         sys.stdout.write("***" + str(self.getPort()) + "***\n")
         sys.stdout.flush()
+        self.profile.setValue('port', self.getPort())
         from ... import version
         self.logger.info('blenderVR version:', version)
         self.configuration()
@@ -112,7 +132,16 @@ class Controller():
                 break
 
     def quit(self):
-        pass
+        self._clean_quit()
+
+    def _clean_quit(self, *argv):
+        self.profile.setValue('port', None)
+        self.runAction('kill', 'all')
+        for ui in self._uis:
+                ui.kill()
+        for logger in self._loggers:
+                logger.kill()
+        sys.exit()
 
     def _create_client(self, client):
         type = client.getType()

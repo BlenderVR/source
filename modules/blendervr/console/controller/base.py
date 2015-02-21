@@ -53,6 +53,14 @@ class Client(Base):
         Base.__init__(self, parent)
         self._client = client
 
+    def __del__(self):
+        self.kill()
+
+    def kill(self):
+        if self._client:
+            self._client.close()
+        self._client = None
+                
     def getClient(self):
         return self._client
 

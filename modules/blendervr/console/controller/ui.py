@@ -54,10 +54,13 @@ class UI(base.Client):
                 self._client.receive()
             except:
                 pass
-            sys.exit()
+            self.controller.quit()
         if command == 'ping':
             self.logger.debug('Ping !')
             self._client.send(command, argument)
+            return
+        if command == 'update_loader':
+            self.controller.update_loader()
             return
         if command == 'set':
             self.set(argument)
@@ -67,6 +70,9 @@ class UI(base.Client):
             return
         if command == 'start' or command == 'stop':
             self.controller.runAction(command, argument)
+            return
+        if command == 'status':
+            self.status(argument)
             return
         if command == 'reload configuration':
             self.controller.configuration()
@@ -91,3 +97,6 @@ class UI(base.Client):
             self._client.send('get', composeMessage(command, self.controller.getScreenSets()))
             return
         
+    def status(self, command):
+        if command == 'simulation':
+            self._client.send('status', composeMessage(command, False))

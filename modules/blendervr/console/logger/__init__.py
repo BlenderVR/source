@@ -40,7 +40,7 @@ from ...tools import controller
 import logging
 
 class Logger:
-    def __init__(self, port, min_log_level, foreground):
+    def __init__(self, port, min_log_level):
         self._port = port
         self._quit = False
 

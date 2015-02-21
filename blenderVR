@@ -76,7 +76,7 @@ profile_file = os.path.join(path, 'vr', 'profile_1.0.pickle')
 # Prepare command-line arguments parsing, then parse it.
 parser = argparse.ArgumentParser()
 parser.add_argument('-r', '--root', dest='root', help='Set the blenderVR root')
-parser.add_argument('-v', '--version', dest='d_version', help='Current version of blender player', action='store_true', default=False)
+parser.add_argument('-v', '--version', dest='version', help='Current version of blender player', action='store_true', default=False)
 
 subparsers = parser.add_subparsers(dest='launch')
 
@@ -87,11 +87,10 @@ p_configuration.add_argument('-c', '--clear', dest='clear', help='Clear the conf
 p_configuration.add_argument('-s', '--set', dest='set', help='Set the configuration of the controller')
 
 p_common = argparse.ArgumentParser(add_help=False)
-p_common.add_argument('-d', '--debug', dest='debug', help='Debug blenderVR application', action='store_true', default=False)
-p_common.add_argument('-f', '--foreground', dest='foreground', help='Run the console in foreground', action='store_true', default=None)
-p_common.add_argument('-b', '--background', dest='foreground', help='Run the console in background', action='store_false', default=None)
+p_common.add_argument('-l', '--log-level', dest='log_level', help='Minimum log level (debug, info, warning, error, critical)', default='warn')
 
 p_controller = subparsers.add_parser('controller', help='Controller daemon', parents = [p_common])
+p_controller.add_argument('-b', '--background', dest='background', help='Run the controller in background', action='store_true', default=False)
 
 p_port = argparse.ArgumentParser(add_help=False)
 p_port.add_argument('-p', '--port', dest='port', help='Set the port of the controller')
@@ -145,7 +144,7 @@ if not checkRoot(root):
 moduleRoot = os.path.join(root, 'modules')
 sys.path.append(moduleRoot)
 
-if environments.d_version:
+if environments.version:
     try:
         import blendervr
         print('blenderVR version:', blendervr.version)
@@ -183,80 +182,85 @@ if environments.launch == 'configuration':
             pickle.dump(configuration, node)
     sys.exit()
 
-environment = os.environ
-if 'PYTHONPATH' in environment:
-    if moduleRoot not in environment['PYTHONPATH']:
-        environment['PYTHONPATH'] = moduleRoot + os.pathsep + environment['PYTHONPATH']
-else:
-    environment['PYTHONPATH'] = moduleRoot
-
-if environments.launch == 'all':
-    environments.foreground = False
-else:
-    if environments.foreground is None:
-        environments.foreground = True
-    
-
-def start(element, options = []):
+def start(windowed, options):
     use_Shell = False
     command = []
-    if environments.foreground:
-        options.append('foreground')
-        stream = None
+    if windowed:
+        stream = None # subprocess.PIPE
+        if sys.platform.startswith('win'): # Windows
+            command = ['start', '/wait']
+            use_shell = True
+        elif sys.platform == 'darwin': # MacOSX
+            command = ['open', '-W', '-a', 'Terminal.app']
+        else: # Unix ...
+            command = ['/usr/bin/mrxvt', '-e']
     else:
-        options.append('background')
         stream = subprocess.PIPE
-        if element != 'controller':
-            if sys.platform.startswith('win'): # Windows
-                command = ['start', '/wait']
-                use_shell = True
-            elif sys.platform == 'darwin': # MacOSX
-                command = ['open', '-W', '-a', 'Terminal.app']
-            else: # Unix ...
-                command = ['/usr/bin/mrxvt', '-e']
-    command += [sys.executable, os.path.join(root, 'utils', 'console', element + '.py')]
 
-    if environments.debug: options.append('min_log_level=debug')
-    else:                  options.append('min_log_level=warn')
+    command += [sys.executable, __file__]
+    options += ['-l', environments.log_level]
 
     try:
-        process = subprocess.Popen(command + options, env = environment, shell = False,
-                                   stdin = stream, stderr = stream, stdout = stream)
+        process = subprocess.Popen(command + options, env = environment, shell = use_Shell, stdin = stream, stderr = stream, stdout = stream)
     except:
         import traceback
         traceback.print_exc()
         sys.exit()
-
-    if environments.foreground:
-        try:
-            process.wait()
-        except KeyboardInterrupt:
-            pass
-        except SystemExit:
-            pass
-        except:
-            import traceback
-            traceback.print_exc()
-        sys.exit()
     return process
 
-if environments.launch == 'controller' or environments.launch == 'all':
-    process = start('controller', [profile_file])
+if environments.launch == 'all':
+    environment = os.environ
+    if 'PYTHONPATH' in environment:
+        if moduleRoot not in environment['PYTHONPATH']:
+            environment['PYTHONPATH'] = moduleRoot + os.pathsep + environment['PYTHONPATH']
+    else:
+        environment['PYTHONPATH'] = moduleRoot
 
+    process = start(False, ['controller', '-b'])
     port = None
     while not port:
         line = process.stdout.readline().decode().strip()
         if line.startswith('***') and line.endswith('***'):
             port = line[3:-3]
-        print('Controller port:', port)
-        environments.port = port
+    print('Controller port:', port)
+
+    process = start(True, ['UI', '-p', str(port)])
+    process = start(True, ['logger', '-p', str(port)])
+    sys.exit()
+
+if environments.launch == 'controller':
+    import blendervr.console.controller
+    application = blendervr.console.controller.Controller(profile_file, environments.log_level, environments.background)
+    application.start()
+    application.main()
+    application.quit()
+    del(application)
+    sys.exit()
+
+if environments.port is None:
+    with open(profile_file, 'rb') as node:
+        configuration = pickle.load(node)
+        if 'port' in configuration:
+            environments.port = configuration['port']
 
 if environments.port is None:
     print('Missing controller port !')
     sys.exit()
 
-if environments.launch == 'UI' or environments.launch == 'all':
-    process = start('ui', [environments.port])
+if environments.launch == 'UI':
+    import blendervr.console.ui
+    application = blendervr.console.ui.UI(environments.port, environments.log_level)
+    application.start()
+    application.main()
+    application.quit()
+    del(application)
+    sys.exit()
 
-if environments.launch == 'logger' or environments.launch == 'all':
-    process = start('logger', [environments.port])
+if environments.launch == 'logger':
+    import blendervr.console.logger
+    application = blendervr.console.logger.Logger(environments.port, environments.log_level)
+    application.start()
+    application.main()
+    application.quit()
+    del(application)
+    sys.exit()
