@@ -65,7 +65,8 @@ class Client(Base):
         return self._client
 
     def send(self, command, argument):
-        self._client.send(command, argument)
+        if self._client:
+            self._client.send(command, argument)
         
     def cb_connect(self):
         pass

@@ -91,7 +91,7 @@ class Controller():
         if os.name == "nt":
             try:
                 import win32api
-                win32api.SetConsoleCtrlHandler(self.stop, True)
+                win32api.SetConsoleCtrlHandler(self.kill, True)
             except ImportError:
                 version = '.'.join(map(str, sys.version_info[:2]))
                 raise Exception('pywin32 not installed for Python ' + version)
@@ -100,12 +100,15 @@ class Controller():
             for signal_name in ['SIGTERM', 'SIGQUIT']:
                 try:
                     signum = getattr(signal, signal_name)
-                    signal.signal(signum, self._clean_quit)
+                    signal.signal(signum, self.kill)
                 except:
                     self.logger.info('Invalid signal:', signal_name, ': ', signum)
                     self.logger.debug(self.logger.EXCEPTION)
                 else:
                     self.logger.debug('Activated signal:', signal_name)
+
+    def __del__(self):
+        self.kill()
 
     def start(self):
         from . import listener
@@ -131,17 +134,14 @@ class Controller():
             except (KeyboardInterrupt, SystemExit):
                 break
 
-    def quit(self):
-        self._clean_quit()
-
-    def _clean_quit(self, *argv):
-        self.profile.setValue('port', None)
-        self.runAction('kill', 'all')
-        for ui in self._uis:
+    def kill(self, *argv):
+        if self.profile.getValue('port'):
+            self.profile.setValue('port', None)
+            self.runAction('kill', 'all')
+            for ui in self._uis:
                 ui.kill()
-        for logger in self._loggers:
+            for logger in self._loggers:
                 logger.kill()
-        sys.exit()
 
     def _create_client(self, client):
         type = client.getType()

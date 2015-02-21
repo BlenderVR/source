@@ -233,7 +233,7 @@ if environments.launch == 'controller':
     application = blendervr.console.controller.Controller(profile_file, environments.log_level, environments.background)
     application.start()
     application.main()
-    application.quit()
+    application.kill()
     del(application)
     sys.exit()
 

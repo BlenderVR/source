@@ -99,11 +99,7 @@ class Listener(base.Base):
                 except controller.closedSocket:
                     self._disconnect_peer(sock)
                 except SystemExit:
-                    for sock in self._sockets:
-                        self._disconnect_peer(sock)
-                        sock.shutdown(socket.SHUT_RDWR)
-                        sock.close()
-                    sys.exit()
+                    raise # Exception will be manage by the controller itself
                 except:
                     self.logger.warning(self.logger.EXCEPTION)
         now = time.time()
