@@ -77,6 +77,7 @@ profile_file = os.path.join(path, 'vr', 'profile_1.0.pickle')
 parser = argparse.ArgumentParser()
 parser.add_argument('-r', '--root', dest='root', help='Set the blenderVR root')
 parser.add_argument('-v', '--version', dest='version', help='Current version of blender player', action='store_true', default=False)
+parser.add_argument('-l', '--log-level', dest='log_level', help='Minimum log level (debug, info, warning, error, critical)', default='warn')
 
 subparsers = parser.add_subparsers(dest='launch')
 
@@ -107,6 +108,9 @@ except:
     pass
     
 environments = parser.parse_args()
+
+if not environments.launch:
+    environments.launch = 'all'
 
 def checkRoot(path):
     """Check if a given path is valid as blenderVR root.
