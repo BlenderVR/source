@@ -62,8 +62,9 @@ class Client(controller.Common):
 class Listener(base.Base):
     def __init__(self, parent):
         base.Base.__init__(self, parent)
-        self._sockets = []
-        self._peers = {}
+        self._sockets  = []
+        self._peers    = {}
+        self._timeouts = {}
 
         self._socket  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._port    = 31415
@@ -76,7 +77,22 @@ class Listener(base.Base):
 
         self._socket.listen(100)
         self._sockets.append(self._socket)
-        self._timeouts           = {}
+
+    def __del__(self):
+        # First, we remove all sockets !
+        for client in self._sockets:
+            client.close()
+        self._sockets  = []
+        self._peers    = {}
+        self._timeouts = {}
+        # Then we colse the main server socket
+        if self._socket:
+            try:
+                self._socket.shutdown(socket.SHUT_RDWR)
+                self._socket.close()
+            except:
+                pass
+            self._socket = None
 
     def select(self):
         # Manage timeouts !

@@ -55,3 +55,16 @@ def getRootPath():
     import os
     # hardcoded: returns the folder 3 levels up from this (//modules/blendervr/tools)
     return os.path.dirname(os.path.dirname(os.path.dirname(getModulePath())))
+
+def gentlyAskStopProcess(process):
+    if not process:
+        return
+    # Ask to stop !
+    process.terminate()
+    import time
+    # Wait half a second
+    time.sleep(0.5)
+    if process.poll() is None:
+        # If it does not want to stop, then, kill it !
+        process.kill()
+    process.wait()

@@ -56,6 +56,9 @@ class Screens(base.Base):
                 self._screens[name] = screen.Screen(self, name)
             self._screens[name].setConfiguration(configuration)
 
+    def __del__(self):
+        del(self._screens)
+
     def appendClient(self, client):
         name = client.getName()
         if name in self._screens:

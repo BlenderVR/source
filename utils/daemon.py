@@ -66,39 +66,36 @@ class Daemon:
         from blendervr.tools import logger
         self._logger = logger.getLogger('daemon')
         
-        self._controller = sys.argv[1]
+        self._controller_name = sys.argv[1]
         self._screen_name = sys.argv[2].strip("'\"")
 
         self._process_in = subprocess.PIPE
         self._process_out = subprocess.PIPE
 
         import blendervr.tools.controller
-        self._client = blendervr.tools.controller.Controller(self._controller,
-                                                             'daemon', self._screen_name)
-        #self._client.setCallback(self.processCommand)
-        #self._client.setWait(True)
+        self._controller_connexion = blendervr.tools.controller.Controller(self._controller_name, 'daemon', self._screen_name)
 
         #TODO: use os.name to identify Unixes (Linux, MacOS...) vs Windows
         # Registered: 'posix', 'nt', 'ce', 'java'.
         if ('posix' in sys.builtin_module_names):
             import signal
-            signal.signal(signal.SIGTERM, self._exit)
-        # else:
-        #     try:
-        #         import win32api
-        #         win32api.SetConsoleCtrlHandler(self._exit, True)
-        #     except ImportError:
-        #         version = '.'.join(map(str, sys.version_info[:2]))
-        #         raise Exception('pywin32 not installed for Python ' + version)
+            signal.signal(signal.SIGTERM, sys.exit)
+        else:
+            try:
+                import win32api
+                win32api.SetConsoleCtrlHandler(sys.exit, True)
+            except ImportError:
+                version = '.'.join(map(str, sys.version_info[:2]))
+                raise Exception('pywin32 not installed for Python ' + version)
 
         if forked:
-            self._client.send('forked')
+            self._controller_connexion.send('forked')
 
         self._loader_file = None
         self._loader_path = None
         self._process = None
 
-        logger.Network(self._logger, self._client, 'logger')
+        logger.Network(self._logger, self._controller_connexion, 'logger')
 
     def write(self, *messages):
         """Send message to the client
@@ -111,9 +108,15 @@ class Daemon:
         for message in messages:
             elements.append(str(message))
         for message in (' '.join(elements)).split('\n'):
-            self._client.send('log', message.rstrip(' \n\r'))
+            self._controller_connexion.send('log', message.rstrip(' \n\r'))
 
     def __del__(self):
+        self.quit()
+
+    def quit(self, *args):
+        if self._controller_connexion:
+            self._controller_connexion.close()
+            self._controller_connexion = None
         self._stop_blender_player()
 
     def main(self):
@@ -121,18 +124,17 @@ class Daemon:
         """
         try:
             while True:
-                msg = self._client.receive()
+                msg = self._controller_connexion.receive()
                 if msg:
                     self.processCommand(*msg)
                 else:
-                    self._stop_blender_player()
+                    sys.exit()
         except (socket.error, SystemExit, KeyboardInterrupt):
-            self._stop_blender_player()
+            pass
         except:
             if debug:
                 import traceback
                 traceback.print_exc()
-            self._stop_blender_player()
 
     def processCommand(self, command, argument):
         """Run the received commands
@@ -176,23 +178,15 @@ class Daemon:
         elif command == 'kill':
             self._stop_blender_player()
         elif command == 'kill daemon':
-            self._exit()
+            sys.exit()
 
     def _stop_blender_player(self):
         if self._process is not None:
-            # Gently ask to stop !
-            self._process.terminate()
-            import time
-            # Wait half a second
-            time.sleep(0.5)
-            if self._process:
-                if self._process.poll() is None:
-                    # If it does not want to stop, then, kill it !
-                    self._process.kill()
-                self._process.wait()
+            from blendervr.tools import gentlyAskStopProcess
+            gentlyAskStopProcess(self._process)
             self._process = None
             try:
-                self._client.send('stopped')
+                self._controller_connexion.send('stopped')
             except:
                 pass
 
@@ -203,7 +197,7 @@ class Daemon:
             command = [self._executable]
             if self._executable_options:
                 command += self._executable_options.split()
-            command += [self._loader_file, '-', self._controller,
+            command += [self._loader_file, '-', self._controller_name,
                         self._screen_name]
 
             for index, argument in enumerate(command):
@@ -211,7 +205,7 @@ class Daemon:
                     command[index] = '"' + argument + '"'
 
             try:
-                self._client.send('command', {'command': command,
+                self._controller_connexion.send('command', {'command': command,
                                               'environment': self._environment,
                                               'path': self._loader_path})
                 self._process = subprocess.Popen(command,
@@ -224,17 +218,11 @@ class Daemon:
                              #TODO: use os.name == 'posix'
                              close_fds=('posix' in sys.builtin_module_names))
             except Exception as error:
-                self._client.send('stderr', 'Cannot start blenderplayer: '
+                self._controller_connexion.send('stderr', 'Cannot start blenderplayer: '
                                                     + str(error))
-            threading.Thread(target=Daemon._stream_waiter,
-                                        args=(self, 'stdout')).start()
-            threading.Thread(target=Daemon._stream_waiter,
-                                        args=(self, 'stderr')).start()
-            self._client.send('started')
-
-    def _exit(self, *args):
-        self._stop_blender_player()
-        sys.exit()
+            threading.Thread(target=Daemon._stream_waiter, args=(self, 'stdout')).start()
+            threading.Thread(target=Daemon._stream_waiter, args=(self, 'stderr')).start()
+            self._controller_connexion.send('started')
 
     def _stream_waiter(self, stream_name):
         stream = getattr(self._process, stream_name)
@@ -244,10 +232,9 @@ class Daemon:
                 break
             lines = lines.rstrip(' \r\n')
             for line in lines.split('\n'):
-                self._client.send(stream_name, line)
+                self._controller_connexion.send(stream_name, line)
         if stream_name == 'stdout':
             self._stop_blender_player()
-
 
 def main():
     """Main function to start the daemon.
@@ -314,7 +301,10 @@ def main():
     blenderVR_modules = os.path.join(blenderVR_root, 'modules')
     sys.path.append(blenderVR_modules)
 
-    Daemon(blenderVR_modules).main()
+    daemon = Daemon(blenderVR_modules)
+    daemon.main()
+    daemon.quit()
+    del(daemon)
 
 
 if __name__ == "__main__":

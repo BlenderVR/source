@@ -138,10 +138,17 @@ class Controller():
         if self.profile.getValue('port'):
             self.profile.setValue('port', None)
             self.runAction('kill', 'all')
+            del(self._screens)
             for ui in self._uis:
                 ui.kill()
+                del(ui)
+            del(self._uis)
             for logger in self._loggers:
                 logger.kill()
+                del(logger)
+            del(self._loggers)
+            # We must destroy the listener at the end as it is the first created and that it will destroy the master socket
+            del(self._listener)
 
     def _create_client(self, client):
         type = client.getType()

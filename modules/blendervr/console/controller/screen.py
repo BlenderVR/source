@@ -54,12 +54,17 @@ class Screen(base.Base):
 
     def __del__(self):
         self.kill()
-        
+
     def kill(self):
+        from ...tools import gentlyAskStopProcess
+        gentlyAskStopProcess(self._process)
+        self._process = None
         if self._clients['blender_player']:
             self._clients['blender_player'].kill()
+            self._clients['blender_player'] = None
         if self._clients['daemon']:
             self._clients['daemon'].kill()
+            self._clients['daemon'] = None
 
     def getName(self):
         return self._name
@@ -148,12 +153,9 @@ class Screen(base.Base):
                 if self.profile.getValue(['debug', 'executables']):
                     self.logger.debug('Command to run daemon:', ' '.join(command))
                     self.logger.debug('Its environment variables:', self._daemon['environments'])
-                self._process = subprocess.Popen(command,
-                         env=self._daemon['environments'],
-                         stdin=daemon_in,
-                         stdout=daemon_out,
-                         stderr=daemon_out,
-                         close_fds=('posix' in sys.builtin_module_names))
+                self._process = subprocess.Popen(command, env=self._daemon['environments'],
+                                                 stdin=daemon_in, stdout=daemon_out, stderr=daemon_out,
+                                                 close_fds=('posix' in sys.builtin_module_names))
             except:
                 self._cannot_start_daemon()
             else:
