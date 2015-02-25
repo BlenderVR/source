@@ -38,12 +38,11 @@ import sys
 from . import ui
 from . import daemon
 from . import logger
-from ...tools import logger as tool_logger
+from .. import Console
 
-class Controller():
-    def __init__(self, profile_file, min_log_level, background):
-        self._min_log_level = min_log_level
-        self._background = background
+class Controller(Console):
+    def __init__(self, profile_file, min_log_level, log_in_file, log_on_console):
+        Console.__init__(self, min_log_level, log_in_file, log_on_console)
 
         # Simulation informations
         self._blender_file       = None 
@@ -64,20 +63,18 @@ class Controller():
         from . import profile
         self._profile = profile.Profile(profile_file)
 
-        self._logger = tool_logger.getLogger('blenderVR')
-
         from ...tools import getRootPath
         self._update_loader_script = os.path.join(getRootPath(), 'utils', 'update_loader.py')
 
         from . import logs
         self._logs = logs.Logs(self)
 
-        self._logger.setLevel(self._min_log_level)
-        if not self._background:
-            # Define connexions until the controller is running ...
-            tool_logger.Console(self._logger)
-            self.profile.setValue(['debug', 'daemon'], False)
-            self.profile.setValue(['debug', 'executables'], False)
+        # if self._min_log_level == 'debug' or self._min_log_level == 'debug':
+        #     self.profile.setValue(['debug', 'daemon'], True)
+        #     self.profile.setValue(['debug', 'executables'], True)
+        # else:
+        #     self.profile.setValue(['debug', 'daemon'], False)
+        #     self.profile.setValue(['debug', 'executables'], False)
 
         from . import screens
         self._screens = screens.Screens(self)
@@ -273,10 +270,6 @@ class Controller():
     @property
     def profile(self):
         return self._profile
-
-    @property
-    def logger(self):
-        return self._logger
 
     @property
     def plugins(self):

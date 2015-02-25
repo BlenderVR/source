@@ -38,15 +38,14 @@ import sys
 import time
 from ...tools import controller
 import logging
+from .. import Console
 
-class Logger:
-    def __init__(self, port, min_log_level):
+class Logger(Console):
+    def __init__(self, port, min_log_level, log_in_file):
+        Console.__init__(self, min_log_level, log_in_file)
+
         self._port = port
         self._quit = False
-
-        from ...tools import logger as logger
-        self._logger = logger.getLogger('blenderVR')
-        self._logger.setLevel(min_log_level)
 
         from ...tools import controller
         try:
@@ -88,7 +87,3 @@ class Logger:
             print(self._colors[levelname] + message + '\033[0m')
         else:
             print(message)
-        
-    @property
-    def logger(self):
-        return self._logger

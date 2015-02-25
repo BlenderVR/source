@@ -78,6 +78,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-r', '--root', dest='root', help='Set the blenderVR root')
 parser.add_argument('-v', '--version', dest='version', help='Current version of blender player', action='store_true', default=False)
 parser.add_argument('-l', '--log-level', dest='log_level', help='Minimum log level (debug, info, warning, error, critical)', default='warn')
+parser.add_argument('--log-in-file', dest='log_in_file', help='Log all messages to given file', default=None)
+parser.add_argument('--log-on-console', dest='log_on_console', help='Log all messages in the console', action='store_true', default=False)
 
 subparsers = parser.add_subparsers(dest='launch')
 
@@ -89,9 +91,10 @@ p_configuration.add_argument('-s', '--set', dest='set', help='Set the configurat
 
 p_common = argparse.ArgumentParser(add_help=False)
 p_common.add_argument('-l', '--log-level', dest='log_level', help='Minimum log level (debug, info, warning, error, critical)', default='warn')
+p_common.add_argument('--log-in-file', dest='log_in_file', help='Log all messages to given file', default=None)
 
 p_controller = subparsers.add_parser('controller', help='Controller daemon', parents = [p_common])
-p_controller.add_argument('-b', '--background', dest='background', help='Run the controller in background', action='store_true', default=False)
+p_controller.add_argument('--log-on-console', dest='log_on_console', help='Log all messages in the console', action='store_true', default=False)
 
 p_port = argparse.ArgumentParser(add_help=False)
 p_port.add_argument('-p', '--port', dest='port', help='Set the port of the controller')
@@ -108,9 +111,6 @@ except:
     pass
     
 environments = parser.parse_args()
-
-if not environments.launch:
-    environments.launch = 'all'
 
 def checkRoot(path):
     """Check if a given path is valid as blenderVR root.
@@ -203,6 +203,8 @@ def start(windowed, options):
 
     command += [sys.executable, __file__]
     options += ['-l', environments.log_level]
+    if environments.log_in_file:
+        options += ['--log-in-file', environments.log_in_file + '.' + options[0]]
 
     try:
         process = subprocess.Popen(command + options, env = environment, shell = use_Shell, stdin = stream, stderr = stream, stdout = stream)
@@ -220,7 +222,7 @@ if environments.launch == 'all':
     else:
         environment['PYTHONPATH'] = moduleRoot
 
-    process = start(False, ['controller', '-b'])
+    process = start(False, ['controller'])
     port = None
     while not port:
         line = process.stdout.readline().decode().strip()
@@ -234,7 +236,7 @@ if environments.launch == 'all':
 
 if environments.launch == 'controller':
     import blendervr.console.controller
-    application = blendervr.console.controller.Controller(profile_file, environments.log_level, environments.background)
+    application = blendervr.console.controller.Controller(profile_file, environments.log_level, environments.log_in_file, environments.log_on_console)
     application.start()
     application.main()
     application.kill()
@@ -253,7 +255,7 @@ if environments.port is None:
 
 if environments.launch == 'UI':
     import blendervr.console.ui
-    application = blendervr.console.ui.UI(environments.port, environments.log_level)
+    application = blendervr.console.ui.UI(environments.port, environments.log_level, environments.log_in_file)
     application.start()
     application.main()
     application.quit()
@@ -262,7 +264,7 @@ if environments.launch == 'UI':
 
 if environments.launch == 'logger':
     import blendervr.console.logger
-    application = blendervr.console.logger.Logger(environments.port, environments.log_level)
+    application = blendervr.console.logger.Logger(environments.port, environments.log_level, environments.log_in_file)
     application.start()
     application.main()
     application.quit()

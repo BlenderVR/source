@@ -39,16 +39,14 @@ from ...tools import controller
 import importlib
 from ..protocol import composeMessage
 from ..protocol import decomposeMessage
+from .. import Console
 
-class UI():
-    def __init__(self, port, min_log_level):
+class UI(Console):
+    def __init__(self, port, min_log_level, log_in_file):
+        Console.__init__(self, min_log_level, log_in_file)
+
         self._port  = port
         self._print = lambda *args: True
-
-        from ...tools import logger
-        self._logger = logger.getLogger('blenderVR')
-        logger.File(self._logger, '/tmp/output.ui.log')
-        self._logger.setLevel(min_log_level)
 
         from ...tools import controller
         try:
@@ -140,8 +138,3 @@ class UI():
 
     def quit(self):
         self._quit = True
-
-    @property
-    def logger(self):
-        return self._logger
-

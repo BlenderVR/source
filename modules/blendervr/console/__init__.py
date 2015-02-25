@@ -35,3 +35,22 @@
 ## The fact that you are presently reading this means that you have had
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
+
+from ..tools import logger
+
+class Console():
+    def __init__(self, min_log_level, log_in_file, log_on_console = False):
+        self._logger = logger.getLogger('blenderVR')
+        self._logger.setLevel(min_log_level)
+
+        if log_on_console:
+            # Define connexions until the controller is running ...
+            logger.Console(self._logger)
+
+        if log_in_file:
+            # Define connexions until the controller is running ...
+            logger.File(self._logger, log_in_file)
+
+    @property
+    def logger(self):
+        return self._logger

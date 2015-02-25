@@ -1,4 +1,4 @@
-7# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # file: blendervr/tools/logger.py
 
 ## Copyright (C) LIMSI-CNRS (2014)
