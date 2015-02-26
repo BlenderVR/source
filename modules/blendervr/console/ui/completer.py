@@ -89,6 +89,15 @@ class Completer(base.Base):
         except IndexError:
             return self._screenSets[:]
 
+    def _process_state(self, words):
+        try:
+            word = words[0].lower()
+            return [s
+                    for s in ['true', 'false']
+                    if s and s.startswith(word)]
+        except IndexError:
+            return ['true', 'false']
+
     def _process_file(self, words):
         line = readline.get_line_buffer()
         before_arg = line.rfind(" ", 0, readline.get_begidx())

@@ -56,7 +56,7 @@ class UI(Console):
             sys.exit()
 
         self._commands = {}
-        for moduleName in ['root', 'set', 'get', 'reload', 'status', 'action']:
+        for moduleName in ['root', 'set', 'get', 'reload', 'status', 'action', 'debug']:
             try:
                 _class = moduleName[0].upper() + moduleName[1:]
                 module = importlib.import_module('..protocol.' + moduleName, __name__)

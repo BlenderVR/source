@@ -45,6 +45,9 @@ class UI(base.Client):
                           'simulation file': ['simulation', 'blender', 'file'],
                           'processor file': ['simulation', 'processor', 'file'],
                           'screen set':['virtual environment', 'screen set']}
+        self._debugs = {'processor': ['debug', 'processor'],
+                        'daemon': ['debug', 'daemon'],
+                        'executables': ['debug', 'executables']}
 
     def cb_data(self):
         result = self._client.receive()
@@ -76,6 +79,9 @@ class UI(base.Client):
         if command == 'update loader':
             self.controller.updateLoader()
             return
+        if command == 'debug':
+            self.debug(argument)
+            return
         self.logger.debug('unknown command:', command, '(', argument, ')')
 
     def set(self, argument):
@@ -96,6 +102,16 @@ class UI(base.Client):
             self._client.send('get', composeMessage(command, self.controller.getScreenSets()))
             return
         
+    def debug(self, argument):
+        command, argument = decomposeMessage(argument)
+        if command in self._debugs:
+            self.profile.setValue(self._debugs[command], argument)
+
+    def status(self, command):
+        if command == 'simulation':
+            self._client.send('status', composeMessage(command, False))
+            return
+
     def status(self, command):
         if command == 'simulation':
             self._client.send('status', composeMessage(command, False))
