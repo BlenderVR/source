@@ -50,13 +50,13 @@ class Set(Command):
         """
         Set the simulation (.blend) file
         """
-        self.send('set', composeMessage('simulation', file))
+        self.send('set', composeMessage('simulation file', file))
 
     def processor(self, file):
         """
         Set the processor (.processor.py) file
         """
-        self.send('set', composeMessage('processor', file))
+        self.send('set', composeMessage('processor file', file))
 
     def screenSet(self, screenSet):
         """

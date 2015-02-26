@@ -126,7 +126,7 @@ class Screen(base.Base):
         for index, argument in enumerate(self._daemon['command']):
             if ' ' in argument:
                 self._daemon['command'][index] = '"' + argument + '"'
-        
+
     def runAction(self, action, element):
         if action == 'kill':
             self.kill()
@@ -135,7 +135,9 @@ class Screen(base.Base):
                 self._startDaemon()
         elif element == 'simulation':
             if action == 'start':
-                self._startDaemon()
+                print('START !')
+            else:
+                print('STOP !')
 
     def _startDaemon(self):
         if self._process is None:

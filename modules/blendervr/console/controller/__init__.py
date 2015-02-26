@@ -100,9 +100,6 @@ class Controller(Console):
                     signal.signal(signum, self.kill)
                 except:
                     self.logger.info('Invalid signal:', signal_name, ': ', signum)
-                    self.logger.debug(self.logger.EXCEPTION)
-                else:
-                    self.logger.debug('Activated signal:', signal_name)
 
     def __del__(self):
         self.kill()
@@ -245,6 +242,33 @@ class Controller(Console):
                 processor_files.append(file_name.FileName(processor_file, self._anchor))
             self._screens.adapt_simulation_files_to_screen(loader_file, blender_file, processor_files)
 
+    def updateLoader(self):
+        if self._processor and self._processor.useLoader():
+            update = not os.path.isfile(self._loader_file)
+            if not update:
+                loader_time = os.path.getctime(self._loader_file)
+                for processor_file in [self._blender_file] + self._processor_files:
+                    if os.path.getctime(processor_file) > loader_time:
+                        update = True
+                        break
+            if update:
+                if not os.path.isfile(self._loader_file):
+                    self.logger.debug('Creating loader')
+                else:
+                    self.logger.debug('Updating loader')
+                command = [self._blender_exe, '-b', '-P', self._update_loader_script, '--', self._blender_file] + self._processor_files
+                if self.profile.getValue(['debug', 'executables']):
+                    self.logger.error('Update loader scripe:', ' '.join(command))
+    
+                for index, argument in enumerate(command):
+                    if ' ' in argument:
+                        command[index] = '"' + argument + '"'
+    
+                process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                process.wait()
+                for line in process.stderr:
+                    self.logger.debug(line.decode('UTF-8').rstrip())
+            
     def addTimeout(self, time, callback):
         """
         Add a timeout for a method. Return an index that can be use to del the timeout.
@@ -266,7 +290,7 @@ class Controller(Console):
         :rtype: boolean
         """
         return self._listener.delTimeout(index)
-        
+
     @property
     def profile(self):
         return self._profile

@@ -44,10 +44,11 @@ class Action(Command):
     def __init__(self, connection, action):
         Command.__init__(self, connection)
         self._action = action
+        self._default = self.simulation
 
     def daemon(self):
         self.send(self._action, 'daemon')
-        
-    # def simulation(self):
-    #     self.send(self._action, 'simulation')
+
+    def simulation(self):
+        self.send(self._action, 'simulation')
         

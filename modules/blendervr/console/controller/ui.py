@@ -73,6 +73,9 @@ class UI(base.Client):
         if command == 'reload configuration':
             self.controller.configuration()
             return
+        if command == 'update loader':
+            self.controller.updateLoader()
+            return
         self.logger.debug('unknown command:', command, '(', argument, ')')
 
     def set(self, argument):
@@ -96,3 +99,4 @@ class UI(base.Client):
     def status(self, command):
         if command == 'simulation':
             self._client.send('status', composeMessage(command, False))
+            return

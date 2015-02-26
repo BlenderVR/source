@@ -46,3 +46,7 @@ class Root(Command):
     def kill(self):
         self.send('kill')
         sys.exit()
+
+    def updateLoader(self):
+        self.send('update loader')
+        
