@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-# file: blendervr/plugins/occulus_rift/virtual_environment/__init__.py
-
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
@@ -37,37 +34,9 @@
 ##
 
 from .. import base
-from ....player import exceptions
 
-
-class OcculusRift(base.Base):
-    def __init__(self, parent, configuration):
-        super(OcculusRift, self).__init__(parent)
-
-        try:
-            import sys
-            library_folder = configuration['library']['folder']
-
-            if library_folder not in sys.path:
-                sys.path.append(library_folder)
-
-            from game_engine_rift.rift import PyRift
-            assert PyRift     # avoid import unused
-
-        except ImportError:
-            self.logger.info('No Occulus Rift python module available')
-            self._available = False
-            return
-
-        except Exception as err:
-            self.logger.error(err)
-            self._available = False
-            return
-
-        self._available = True
-
-    def isAvailable(self):
-        if not self._available:
-            self.logger.info('Occulus Rift python module not available !')
-            return False
-        return True
+class Device(base.Base):
+    def __init__(self, parent, name, attrs):
+        super(Device, self).__init__(parent, name, attrs)
+        self._attribute_list += ['model']
+        self._model = 'occulus_rift'

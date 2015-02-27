@@ -214,6 +214,8 @@ class Main:
 
             self.getProcessor().start()
 
+            self._screen.start()
+
             self.run = lambda *args: None
             self._scene.pre_draw.append(self.wait_for_everybody)
 
