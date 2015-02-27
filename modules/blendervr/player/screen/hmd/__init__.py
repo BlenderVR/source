@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# file: blendervr/plugins/occulus_rift/virtual_environment/__init__.py
+# file: blendervr/player/screen/hmd/__init__.py
 
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
@@ -36,38 +36,24 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
-from .. import base
-from ....player import exceptions
+import importlib
 
-
-class OcculusRift(base.Base):
-    def __init__(self, parent, configuration):
-        super(OcculusRift, self).__init__(parent)
-
+def Device(parent, configuration):
+    if 'model' in configuration['hmd']:
         try:
-            import sys
-            library_folder = configuration['library']['folder']
-
-            if library_folder not in sys.path:
-                sys.path.append(library_folder)
-
-            from game_engine_rift.rift import PyRift
-            assert PyRift     # avoid import unused
+            module = importlib.import_module(__name__ + '.'
+                                            + configuration['hmd']['model'])
+            return module.Device(parent, configuration)
 
         except ImportError:
-            self.logger.info('No Occulus Rift python module available')
-            self._available = False
-            return
+            parent.logger.log_traceback(False)
+    else:
+        try:
+            module = importlib.import_module(__name__ + '.base')
+            return module.Device(parent, configuration)
 
-        except Exception as err:
-            self.logger.error(err)
-            self._available = False
-            return
+        except ImportError:
+            parent.logger.log_traceback(False)
 
-        self._available = True
-
-    def isAvailable(self):
-        if not self._available:
-            self.logger.info('Occulus Rift python module not available !')
-            return False
-        return True
+    from ... import exceptions
+    raise exceptions.Common('No valid hmd device screen found')

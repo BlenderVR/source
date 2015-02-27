@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# file: blendervr/player/screen/hmd.py
+# file: blendervr/player/screen/hmd/base.py
 
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
@@ -38,10 +38,10 @@
 
 import mathutils
 import bge
-from . import base
-from .. import exceptions
+from .. import base
+from ... import exceptions
 
-""" @package wall
+""" @package hmd
 Manager of Head Mounted Display (HMD) screens with blenderVR ...
 """
 
