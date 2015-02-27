@@ -148,6 +148,10 @@ class Daemon:
                             + os.pathsep + self._environment['PYTHONPATH']
             else:
                 self._environment['PYTHONPATH'] = blenderVR_modules
+
+            if 'SYSTEMROOT' in os.environ:  # Windows http://bugs.python.org/issue20614
+                self._environment['SYSTEMROOT'] = os.environ['SYSTEMROOT']
+
         elif command == 'log_to_clear':
             self._log_to_clear = argument
         elif command == 'state':
