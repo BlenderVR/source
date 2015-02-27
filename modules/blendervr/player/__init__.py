@@ -333,6 +333,8 @@ class Main:
         if hasattr(self, '_connector'):
             self._connector.quit(reason)
 
+        bge.logic.endGame()
+
     def isMaster(self):
         """Are we the master rendering node ?
 
