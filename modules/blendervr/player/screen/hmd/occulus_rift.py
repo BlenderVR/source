@@ -54,6 +54,8 @@ class Device(base.Device):
         self._plugin = None
 
     def start(self):
+        super(Device, self).start()
+
         import sys
 
         self._plugin = self.blenderVR.getPlugin('occulus_rift')
@@ -87,6 +89,8 @@ class Device(base.Device):
 
 
     def run(self):
+        super(Device, self).run()
+
         if self._plugin == None:
             return
 
