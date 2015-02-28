@@ -84,7 +84,7 @@ def getProcessor():
         _main_logger.warning('Cannot import "' + module_name + '" module from "'
                         + module_path + '"')
         if _debug_processor:
-            _main_logger.debug_processor(False)
+            _main_logger.debug(_main_logger.EXCEPTION)
         return Processor
 
     try:
@@ -93,7 +93,7 @@ def getProcessor():
     except:
         _main_logger.warning('Invalid import of module "' + processor_file + '"')
         if _debug_processor:
-            _main_logger.debug_processor(False)
+            _main_logger.debug(_main_logger.EXCEPTION)
         return Processor
 
     import inspect

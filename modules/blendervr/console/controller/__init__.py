@@ -200,9 +200,9 @@ class Controller(Console):
         return None
 
     def update_user_files(self, force = False):
-        blender_file = self.profile.getValue(['files','blender'])
+        blender_file = self.profile.getValue(['simulation', 'blender', 'file'])
 
-        processor_files = [self.profile.getValue(['files', 'processor'])] + self._common_processors
+        processor_files = [self.profile.getValue(['simulation', 'processor', 'file'])] + self._common_processors
         if self._processor_files != processor_files:
             if self._processor:
                 self._processor.quit()
