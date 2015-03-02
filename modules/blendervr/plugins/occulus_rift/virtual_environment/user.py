@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# file: blendervr/plugins/osc/virtual_environment/user.py
+
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
@@ -33,43 +36,38 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
-import os
-from .. import xml
-
-class XML(xml.XML):
-
-    def __init__(self, parent, name, attrs):
-        super(XML, self).__init__(parent, name, attrs)
-        self._class_list += ['users']
-        self._users = None
-
-        if 'users' in attrs:
-            self._users = attrs['users']
-        else:
-            self._users = None
-
-    def _getChildren(self, name, attrs):
-        if name == 'user':
-            user = User(self, name, attrs)
-            if self._users is None:
-                self._users = [user]
-            else:
-                self._users.append(user)
-            return user
-
-        return super(XML, self)._getChildren(name, attrs)
+from .. import base
+#import bge
+#import mathutils
+#import math
 
 
-class User(xml.mono):
-    def __init__(self, parent, name, attrs):
-        super(User, self).__init__(parent, name, attrs)
-        self._attribute_list += ['viewer', 'processor_method', 'computer']
+class User(base.Base):
+    def __init__(self, parent, configuration, id):
+        super(User, self).__init__(parent)
+        self._id = None
+        self._viewer = None
+        self._available = False
 
-        if 'viewer' not in attrs or \
-           'processor_method' not in attrs or \
-           'computer' not in attrs:
-            self.raise_error('Occulus Rift User must have a viewer a computer and a processor_method!')
+        if self.blenderVR.getComputerName() == configuration['computer']:
+            self._available = True
+            self._id = id
+            self._viewer = self.blenderVR.getUserByName(configuration['viewer'])
+            self._processor_method = configuration['processor_method']
 
-        self._viewer = attrs.get('viewer')
-        self._computer = attrs.get('computer')
-        self._processor_method = attrs.get('processor_method')
+
+    def run(self):
+        super(User, self).run()
+        """
+        self.position(self._viewer.getPosition()
+                      * self._viewer.getVehiclePosition())
+        """
+
+    def getName(self):
+        return self._viewer.getName()
+
+    def getUser(self):
+        return self._viewer
+
+    def isAvailable(self):
+        return self._available

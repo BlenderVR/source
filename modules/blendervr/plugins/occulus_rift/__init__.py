@@ -36,6 +36,13 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
+"""
+Occulus Rift Plugin
+*******************
+
+This script instantiates the Occulus Rift plugin
+"""
+
 from .. import *
 from .. import exceptions
 

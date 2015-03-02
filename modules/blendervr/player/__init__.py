@@ -136,6 +136,7 @@ class Main:
             if 'computer' not in configuration['complements']:
                 self.logger.fatal('Cannot find any "computer" information')
 
+            self._computer_name = configuration['complements']['computer']['name']
             # Configure the system paths
             self._setSystemPath(configuration['complements']['computer'])
             del(configuration['complements']['computer'])
@@ -298,6 +299,9 @@ class Main:
         except:
             self.stopDueToError()
         self._previous_pre_draw = True
+
+    def getComputerName(self):
+        return self._computer_name
 
     def getController(self):
         return self._controller
