@@ -133,6 +133,13 @@ class Main:
             if 'users' not in configuration['complements']:
                 self.logger.fatal('Cannot find any "user" information')
 
+            if 'computer' not in configuration['complements']:
+                self.logger.fatal('Cannot find any "computer" information')
+
+            # Configure the system paths
+            self._setSystemPath(configuration['complements']['computer'])
+            del(configuration['complements']['computer'])
+
             # Configure the users
             from . import user
             self._users = {}
@@ -457,3 +464,19 @@ class Main:
     def getVersion(self):
         from .. import version
         return version
+
+    def _setSystemPath(self, configuration):
+        if not 'system' in configuration or \
+           not 'libraries' in configuration['system']:
+            return
+
+        for library in configuration['system']['libraries']:
+            path = library['path']
+
+            if not os.path.exists(path):
+                self.logger.error("Library folder \"{0}\" doesn't exist !".format(path))
+            elif not os.path.isdir(path):
+                self.logger.error("Library folder \"{0}\" is not a directory !".format(path))
+            else:
+                if not path in sys.path:
+                    sys.path.append(path)

@@ -77,7 +77,7 @@ class Controller(base.Base):
             return
 
         if command in ['screen', 'complements', 'network',
-                        'blender_file', 'processor_files']:
+                        'blender_file', 'processor_files', 'computer']:
             self._configuration[command] = argument
         else:
             self._processControllerCommand(command, argument)

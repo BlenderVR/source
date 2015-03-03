@@ -153,7 +153,8 @@ class Logic:
 
             complements = {'users': self._configuration['users'],
                            'plugins': self._configuration['plugins'],
-                           'processors': self._configuration['processors']}
+                           'processors': self._configuration['processors'],
+                           'computer': configuration_computers[computer_name]}
             self._screens.set_screens(configurations,
                                       self._net_console,
                                       masterScreen,

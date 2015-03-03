@@ -135,12 +135,23 @@ class login(base.mono):
             self._python = sys.executable
 
 
+class Library(base.mono):
+    def __init__(self, parent, name, attrs):
+        super(Library, self).__init__(parent, name, attrs)
+        self._attribute_list += ['path']
+
+        if 'path' in attrs:
+            self._path = attrs['path']
+        else:
+            self._path = None
+
+
 class XML(common_system.XML):
 
     def __init__(self, parent, name, attrs):
         super(XML, self).__init__(parent, name, attrs)
         self._attribute_list += ['root']
-        self._class_list     += ['blenderplayer', 'daemon', 'log', 'login']
+        self._class_list     += ['blenderplayer', 'daemon', 'log', 'login', 'libraries']
         if 'root' in attrs:
             self._root = attrs['root']
         else:
@@ -149,6 +160,7 @@ class XML(common_system.XML):
         self._daemon        = None
         self._log           = None
         self._login         = None
+        self._libraries = None
 
     def _getChildren(self, name, attrs):
         if name == 'blenderplayer':
@@ -163,6 +175,13 @@ class XML(common_system.XML):
         if name == 'login':
             self._login = login(self, name, attrs)
             return self._login
+        if name == 'library':
+            library = Library(self, name, attrs)
+            if self._libraries is None:
+                self._libraries = [library]
+            else:
+                self._libraries.append(library)
+            return library
         return super(XML, self)._getChildren(name, attrs)
 
     def _default(self):
