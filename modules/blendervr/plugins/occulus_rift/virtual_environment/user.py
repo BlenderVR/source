@@ -36,32 +36,29 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
-from .. import base
-#import bge
-#import mathutils
-#import math
+from ....player import device
 
 
-class User(base.Base):
-    def __init__(self, parent, configuration, id):
-        super(User, self).__init__(parent)
-        self._id = None
-        self._viewer = None
+class User(device.Sender):
+    def __init__(self, parent, configuration):
+        _configuration = configuration.copy()
+        _configuration['users'] = _configuration['viewer']
+
+        super(User, self).__init__(parent, _configuration)
         self._available = False
 
-        if self.blenderVR.getComputerName() == configuration['computer']:
-            self._available = True
-            self._id = id
-            self._viewer = self.blenderVR.getUserByName(configuration['viewer'])
-            self._processor_method = configuration['processor_method']
+        if self.blenderVR.getComputerName() != _configuration['computer']:
+            return
+
+        self._available = True
+        self._viewer = self.blenderVR.getUserByName(configuration['viewer'])
 
 
-    def run(self):
-        super(User, self).run()
-        """
-        self.position(self._viewer.getPosition()
-                      * self._viewer.getVehiclePosition())
-        """
+    def run(self, info):
+        try:
+            self.process(info)
+        except Exception as err:
+            self.logger.log_traceback(err)
 
     def getName(self):
         return self._viewer.getName()

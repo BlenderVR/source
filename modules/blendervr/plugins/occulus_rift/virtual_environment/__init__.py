@@ -37,34 +37,20 @@
 ##
 
 from .. import base
-from ....player import device, exceptions
 from . import user
 
 
-class OcculusRift(base.Base, device.Sender):
+class OcculusRift(base.Base):
     def __init__(self, parent, configuration):
         super(OcculusRift, self).__init__(parent)
 
-        self._viewers = {}
-        self._users = {}
-
-        if 'users' in configuration:
-            for index, user_entry in enumerate(configuration['users']):
-                try:
-                    _user = user.User(self, user_entry, index)
-
-                    if _user.isAvailable():
-                        self._users[_user.getName()] = _user
-                        viewer = _user.getUser()
-
-                        if viewer is not None:
-                            self._viewers[id(viewer)] = _user
-                except:
-                    self.logger.log_traceback(False)
+        self._user = None
+        self._rift = None
+        self._matrix = None
 
         try:
             from game_engine_rift.rift import PyRift
-            assert PyRift     # avoid import unused
+            assert(PyRift)
 
         except ImportError:
             self.logger.info('No Occulus Rift python module available')
@@ -76,63 +62,66 @@ class OcculusRift(base.Base, device.Sender):
             self._available = False
             return
 
+        if 'users' in configuration:
+            for user_entry in configuration['users']:
+                try:
+                    _user = user.User(self, user_entry)
+                    if _user.isAvailable():
+                        viewer = _user.getUser()
+                        if viewer is not None:
+                            self._user = _user
+                            # each computer can only have one user/viewer
+                            break
+                except:
+                    self.logger.log_traceback(False)
+
         self._available = True
 
-    def isAvailable(self):
+    def start(self):
+        super(OcculusRift, self).start()
+        try:
+            from game_engine_rift.rift import PyRift
+            from mathutils import Matrix
+
+            self._rift = PyRift()
+            self._matrix = Matrix.Identity(4)
+
+        except Exception as err:
+            self.logger.log_traceback(err)
+
+    def run(self):
+        super(OcculusRift, self).run()
+
+        try:
+            self._updateMatrix()
+            info = {'matrix' : self._matrix}
+            self._user.run(info)
+
+        except Exception as err:
+            self.logger.log_traceback(err)
+
+    def _updateMatrix(self):
+        from mathutils import Quaternion
+
+        self._rift.poll()
+        self._matrix = Quaternion((self._rift.rotation[0],
+                                   self._rift.rotation[1],
+                                   self._rift.rotation[2],
+                                   self._rift.rotation[3])).to_matrix().to_4x4()
+
+    def checkMethods(self):
         if not self._available:
             self.logger.info('Occulus Rift python module not available !')
             return False
-        elif not self._viewers:
-            self.logger.info('Occulus Rift python module not available ! No valid user found.')
+
+        if not self._user:
+            self.logger.info('Occulus Rift python module not available ! No valid user found for this computer.')
             return False
+
+        if not self._user.checkMethod(True):
+            self.logger.info('No Occulus Rift processor method available !')
+            del self._user
+            self._user = None
+            return False
+
         return True
-
-    """
-    TODO
-    call the processor methods with the info['matrix']
-    """
-    def run(self):
-
-        """
-        do the following for a user only
-        """
-        try:
-            import bge
-            from mathutils import Euler
-            from math import pi
-
-            from game_engine_rift.rift import PyRift
-
-            if not hasattr(bge.logic, 'rift'):
-                bge.logic.rift = PyRift()
-                euler = Euler((0, 0, 0), 'XYZ')
-            else:
-                self._poll(bge.logic.rift)
-                euler = bge.logic.rotation.to_euler()
-
-            """
-            TODO: the following is the part we need to change later
-            so it uses our internal classes to access the navigation
-            (instead of by passing it entirely)
-            """
-            scene = bge.logic.getCurrentScene()
-            camera = scene.active_camera
-            fix = Euler((-pi/2, 0, 0), 'XYZ')
-
-            rot = Euler((-euler.z, euler.y, -euler.x), 'XYZ')
-            rot.rotate(fix)
-            camera.worldOrientation = rot
-
-        except Exception as err:
-            self.logger.error(err)
-
-    def _poll(self, rift):
-        import bge
-        from mathutils import Quaternion
-
-        rift.poll()
-        bge.logic.rotation = Quaternion((rift.rotation[0],
-                rift.rotation[1],
-                rift.rotation[2],
-                rift.rotation[3]))
-

@@ -61,7 +61,7 @@ class Device(base.Device):
         self._plugin = self.blenderVR.getPlugin('occulus_rift')
         if self._plugin is None:
             self.logger.error("Occulus Rift plugin (occulus_rift) not setup in the configuration file, HMD device won't work")
-            self.blenderVR.quit("Occulus Rift plugin (occulus_rift) not setup in the configuration file, HMD device won't work")
+            #self.blenderVR.quit("Occulus Rift plugin (occulus_rift) not setup in the configuration file, HMD device won't work")
             return
 
         try:
