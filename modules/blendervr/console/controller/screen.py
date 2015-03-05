@@ -46,8 +46,9 @@ from . import daemon
 class Screen(base.Base):
     def __init__(self, parent, name):
         base.Base.__init__(self, parent)
-        self._name    = name
-        self._process = None
+        self._name        = name
+        self._process     = None
+        self._loader_file = None
 
         self._clients = {'daemon': None,
                          'blender_player': None}
@@ -197,6 +198,5 @@ class Screen(base.Base):
         self._send_loader_file()
 
     def _send_loader_file(self):
-        if (self._clients['daemon'] is not None) \
-                                    and (self._loader_file is not None):
+        if (self._clients['daemon'] is not None) and (self._loader_file is not None):
             self._clients['daemon'].send('loader_file', self._loader_file)
