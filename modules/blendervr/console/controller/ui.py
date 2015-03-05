@@ -58,9 +58,6 @@ class UI(base.Client):
             self.logger.debug('Ping !')
             self._client.send(command, argument)
             return
-        if command == 'update_loader':
-            self.controller.update_loader()
-            return
         if command == 'set':
             self.set(argument)
             return
