@@ -35,6 +35,7 @@
 
 import os
 import sys
+import subprocess
 from . import ui
 from . import daemon
 from . import logger
@@ -217,6 +218,7 @@ class Controller(Console):
                 self._processor = None
                 processor_files = []
 
+        loader_file = None
         if self._processor and self._processor.useLoader():
             command = [sys.executable, self._update_loader_script, '--', blender_file]
             if self.profile.getValue(['debug', 'executables']):
@@ -226,7 +228,7 @@ class Controller(Console):
             for line in process.stdout:
                 loader_file = line.decode('UTF-8').rstrip()
                 break
-        else:
+        if not loader_file:
             loader_file = blender_file
 
         if loader_file != self._loader_file or blender_file != self._blender_file or processor_files != self._processor_files or force:
