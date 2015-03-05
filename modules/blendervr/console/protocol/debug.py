@@ -59,3 +59,6 @@ class Debug(Command):
     def executables(self, state):
         return self._send('executables', state)
 
+    def updater(self, state):
+        return self._send('updater', state)
+

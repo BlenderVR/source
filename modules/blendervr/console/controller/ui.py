@@ -45,9 +45,10 @@ class UI(base.Client):
                           'simulation file': ['simulation', 'blender', 'file'],
                           'processor file': ['simulation', 'processor', 'file'],
                           'screen set':['virtual environment', 'screen set']}
-        self._debugs = {'processor': ['debug', 'processor'],
-                        'daemon': ['debug', 'daemon'],
-                        'executables': ['debug', 'executables']}
+        self._debugs = {'processor':   ['debug', 'processor'],
+                        'daemon':      ['debug', 'daemon'],
+                        'executables': ['debug', 'executables'],
+                        'updater':     ['debug', 'updater']}
 
     def cb_data(self):
         result = self._client.receive()

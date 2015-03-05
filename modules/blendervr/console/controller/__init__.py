@@ -70,13 +70,6 @@ class Controller(Console):
         from . import logs
         self._logs = logs.Logs(self)
 
-        # if self._min_log_level == 'debug' or self._min_log_level == 'debug':
-        #     self.profile.setValue(['debug', 'daemon'], True)
-        #     self.profile.setValue(['debug', 'executables'], True)
-        # else:
-        #     self.profile.setValue(['debug', 'daemon'], False)
-        #     self.profile.setValue(['debug', 'executables'], False)
-
         from . import screens
         self._screens = screens.Screens(self)
 
@@ -228,6 +221,12 @@ class Controller(Console):
             for line in process.stdout:
                 loader_file = line.decode('UTF-8').rstrip()
                 break
+            if not loader_file:
+                if self.profile.getValue(['debug', 'updater']):
+                    error_message = ''
+                    for line in process.stderr:
+                        error_message += line.decode('UTF-8')
+                    self.logger.debug(error_message.rstrip())
         if not loader_file:
             loader_file = blender_file
 
@@ -270,7 +269,7 @@ class Controller(Console):
                 process.wait()
                 for line in process.stderr:
                     self.logger.debug(line.decode('UTF-8').rstrip())
-            
+
     def addTimeout(self, time, callback):
         """
         Add a timeout for a method. Return an index that can be use to del the timeout.
