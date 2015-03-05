@@ -65,7 +65,7 @@ class Controller(Console):
         self._profile = profile.Profile(profile_file)
 
         from ...tools import getRootPath
-        self._update_loader_script = os.path.join(getRootPath(), 'utils', 'update_loader.py')
+        self._updater_script = os.path.join(getRootPath(), 'utils', 'updater.py')
 
         from . import logs
         self._logs = logs.Logs(self)
@@ -213,7 +213,7 @@ class Controller(Console):
 
         loader_file = None
         if self._processor and self._processor.useLoader():
-            command = [sys.executable, self._update_loader_script, '--', blender_file]
+            command = [sys.executable, self._updater_script, '--', blender_file]
             if self.profile.getValue(['debug', 'executables']):
                 self.logger.error('Get loader script name:', ' '.join(command))
             process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -257,7 +257,7 @@ class Controller(Console):
                     self.logger.debug('Creating loader')
                 else:
                     self.logger.debug('Updating loader')
-                command = [self._blender_exe, '-b', '-P', self._update_loader_script, '--', self._blender_file] + self._processor_files
+                command = [self._blender_exe, '-b', '-P', self._updater_script, '--', self._blender_file] + self._processor_files
                 if self.profile.getValue(['debug', 'executables']):
                     self.logger.error('Update loader scripe:', ' '.join(command))
     
