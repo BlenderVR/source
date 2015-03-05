@@ -64,7 +64,7 @@ class ProcessorCommon(base.Base):
 if is_virtual_environment():
     class Processor(ProcessorCommon):
 
-        def __init__(self, parent):
+        def __init__(self, parent, *args, **kwargs):
             ProcessorCommon.__init__(self, parent)
 
         def setAsObjectToSynchronize(self, name):
@@ -122,7 +122,7 @@ if is_virtual_environment():
 elif is_creating_loader():
     class Processor(ProcessorCommon):
 
-        def __init__(self, parent):
+        def __init__(self, parent, *args, **kwargs):
             ProcessorCommon.__init__(self, parent)
 
         def process(self, controller):
@@ -131,7 +131,7 @@ elif is_creating_loader():
 elif is_console():
     class Processor(ProcessorCommon):
 
-        def __init__(self, parent):
+        def __init__(self, parent, *args, **kwargs):
             ProcessorCommon.__init__(self, parent)
 
             self._main_profile = parent.profile
