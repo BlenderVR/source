@@ -19,7 +19,6 @@ import blendervr.tools.logger
 logger = blendervr.tools.logger.getLogger('loader creation')
 logger.addLoginWindow(blendervr.tools.logger.Console(''), True)
 
-
 try:
     from blendervr import loader
     creator = loader.Creator(logger)

@@ -66,6 +66,7 @@ class Controller(Console):
 
         from ...tools import getRootPath
         self._updater_script = os.path.join(getRootPath(), 'utils', 'updater.py')
+        self._updater            = None
 
         from . import logs
         self._logs = logs.Logs(self)
@@ -94,6 +95,34 @@ class Controller(Console):
                     signal.signal(signum, self.kill)
                 except:
                     self.logger.info('Invalid signal:', signal_name, ': ', signum)
+
+    def _use_updater(self, blender_file = None):
+        if blender_file:
+            command = [sys.executable, self._updater_script, '--', blender_file]
+        else:
+            if not os.path.isfile(self._loader_file):
+                self.logger.debug('Creating loader')
+            else:
+                self.logger.debug('Updating loader')
+            command = [self._blender_exe, '-b', '-P', self._updater_script, '--', self._blender_file] + self._processor_files
+        if self.profile.getValue(['debug', 'executables']):
+            self.logger.error('Get loader script name:', ' '.join(command))
+
+        for index, argument in enumerate(command):
+            if ' ' in argument:
+                command[index] = '"' + argument + '"'
+
+        process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process.wait()
+
+        for line in process.stdout:
+            return line.decode('UTF-8').rstrip()
+        if self.profile.getValue(['debug', 'updater']):
+            error_message = ''
+            for line in process.stderr:
+                error_message += line.decode('UTF-8')
+            self.logger.debug(error_message.rstrip())
+        return None
 
     def __del__(self):
         self.kill()
@@ -213,20 +242,7 @@ class Controller(Console):
 
         loader_file = None
         if self._processor and self._processor.useLoader():
-            command = [sys.executable, self._updater_script, '--', blender_file]
-            if self.profile.getValue(['debug', 'executables']):
-                self.logger.error('Get loader script name:', ' '.join(command))
-            process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            process.wait()
-            for line in process.stdout:
-                loader_file = line.decode('UTF-8').rstrip()
-                break
-            if not loader_file:
-                if self.profile.getValue(['debug', 'updater']):
-                    error_message = ''
-                    for line in process.stderr:
-                        error_message += line.decode('UTF-8')
-                    self.logger.debug(error_message.rstrip())
+            loader_file = self._use_updater(blender_file)
         if not loader_file:
             loader_file = blender_file
 
@@ -253,22 +269,7 @@ class Controller(Console):
                         update = True
                         break
             if update:
-                if not os.path.isfile(self._loader_file):
-                    self.logger.debug('Creating loader')
-                else:
-                    self.logger.debug('Updating loader')
-                command = [self._blender_exe, '-b', '-P', self._updater_script, '--', self._blender_file] + self._processor_files
-                if self.profile.getValue(['debug', 'executables']):
-                    self.logger.error('Update loader scripe:', ' '.join(command))
-    
-                for index, argument in enumerate(command):
-                    if ' ' in argument:
-                        command[index] = '"' + argument + '"'
-    
-                process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                process.wait()
-                for line in process.stderr:
-                    self.logger.debug(line.decode('UTF-8').rstrip())
+                self._use_updater()
 
     def addTimeout(self, time, callback):
         """
