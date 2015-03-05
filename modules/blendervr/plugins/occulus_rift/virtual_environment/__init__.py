@@ -104,10 +104,15 @@ class OcculusRift(base.Base):
         from mathutils import Quaternion
 
         self._rift.poll()
-        self._matrix = Quaternion((self._rift.rotation[0],
+        self._matrix = Quaternion((self._rift.rotation[3],
+                                   self._rift.rotation[0],
                                    self._rift.rotation[1],
-                                   self._rift.rotation[2],
-                                   self._rift.rotation[3])).to_matrix().to_4x4()
+                                   self._rift.rotation[2])).to_matrix().to_4x4()
+
+        """
+        When we get position from Occulus we will do:
+        self._matrix = position * orientation
+        """
 
     def checkMethods(self):
         if not self._available:
