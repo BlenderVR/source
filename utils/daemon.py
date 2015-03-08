@@ -63,6 +63,10 @@ class Daemon:
     def __init__(self, blenderVR_modules):
         self._blenderVR_modules = blenderVR_modules
 
+        self._loader_file = None
+        self._loader_path = None
+        self._process = None
+
         from blendervr.tools import logger
         self._logger = logger.getLogger('daemon')
         
@@ -73,7 +77,13 @@ class Daemon:
         self._process_out = subprocess.PIPE
 
         import blendervr.tools.controller
-        self._controller_connexion = blendervr.tools.controller.Controller(self._controller_name, 'daemon', self._screen_name)
+        try:
+            self._controller_connexion = blendervr.tools.controller.Controller(self._controller_name, 'daemon', self._screen_name)
+        except:
+            console_logger = logger.Console(self._logger)
+            self._logger.warning(self._logger.EXCEPTION)
+        if not hasattr(self, '_controller_connexion'):
+            return
 
         #TODO: use os.name to identify Unixes (Linux, MacOS...) vs Windows
         # Registered: 'posix', 'nt', 'ce', 'java'.
@@ -90,10 +100,6 @@ class Daemon:
 
         if forked:
             self._controller_connexion.send('forked')
-
-        self._loader_file = None
-        self._loader_path = None
-        self._process = None
 
         logger.Network(self._logger, self._controller_connexion, 'logger')
 
@@ -117,12 +123,14 @@ class Daemon:
         sys.exit()
         
     def quit(self, *args):
-        if self._controller_connexion:
+        if hasattr(self, '_controller_connexion'):
             self._controller_connexion.close()
             self._controller_connexion = None
         self._stop_blender_player()
 
     def main(self):
+        if not hasattr(self, '_controller_connexion'):
+            return
         """Start the Daemon, quits any instance of BlenderPlayer running.
         """
         try:
