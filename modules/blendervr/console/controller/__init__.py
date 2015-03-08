@@ -118,7 +118,7 @@ class Controller(Console):
                 self.logger.debug('Updating loader')
             command = [self._blender_exe, '-b', '-P', self._updater_script, '--', self._blender_file] + self._processor_files
         if self.profile.getValue(['debug', 'executables']):
-            self.logger.error('Get loader script name:', ' '.join(command))
+            self.logger.debug('Command to get the updater:', ' '.join(command))
 
         for index, argument in enumerate(command):
             if ' ' in argument:
