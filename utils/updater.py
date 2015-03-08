@@ -20,8 +20,9 @@ def display_log(message):
     print(json.dumps({'logger': message}))
 
 import blendervr.tools.logger
-logger = blendervr.tools.logger.getLogger('loader creation')
-blendervr.tools.logger.Formatter(logger, display_log)
+logger    = blendervr.tools.logger.getLogger('loader creator')
+formatter = blendervr.tools.logger.Formatter(display_log)
+logger.addHandler(formatter)
 
 try:
     from blendervr import loader

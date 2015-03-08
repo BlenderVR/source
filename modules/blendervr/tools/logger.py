@@ -115,18 +115,17 @@ class Logger(logging.getLoggerClass()):
         return logging.WARNING
 
 class Handler(logging.Handler):
-    def __init__(self, logger):
+    def __init__(self):
         logging.Handler.__init__(self)
-        logger.addHandler(self)
 
     # TODO: implement flush element
     def flush(self):
         pass
 
 class Formatter(Handler):
-    def __init__(self, logger, callback):
+    def __init__(self, callback):
         self._callback = callback
-        Handler.__init__(self, logger)
+        Handler.__init__(self)
 
     def emit(self, record):
         self._callback({'level':   record.levelno,
@@ -135,8 +134,8 @@ class Formatter(Handler):
                         'message': record.msg})
 
 class Network(Formatter):
-    def __init__(self, logger, connection):
-        Formatter.__init__(self, logger, self._send)
+    def __init__(self, connection):
+        Formatter.__init__(self, self._send)
         self._connection = connection
 
     def _send(self, message):
@@ -144,15 +143,15 @@ class Network(Formatter):
 
 # Minimal logger on the screen. We can add formatter later, if we wish ...
 class Console(Handler):
-    def __init__(self, logger):
-        Handler.__init__(self, logger)
+    def __init__(self):
+        Handler.__init__(self)
 
     def emit(self, record):
         sendLogToStream(record.levelno, record.msg)
 
 class File(Handler):
-    def __init__(self, logger, filename):
-        Handler.__init__(self, logger)
+    def __init__(self, filename):
+        Handler.__init__(self)
         self._filename = filename
 
     def emit(self, record):

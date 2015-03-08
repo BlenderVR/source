@@ -75,9 +75,9 @@ class Controller(Console):
         from .log_history import Log_History
         self._logs = Log_History(self)
 
-        from .log_handler import Log_Handler
-        Log_Handler(self, self.logger)
-        Log_Handler(self, self._blender_logger)
+        self._log_formatter = tools_logger.Formatter(self.addLogMessage)
+        self.logger.addHandler(self._log_formatter)
+        self._blender_logger.addHandler(self._log_formatter)
 
         if log_on_console:
             from ..logger.printer import Printer

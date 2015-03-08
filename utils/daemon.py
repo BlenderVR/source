@@ -100,7 +100,7 @@ class Daemon:
         if forked:
             self._controller_connexion.send('forked')
 
-        logger.Network(self._logger, self._controller_connexion)
+        self._logger.addHandler(logger.Network(self._controller_connexion))
 
     def write(self, *messages):
         """Send message to the client
