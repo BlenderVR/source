@@ -29,8 +29,6 @@ class Logger_Handler(blendervr.tools.logger.Handler):
 
 Logger_Handler(logger, 'updater')
 
-logger.error('Yop !')
-
 try:
     from blendervr import loader
     creator = loader.Creator(logger)
