@@ -68,8 +68,11 @@ class Controller(Console):
         self._updater_script = os.path.join(getRootPath(), 'utils', 'updater.py')
         self._updater            = None
 
-        from ..logger.history import History
-        self._logs = History(self)
+        from .log_history import Log_History
+        self._logs = Log_History(self)
+
+        from .log_handler import Log_Handler
+        Log_Handler(self, self.logger, 'controller')
 
         if log_on_console:
             from ..logger.printer import Printer

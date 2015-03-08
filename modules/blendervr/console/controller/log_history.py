@@ -37,28 +37,20 @@
 ##
 
 from . import base
-from ...tools import logger
 
-class History(base.Base, logger.Handler):
+class Log_History(base.Base):
     def __init__(self, parent):
         base.Base.__init__(self, parent)
-        logger.Handler.__init__(self, self.logger)
         self._callbacks = []
         self.clear()
 
     def addCallback(self, callback):
         if callback not in self._callbacks:
             self._callbacks.append(callback)
-        
+
     def removeCallback(self, callback):
         if callback in self._callbacks:
             self._callbacks.remove(callback)
-        
-    def emit(self, record):
-        try:
-            self.addMessage(self._getLogFromRecord(record, 'controller'))
-        except Exception:
-            self.handleError(record)
 
     def addMessage(self, message):
         self._messages.append(message)
@@ -67,10 +59,6 @@ class History(base.Base, logger.Handler):
 
     def getAllMessages(self):
         return self._messages
-
-    def display(self):
-        for message in self._messages:
-            logger.sendLogToStream(message['level'], '[' + message['context'] + '] ' + message['message'])
 
     def clear(self):
         self._messages = []

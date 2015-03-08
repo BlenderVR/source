@@ -123,20 +123,25 @@ class Handler(logging.Handler):
     def flush(self):
         pass
 
-    def _getLogFromRecord(self, record, context):
-        return {'level':   record.levelno,
-                'time':    record.created,
-                'context': context,
-                'message': record.msg}
-
-class Network(Handler):
-    def __init__(self, logger, connection, context):
+class Formatter(Handler):
+    def __init__(self, logger, context, callback):
+        self._context  = context
+        self._callback = callback
         Handler.__init__(self, logger)
-        self._connection = connection
-        self._context    = context
 
     def emit(self, record):
-        self._connection.send('logger', self._getLogFromRecord(record, self._context))
+        self._callback({'level':   record.levelno,
+                        'time':    record.created,
+                        'context': self._context,
+                        'message': record.msg})
+
+class Network(Formatter):
+    def __init__(self, logger, connection, context):
+        Formatter.__init__(self, logger, context, self._send)
+        self._connection = connection
+
+    def _send(self, message):
+        self._connection.send('logger', message)
 
 # Minimal logger on the screen. We can add formatter later, if we wish ...
 class Console(Handler):
