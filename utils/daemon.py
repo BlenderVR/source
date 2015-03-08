@@ -123,7 +123,7 @@ class Daemon:
         sys.exit()
         
     def quit(self, *args):
-        if hasattr(self, '_controller_connexion'):
+        if hasattr(self, '_controller_connexion') and self._controller_connexion:
             self._controller_connexion.close()
             self._controller_connexion = None
         self._stop_blender_player()
