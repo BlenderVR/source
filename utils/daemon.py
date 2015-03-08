@@ -66,11 +66,11 @@ class Daemon:
         self._loader_path = None
         self._process = None
 
-        from blendervr.tools import logger
-        self._logger = logger.getLogger('daemon')
-        
         self._controller_name = sys.argv[1]
         self._screen_name = sys.argv[2].strip("'\"")
+
+        from blendervr.tools import logger
+        self._logger = logger.getLogger('daemon:' + self._screen_name)
 
         self._process_in = subprocess.PIPE
         self._process_out = subprocess.PIPE
@@ -101,7 +101,7 @@ class Daemon:
             self._controller_connexion.send('forked')
 
         self._logger.addHandler(logger.Network(self._controller_connexion))
-
+        
     def write(self, *messages):
         """Send message to the client
 
