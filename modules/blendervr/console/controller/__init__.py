@@ -43,7 +43,7 @@ from .. import Console
 
 class Controller(Console):
     def __init__(self, profile_file, min_log_level, log_in_file, log_on_console):
-        Console.__init__(self, min_log_level, log_in_file, log_on_console)
+        Console.__init__(self, min_log_level, log_in_file)
 
         # Simulation informations
         self._blender_file       = None 
@@ -68,9 +68,13 @@ class Controller(Console):
         self._updater_script = os.path.join(getRootPath(), 'utils', 'updater.py')
         self._updater            = None
 
-        from . import logs
-        self._logs = logs.Logs(self)
+        from ..logger.logs import Logs
+        self._logs = Logs(self)
 
+        if log_on_console:
+            from ..logger.printer import Printer
+            self._printer = Printer(self)
+        
         from . import screens
         self._screens = screens.Screens(self)
 
@@ -136,6 +140,12 @@ class Controller(Console):
         self.profile.setValue('port', self.getPort())
         from ... import version
         self.logger.info('blenderVR version:', version)
+
+        if hasattr(self, '_printer'): # log on console !
+            for msg in self._logs.getAllMessages():
+                self._printer.print(msg)
+            self._logs.addCallback(self._printer.print)
+
         self.configuration()
 
     def getPort(self):

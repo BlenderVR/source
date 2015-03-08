@@ -39,13 +39,9 @@
 from ..tools import logger as tools_logger
 
 class Console:
-    def __init__(self, min_log_level, log_in_file, log_on_console = False):
+    def __init__(self, min_log_level, log_in_file):
         self._logger = tools_logger.getLogger('blenderVR')
         self._logger.setLevel(min_log_level)
-
-        if log_on_console:
-            # Define connexions until the controller is running ...
-            tools_logger.Console(self._logger)
 
         if log_in_file:
             # Define connexions until the controller is running ...
