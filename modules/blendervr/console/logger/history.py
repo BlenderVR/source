@@ -39,7 +39,7 @@
 from . import base
 from ...tools import logger
 
-class Logs(base.Base, logger.Handler):
+class History(base.Base, logger.Handler):
     def __init__(self, parent):
         base.Base.__init__(self, parent)
         logger.Handler.__init__(self, self.logger)

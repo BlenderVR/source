@@ -43,8 +43,8 @@ class Logger(base.Client):
         base.Client.__init__(self, parent, client)
 
     def cb_connect(self):
-        self.controller._logs.addCallback(self.data)
-        for message in self.controller._logs.getAllMessages():
+        self.controller._history.addCallback(self.data)
+        for message in self.controller._history.getAllMessages():
             self.data(message)
 
     def cb_data(self):
@@ -53,7 +53,7 @@ class Logger(base.Client):
         self.logger.debug(self.logger.POSITION, ': unknown command:', command, '(', argument, ')')
 
     def cb_disconnect(self):
-        self.controller._logs.removeCallback(self.data)
+        self.controller._history.removeCallback(self.data)
         
     def data(self, message):
         self._client.send('log', message)
