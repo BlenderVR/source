@@ -45,4 +45,4 @@ class Log_Handler(base.Base, logger.Formatter):
         logger.Formatter.__init__(self, _logger, self.addMessage)
 
     def addMessage(self, message):
-        self.controller._logs.addMessage(message)
+        self.controller.addLogMessage(message)

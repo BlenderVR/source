@@ -142,7 +142,7 @@ class Controller(Console):
                 continue
             for context, message in messages.items():
                 if context == 'logger':
-                    self._logs.addMessage(message)
+                    self.addLogMessage(message)
                     continue
                 if context == 'loader':
                     loader_name = message
@@ -340,3 +340,6 @@ class Controller(Console):
 
     def runAction(self, action, element):
         self._screens.runAction(action, element)
+
+    def addLogMessage(self, message):
+        self._logs.addMessage(message)

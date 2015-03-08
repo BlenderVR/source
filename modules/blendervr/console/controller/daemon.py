@@ -52,6 +52,11 @@ class Daemon(base.Client):
 
     def cb_data(self):
         result = self._client.receive()
+        if result:
+            command, argument = result
+            if command == 'logger':
+                self.controller.addLogMessage(argument)
+            return
 
     def cb_disconnect(self):
         return

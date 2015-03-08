@@ -56,8 +56,6 @@ import threading
 debug = False
 forked = False
 
-# TODO: fix logger to send information to the controller
-
 class Daemon:
     """Background management of the Blender Player and related stuff.
     """
