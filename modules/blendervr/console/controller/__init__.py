@@ -119,14 +119,25 @@ class Controller(Console):
         process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         process.wait()
 
+        loader_name = None
+        
+        import json
+
         for line in process.stdout:
-            return line.decode('UTF-8').rstrip()
+            messages = json.loads(line.decode('UTF-8'))
+            for context, message in messages.items():
+                if context == 'logger':
+                    self._logs.addMessage(message)
+                    continue
+                if context == 'loader':
+                    loader_name = message
         if self.profile.getValue(['debug', 'updater']):
             error_message = ''
             for line in process.stderr:
                 error_message += line.decode('UTF-8')
-            self.logger.debug(error_message.rstrip())
-        return None
+            if error_message:
+                self.logger.debug(error_message.rstrip())
+        return loader_name
 
     def __del__(self):
         self.kill()

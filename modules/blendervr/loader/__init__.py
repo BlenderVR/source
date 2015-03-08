@@ -119,7 +119,8 @@ class Creator:
                                     relative_remap=True)
 
         elif is_console():
-            print(self._output_blender_file)
+            import json
+            print(json.dumps({'loader': self._output_blender_file}))
 
 
 SHADER_PROGRAM = """uniform sampler2D bgl_RenderedTexture;

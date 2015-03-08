@@ -12,12 +12,24 @@ A few Logic Bricks are created among other changes in the initial scene.
 
 import sys
 import os
+import json
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'modules'))
 
 import blendervr.tools.logger
 logger = blendervr.tools.logger.getLogger('loader creation')
-logger.addLoginWindow(blendervr.tools.logger.Console(''), True)
+
+class Logger_Handler(blendervr.tools.logger.Handler):
+    def __init__(self, logger, context):
+        blendervr.tools.logger.Handler.__init__(self, logger)
+        self._context = context
+
+    def emit(self, record):
+        print(json.dumps({'logger': self._getLogFromRecord(record, self._context)}))
+
+Logger_Handler(logger, 'updater')
+
+logger.error('Yop !')
 
 try:
     from blendervr import loader
