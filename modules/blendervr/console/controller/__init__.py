@@ -124,19 +124,25 @@ class Controller(Console):
         import json
 
         for line in process.stdout:
-            messages = json.loads(line.decode('UTF-8'))
+            line = line.decode('UTF-8').rstrip()
+            if not line:
+                continue
+            try:
+                messages = json.loads(line)
+            except:
+                self.logger.info(line.rstrip())
+                continue
             for context, message in messages.items():
                 if context == 'logger':
                     self._logs.addMessage(message)
                     continue
                 if context == 'loader':
                     loader_name = message
-        if self.profile.getValue(['debug', 'updater']):
-            error_message = ''
-            for line in process.stderr:
-                error_message += line.decode('UTF-8')
-            if error_message:
-                self.logger.debug(error_message.rstrip())
+        for line in process.stderr:
+            line = line.decode('UTF-8').rstrip()
+            if not line:
+                continue
+            self.logger.warn(error_message.rstrip())
         return loader_name
 
     def __del__(self):
