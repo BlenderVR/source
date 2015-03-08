@@ -233,6 +233,8 @@ class Controller(Console):
         if not configuration:
             return
 
+        self._blender_exe = configuration['console']['blender_exe']
+
         self._controller_address = configuration['console']['controller'] + ':' + str(self.getPort())
         self._screens.setConfiguration(configuration['screens'])
         del(configuration['screens'])

@@ -109,7 +109,7 @@ class Configuration(base.Base):
                 configuration_screens[screen_name]['keep_focus'] = False
 
             screens[screen_name] = { 'screen':   configuration_screens[screen_name],
-                                            'computer': configuration_computers[computer_name]}
+                                     'computer': configuration_computers[computer_name]}
             
         complements = {'users'     : self._configuration['users'],
                        'plugins'   : self._configuration['plugins'],
