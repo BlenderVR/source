@@ -40,6 +40,7 @@ from . import ui
 from . import daemon
 from . import logger
 from .. import Console
+from ...tools import logger as tools_logger
 
 class Controller(Console):
     def __init__(self, profile_file, min_log_level, log_in_file, log_on_console):
@@ -66,13 +67,17 @@ class Controller(Console):
 
         from ...tools import getRootPath
         self._updater_script = os.path.join(getRootPath(), 'utils', 'updater.py')
-        self._updater            = None
+        self._updater        = None
 
+        self._blender_logger = tools_logger.getLogger('blender')
+        self._blender_logger.setLevel(min_log_level)
+        
         from .log_history import Log_History
         self._logs = Log_History(self)
 
         from .log_handler import Log_Handler
-        Log_Handler(self, self.logger, 'controller')
+        Log_Handler(self, self.logger)
+        Log_Handler(self, self._blender_logger)
 
         if log_on_console:
             from ..logger.printer import Printer
@@ -133,7 +138,7 @@ class Controller(Console):
             try:
                 messages = json.loads(line)
             except:
-                self.logger.info(line.rstrip())
+                self._blender_logger.info(line)
                 continue
             for context, message in messages.items():
                 if context == 'logger':
@@ -145,7 +150,7 @@ class Controller(Console):
             line = line.decode('UTF-8').rstrip()
             if not line:
                 continue
-            self.logger.warn(error_message.rstrip())
+            self._blender_logger.warn(line)
         return loader_name
 
     def __del__(self):

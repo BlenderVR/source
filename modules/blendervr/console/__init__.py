@@ -40,7 +40,7 @@ from ..tools import logger as tools_logger
 
 class Console:
     def __init__(self, min_log_level, log_in_file):
-        self._logger = tools_logger.getLogger('blenderVR')
+        self._logger = tools_logger.getLogger('controller')
         self._logger.setLevel(min_log_level)
 
         if log_in_file:

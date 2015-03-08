@@ -124,20 +124,19 @@ class Handler(logging.Handler):
         pass
 
 class Formatter(Handler):
-    def __init__(self, logger, context, callback):
-        self._context  = context
+    def __init__(self, logger, callback):
         self._callback = callback
         Handler.__init__(self, logger)
 
     def emit(self, record):
         self._callback({'level':   record.levelno,
                         'time':    record.created,
-                        'context': self._context,
+                        'context': record.name,
                         'message': record.msg})
 
 class Network(Formatter):
-    def __init__(self, logger, connection, context):
-        Formatter.__init__(self, logger, context, self._send)
+    def __init__(self, logger, connection):
+        Formatter.__init__(self, logger, self._send)
         self._connection = connection
 
     def _send(self, message):

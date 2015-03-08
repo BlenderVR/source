@@ -56,6 +56,7 @@ import threading
 debug = False
 forked = False
 
+# TODO: fix logger to send information to the controller
 
 class Daemon:
     """Background management of the Blender Player and related stuff.
@@ -101,7 +102,7 @@ class Daemon:
         if forked:
             self._controller_connexion.send('forked')
 
-        logger.Network(self._logger, self._controller_connexion, 'logger')
+        logger.Network(self._logger, self._controller_connexion)
 
     def write(self, *messages):
         """Send message to the client

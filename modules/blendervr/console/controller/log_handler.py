@@ -40,9 +40,9 @@ from . import base
 from ...tools import logger
 
 class Log_Handler(base.Base, logger.Formatter):
-    def __init__(self, parent, _logger, context):
+    def __init__(self, parent, _logger):
         base.Base.__init__(self, parent)
-        logger.Formatter.__init__(self, _logger, context, self.addMessage)
+        logger.Formatter.__init__(self, _logger, self.addMessage)
 
     def addMessage(self, message):
         self.controller._logs.addMessage(message)

@@ -16,18 +16,12 @@ import json
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'modules'))
 
+def display_log(message):
+    print(json.dumps({'logger': message}))
+
 import blendervr.tools.logger
 logger = blendervr.tools.logger.getLogger('loader creation')
-
-class Logger_Handler(blendervr.tools.logger.Handler):
-    def __init__(self, logger, context):
-        blendervr.tools.logger.Handler.__init__(self, logger)
-        self._context = context
-
-    def emit(self, record):
-        print(json.dumps({'logger': self._getLogFromRecord(record, self._context)}))
-
-Logger_Handler(logger, 'updater')
+blendervr.tools.logger.Formatter(logger, display_log)
 
 try:
     from blendervr import loader
