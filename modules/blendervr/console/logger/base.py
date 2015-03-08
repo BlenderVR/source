@@ -33,44 +33,8 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-import sys
-from ...tools import controller
-import logging
-from .. import Console
-from .printer import Printer
+from .. import base
 
-class Logger(Console):
-    def __init__(self, port, min_log_level, log_in_file):
-        Console.__init__(self, min_log_level, log_in_file)
-
-        self._port = port
-        self._quit = False
-
-        from ...tools import controller
-        try:
-            self._controller = controller.Controller('localhost:' + str(self._port), 'logger')
-        except ConnectionRefusedError:
-            self.logger.warning('Cannot find the controller on localhost:' + str(self._port))
-            sys.exit()
-
-        self._printer = Printer(self)
-
-    def start(self):
-        from ... import version
-        self.logger.info('blenderVR version:', version)
-
-    def main(self):
-        try:
-            while True:
-                message = self._controller.receive()
-                if message:
-                    command, argument = message
-                    if command == 'log':
-                        self._printer.print(argument)
-        except controller.closedSocket as e:
-            self.logger.warning(e)
-        except (KeyboardInterrupt, SystemExit):
-            return
-
-    def quit(self):
-        self._quit = True
+class Base(base.Base):
+    def __init__(self, parent):
+        base.Base.__init__(self, parent)

@@ -33,44 +33,23 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ## 
 
-import sys
-from ...tools import controller
 import logging
-from .. import Console
-from .printer import Printer
+from . import base
 
-class Logger(Console):
-    def __init__(self, port, min_log_level, log_in_file):
-        Console.__init__(self, min_log_level, log_in_file)
+class Printer(base.Base):
+    def __init__(self, parent):
+        base.Base.__init__(self, parent)
 
-        self._port = port
-        self._quit = False
+        self._colors = {'DEBUG': '\033[94m',
+                        'INFO': '\033[92m',
+                        'WARNING': '\033[93m',
+                        'ERROR': '\033[91m',
+                        'CRITICAL': '\033[1m\033[91m'}
 
-        from ...tools import controller
-        try:
-            self._controller = controller.Controller('localhost:' + str(self._port), 'logger')
-        except ConnectionRefusedError:
-            self.logger.warning('Cannot find the controller on localhost:' + str(self._port))
-            sys.exit()
-
-        self._printer = Printer(self)
-
-    def start(self):
-        from ... import version
-        self.logger.info('blenderVR version:', version)
-
-    def main(self):
-        try:
-            while True:
-                message = self._controller.receive()
-                if message:
-                    command, argument = message
-                    if command == 'log':
-                        self._printer.print(argument)
-        except controller.closedSocket as e:
-            self.logger.warning(e)
-        except (KeyboardInterrupt, SystemExit):
-            return
-
-    def quit(self):
-        self._quit = True
+    def print(self, record):
+        levelname = logging.getLevelName(record['level'])
+        message = '[' + record['context'] + ']: ' + record['message']
+        if levelname in self._colors:
+            print(self._colors[levelname] + message + '\033[0m')
+        else:
+            print(message)
