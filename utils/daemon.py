@@ -79,11 +79,11 @@ class Daemon:
         # Registered: 'posix', 'nt', 'ce', 'java'.
         if ('posix' in sys.builtin_module_names):
             import signal
-            signal.signal(signal.SIGTERM, sys.exit)
+            signal.signal(signal.SIGTERM, self._exit)
         else:
             try:
                 import win32api
-                win32api.SetConsoleCtrlHandler(sys.exit, True)
+                win32api.SetConsoleCtrlHandler(self._exit, True)
             except ImportError:
                 version = '.'.join(map(str, sys.version_info[:2]))
                 raise Exception('pywin32 not installed for Python ' + version)
@@ -113,6 +113,9 @@ class Daemon:
     def __del__(self):
         self.quit()
 
+    def _exit(self, *args):
+        sys.exit()
+        
     def quit(self, *args):
         if self._controller_connexion:
             self._controller_connexion.close()
