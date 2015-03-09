@@ -196,3 +196,25 @@ class Base(base.Base):
         result['windowCoordinates'] = wc
 
         return result
+
+    def _setModelViewMatrix(self, camera, matrix):
+        from bgl import (
+                Buffer,
+                GL_FLOAT,
+                GL_MODELVIEW,
+                glMatrixMode,
+                glLoadMatrixf,
+                )
+
+        matrix *= camera.modelview_matrix
+        buf = Buffer(GL_FLOAT, [4, 4])
+        for i in range(4):
+            for j in range(4):
+                # transposed
+                buf[i][j] = matrix[j][i]
+
+        glMatrixMode(GL_MODELVIEW)
+        glLoadMatrixf(buf)
+
+    def _setProjectionMatrix(self, camera, matrix):
+        camera.projection_matrix = matrix
