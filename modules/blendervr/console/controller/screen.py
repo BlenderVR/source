@@ -147,10 +147,14 @@ class Screen(base.Base):
             if self.profile.getValue(['debug', 'daemon']):  # Debug ?
                 daemon_in = None
                 daemon_out = None
-                command.append('debug')
+                command.append('foreground')
             else:
                 daemon_in = open(os.devnull, 'r')
                 daemon_out = open(os.devnull, 'w')
+                command.append('background')
+
+            command.append('log_level=' + self.logger.getReverseVerbosity(self.logger.getEffectiveLevel()))
+            command.append('debug_executable=' + str(self.profile.getValue(['debug', 'executables'])))
 
             try:
                 if self.profile.getValue(['debug', 'executables']):

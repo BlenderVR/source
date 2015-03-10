@@ -114,6 +114,19 @@ class Logger(logging.getLoggerClass()):
 
         return logging.WARNING
 
+    def getReverseVerbosity(self, verbosity):
+        if verbosity == logging.DEBUG:
+            return 'debug'
+        if verbosity == logging.INFO:
+            return 'info'
+        if verbosity == logging.WARNING:
+            return 'warning'
+        if verbosity == logging.ERROR:
+            return 'error'
+        if verbosity == logging.CRITICAL:
+            return 'critical'
+        return None
+
 class Handler(logging.Handler):
     def __init__(self):
         logging.Handler.__init__(self)

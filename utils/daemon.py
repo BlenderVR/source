@@ -53,7 +53,7 @@ import os
 import subprocess
 import threading
 
-debug = False
+foreground = False
 forked = False
 
 class Daemon:
@@ -71,6 +71,17 @@ class Daemon:
 
         from blendervr.tools import logger
         self._logger = logger.getLogger('daemon:' + self._screen_name)
+        if len(sys.argv) > 4 and sys.argv[4].startswith('log_level'):
+            level = sys.argv[4].split('=')[1]
+            self._logger.setLevel(level)
+
+        if len(sys.argv) > 5 and sys.argv[5].startswith('debug_executable'):
+            self._debug_executable = eval(sys.argv[5].split('=')[1])
+        else:
+            self._debug_executable = False
+
+        self._blender_vr_logger = logger.getLogger('blendervr:' + self._screen_name)
+        self._blender_vr_logger.setLevel('info')
 
         self._process_in = subprocess.PIPE
         self._process_out = subprocess.PIPE
@@ -101,19 +112,7 @@ class Daemon:
             self._controller_connexion.send('forked')
 
         self._logger.addHandler(logger.Network(self._controller_connexion))
-        
-    def write(self, *messages):
-        """Send message to the client
-
-        :param messages: all the messages to send to the client (i.e., console
-            commands)
-        :type messages: list
-        """
-        elements = []
-        for message in messages:
-            elements.append(str(message))
-        for message in (' '.join(elements)).split('\n'):
-            self._controller_connexion.send('log', message.rstrip(' \n\r'))
+        self._blender_vr_logger.addHandler(logger.Network(self._controller_connexion))
 
     def __del__(self):
         self.quit()
@@ -142,7 +141,8 @@ class Daemon:
         except (socket.error, SystemExit, KeyboardInterrupt):
             pass
         except:
-            if debug:
+            self._logger.error(self._logger.EXCEPTION)
+            if foreground:
                 import traceback
                 traceback.print_exc()
 
@@ -215,34 +215,36 @@ class Daemon:
                     command[index] = '"' + argument + '"'
 
             try:
-                self._controller_connexion.send('command', {'command': command,
-                                              'environment': self._environment,
-                                              'path': self._loader_path})
+                if self._debug_executable:
+                    self._logger.info('Command to run blenderplayer:', command)
+                    self._logger.info('Its environment variables:', self._environment)
+                    self._logger.info('Its path:', self._loader_path)
                 self._process = subprocess.Popen(command,
-                             env=self._environment,
-                             stdin=self._process_in,
-                             stdout=self._process_out,
-                             stderr=self._process_out,
-                             cwd=self._loader_path,
-                             universal_newlines=True,
-                             #TODO: use os.name == 'posix'
-                             close_fds=('posix' in sys.builtin_module_names))
+                                                 env=self._environment,
+                                                 stdin=self._process_in,
+                                                 stdout=self._process_out,
+                                                 stderr=self._process_out,
+                                                 cwd=self._loader_path,
+                                                 universal_newlines=True,
+                                                 #TODO: use os.name == 'posix'
+                                                 close_fds=('posix' in sys.builtin_module_names))
             except Exception as error:
-                self._controller_connexion.send('stderr', 'Cannot start blenderplayer: '
-                                                    + str(error))
+                self._logger.error('Cannot start blenderplayer: ' + str(error))
             threading.Thread(target=Daemon._stream_waiter, args=(self, 'stdout')).start()
             threading.Thread(target=Daemon._stream_waiter, args=(self, 'stderr')).start()
             self._controller_connexion.send('started')
 
     def _stream_waiter(self, stream_name):
         stream = getattr(self._process, stream_name)
+        if stream_name == 'stdout':
+            logger = self._blender_vr_logger.info
+        else:
+            logger = self._blender_vr_logger.error
         while True:
             lines = stream.readline()
             if not lines:
                 break
-            lines = lines.rstrip(' \r\n')
-            for line in lines.split('\n'):
-                self._controller_connexion.send(stream_name, line)
+            logger(lines)
         if stream_name == 'stdout':
             self._stop_blender_player()
 
@@ -252,15 +254,15 @@ def main():
     Prepare execution (daemonize if necessary), then build a Daemon and
     call its main() method to manage background communications.
     """
-    global debug
+    global foreground
     global forked
 
-    if len(sys.argv) > 3 and sys.argv[3] == 'debug':
-        debug = True
+    if len(sys.argv) > 3 and sys.argv[3] == 'foreground':
+        foreground = True
     else:
-        debug = False
+        foreground = False
 
-    if not debug:
+    if not foreground:
         try:
             # on Linux, we daemonize !
             process_id = os.fork()
