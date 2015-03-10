@@ -244,7 +244,7 @@ class Daemon:
             lines = stream.readline()
             if not lines:
                 break
-            logger(lines)
+            logger(lines.rstrip())
         if stream_name == 'stdout':
             self._stop_blender_player()
 

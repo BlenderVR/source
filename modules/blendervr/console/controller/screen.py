@@ -135,10 +135,7 @@ class Screen(base.Base):
             if action == 'start':
                 self._startDaemon()
         elif element == 'simulation':
-            if action == 'start':
-                print('START !')
-            else:
-                print('STOP !')
+            self._clients['daemon'].send('state', action)
 
     def _startDaemon(self):
         if self._process is None:

@@ -109,8 +109,3 @@ class UI(base.Client):
         if command == 'simulation':
             self._client.send('status', composeMessage(command, False))
             return
-
-    def status(self, command):
-        if command == 'simulation':
-            self._client.send('status', composeMessage(command, False))
-            return
