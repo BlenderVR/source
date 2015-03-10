@@ -123,12 +123,13 @@ class Master(Base):
             self._addToBuffer(self.OBJECT, id(self._objects),
                               self._objects.checkItems())
         except:
-            self.logger.log_traceback()
+            self.logger.log_traceback(False)
 
         # Then update objects attributs
         for objects_id, object in self._synchronizedObjects.items():
             self._addToBuffer(self.OBJECT, objects_id, object.getSynchronizerBuffer())
         self._sendBuffer()
+
 
 class Slave(Base):
 
