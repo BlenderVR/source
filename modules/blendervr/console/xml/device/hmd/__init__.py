@@ -45,10 +45,9 @@ def Device(parent, name, attrs):
             parent.logger.log_traceback(False)
     else:
         try:
-            module = importlib.import_module(__name__ + '.legacy')
+            module = importlib.import_module(__name__ + '.base')
             return module.Device(parent, name, attrs)
         except ImportError:
             pass
-
     from ... import exceptions
     raise exceptions.Common('No valid hmd device screen found')

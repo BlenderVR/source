@@ -1,4 +1,4 @@
-## Copyright (C) LIMSI-CNRS (2015)
+## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
 ## Laurent Pointal, Julian Adenauer,
@@ -33,9 +33,19 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
-from .. import screen
+from .. import base
 
-class Device(screen.Screen):
+class Device(base.Base):
 
     def __init__(self, parent, name, attrs):
         super(Device, self).__init__(parent, name, attrs)
+
+
+    def _getChildren(self, name, attrs):
+        if name in {'left', 'mono', 'right'}:
+            from . import screen
+            display = screen.Screen(self, name, attrs)
+            setattr(self, '_' + name, display)
+            self._class_list += [name]
+            return display
+

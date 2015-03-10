@@ -45,15 +45,14 @@ from ... import exceptions
 Manager of Head Mounted Display (HMD) screens with blenderVR ...
 """
 
+warning_for_unsure_projection_displayed = False
+
+
 class Device(base.Base):
 
     def __init__(self, parent, configuration):
         super(Device, self).__init__(parent, configuration)
 
-        self._screens_informations = self.computeScreenRegardingCorners(
-                            configuration['hmd']['corners'])
-
-        """
         self._screens_informations = {}
         for bufferName in {'left', 'mono', 'right'}:
             if bufferName in configuration['hmd']:
@@ -71,7 +70,6 @@ class Device(base.Base):
                                 "screen is not validated !\nYou should "
                                 "try it with caution.")
             warning_for_unsure_projection_displayed = True
-        """
 
     def _updateMatrixForBuffer(self, bufferName, camera, depth):
 
