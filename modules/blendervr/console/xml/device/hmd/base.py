@@ -43,7 +43,7 @@ class Device(base.Base):
 
     def _getChildren(self, name, attrs):
         if name in {'left', 'mono', 'right'}:
-            from . import screen
+            from .. import screen
             display = screen.Screen(self, name, attrs)
             setattr(self, '_' + name, display)
             self._class_list += [name]
