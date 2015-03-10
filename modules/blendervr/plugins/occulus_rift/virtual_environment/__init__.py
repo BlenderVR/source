@@ -114,6 +114,8 @@ class OcculusRift(base.Base):
         self._matrix = position * orientation
         """
 
+        self._matrix.invert()
+
     def checkMethods(self):
         if not self._available:
             self.logger.info('Occulus Rift python module not available !')
