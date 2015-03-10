@@ -33,22 +33,28 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
-import importlib
+"""
+.. note
+    This file doesn't work well. It's kept in the code for legacy reasons.
+    It can be removed once HMD is properly supported
+"""
 
-def Device(parent, name, attrs):
-    if 'model' in attrs:
-        try:
-            module = importlib.import_module(__name__ + '.'
-                                            + attrs['model'])
-            return module.Device(parent, name, attrs)
-        except ImportError:
-            parent.logger.log_traceback(False)
-    else:
-        try:
-            module = importlib.import_module(__name__ + '.legacy')
-            return module.Device(parent, name, attrs)
-        except ImportError:
-            pass
 
-    from ... import exceptions
-    raise exceptions.Common('No valid hmd device screen found')
+from .. import base
+
+class Device(base.Base):
+
+    def __init__(self, parent, name, attrs):
+        super(Device, self).__init__(parent, name, attrs)
+        self._attribute_list += ['model']
+        self._model = 'legacy'
+
+
+    def _getChildren(self, name, attrs):
+        if name in {'left', 'mono', 'right'}:
+            from .. import screen
+            display = screen.Screen(self, name, attrs)
+            setattr(self, '_' + name, display)
+            self._class_list += [name]
+            return display
+

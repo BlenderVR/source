@@ -33,9 +33,9 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
-from .. import base
+from . import base
 
-class Device(base.Base):
+class Device(base.Device):
     def __init__(self, parent, name, attrs):
         super(Device, self).__init__(parent, name, attrs)
         self._attribute_list += ['model']

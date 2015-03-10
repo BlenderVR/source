@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# file: blendervr/player/screen/hmd/base.py
+# file: blendervr/player/screen/hmd/legacy.py
 
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
@@ -43,17 +43,20 @@ from ... import exceptions
 
 """ @package hmd
 Manager of Head Mounted Display (HMD) screens with blenderVR ...
+
+.. note
+    This file doesn't work well. It's kept in the code for legacy reasons.
+    It can be removed once HMD is properly supported
 """
+
+warning_for_unsure_projection_displayed = False
+
 
 class Device(base.Base):
 
     def __init__(self, parent, configuration):
         super(Device, self).__init__(parent, configuration)
 
-        self._screens_informations = self.computeScreenRegardingCorners(
-                            configuration['hmd']['corners'])
-
-        """
         self._screens_informations = {}
         for bufferName in {'left', 'mono', 'right'}:
             if bufferName in configuration['hmd']:
@@ -71,7 +74,6 @@ class Device(base.Base):
                                 "screen is not validated !\nYou should "
                                 "try it with caution.")
             warning_for_unsure_projection_displayed = True
-        """
 
     def _updateMatrixForBuffer(self, bufferName, camera, depth):
 
