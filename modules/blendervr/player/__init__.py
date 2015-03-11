@@ -47,7 +47,7 @@ import sys
 import os
 from . import exceptions
 from .buffer import Buffer
-from ..tools import protocol
+from ..console import protocol
 
 from .. import is_virtual_environment
 if not is_virtual_environment():
@@ -80,8 +80,7 @@ class Main:
 
             # Define connexions until the controller is running ...
             console_logger = logger.Console()
-            self._default_logger = self._logger.addLoginWindow(
-                                                        console_logger, True)
+            self._logger.addHandler(console_logger)
             self._logger.setLevel('debug')
 
             from .network import controller

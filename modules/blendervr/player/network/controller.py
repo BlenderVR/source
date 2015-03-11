@@ -40,9 +40,8 @@ import socket
 import sys
 import os
 from .. import base
-from ...tools import connector
-from ...tools import protocol
-
+from ..console import protocol
+from ..tools import controller
 
 class Controller(base.Base):
 
