@@ -78,6 +78,9 @@ class Creator:
             camera = scene.camera
 
             if camera:
+                if bpy.context.object == None:
+                    scene.objects.active = camera
+
                 SENSOR = ELEMENTS_MAIN_PREFIX + 'Sensor'
                 bpy.ops.logic.sensor_add(type='ALWAYS', name=SENSOR,
                                                         object=camera.name)
