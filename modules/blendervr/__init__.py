@@ -81,23 +81,10 @@ def is_console():
     return not is_virtual_environment() and not is_creating_loader()
 
 
-def main():
-    if is_virtual_environment():
-        try:
-            import bge
-            from .player import Main
+if is_virtual_environment():
+    import bge
+    from .player import Main
 
-            bge.logic.blenderVR = Main()
-
-            def run():
-                bge.logic.blenderVR.run()
-        except:
-            def run():
-                pass
-
-
-import os
-# Environment variable set by documentation processing, used to avoid
-#
-if os.environ.get('READTHEDOCS', False) != 'True':
-    main()
+    bge.logic.blenderVR = Main()
+    def run():
+        bge.logic.blenderVR.run()

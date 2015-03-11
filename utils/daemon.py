@@ -80,7 +80,7 @@ class Daemon:
         else:
             self._debug_executable = False
 
-        self._blender_vr_logger = logger.getLogger('blendervr:' + self._screen_name)
+        self._blender_vr_logger = logger.getLogger('blenderplayer:' + self._screen_name)
         self._blender_vr_logger.setLevel('info')
 
         self._process_in = subprocess.PIPE
