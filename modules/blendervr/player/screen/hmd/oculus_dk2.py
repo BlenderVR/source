@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# file: blendervr/plugins/osc/virtual_environment/user.py
+# file: blendervr/player/screen/hmd/oculus_dk2.py
 
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
@@ -36,35 +36,53 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
-from ....player import device
+import mathutils
+import bge
+from . import base
+from ... import exceptions
 
+""" @package hmd
+Manager of Oculus DK2 screens with blenderVR
+"""
 
-class User(device.Sender):
+warning_for_unsure_projection_displayed = False
+
+class Device(base.Device):
+
     def __init__(self, parent, configuration):
-        _configuration = configuration.copy()
-        _configuration['users'] = _configuration['viewer']
+        super(Device, self).__init__(parent, configuration)
+        self._plugin = None
 
-        super(User, self).__init__(parent, _configuration)
-        self._available = False
+    def start(self):
+        super(Device, self).start()
 
-        if self.blenderVR.getComputerName() != _configuration['computer']:
+        import sys
+
+        self._plugin = self.blenderVR.getPlugin('oculus_dk2')
+        if self._plugin is None:
+            self.logger.error("Oculus DK2 plugin (oculus_dk2) not setup in the configuration file, HMD device won't work")
+            #self.blenderVR.quit("Oculus DK2 plugin (oculus_dk2) not setup in the configuration file, HMD device won't work")
             return
 
-        self._available = True
-        self._viewer = self.blenderVR.getUserByName(configuration['viewer'])
-
-
-    def run(self, info):
         try:
-            self.process(info)
+            import bge
+
+            width = bge.render.getWindowWidth()
+            height = bge.render.getWindowHeight()
+
+            cont = bge.logic.getCurrentController()
+
+            cont.owner["screen_width"] = width
+            cont.owner["screen_height"] = height
+
+            ELEMENTS_MAIN_PREFIX = 'blenderVR:'
+            ACTUATOR = ELEMENTS_MAIN_PREFIX + 'OculusDK2:Filter'
+
+            actuator = cont.actuators.get(ACTUATOR)
+            if not actuator:
+                self.logger.error('Error: Oculus DK2 2D Filter Actuator not found ({0})'.format(ACTUATOR))
+            else:
+                cont.activate(actuator)
+
         except Exception as err:
-            self.logger.log_traceback(err)
-
-    def getName(self):
-        return self._viewer.getName()
-
-    def getUser(self):
-        return self._viewer
-
-    def isAvailable(self):
-        return self._available
+            self.logger.error(err)

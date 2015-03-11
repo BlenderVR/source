@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# file: blendervr/plugins/oculus_dk2/__init__.py
+
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
@@ -33,10 +36,36 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
-from . import base
+"""
+Oculus Rift Plugin
+*******************
 
-class Device(base.Device):
-    def __init__(self, parent, name, attrs):
-        super(Device, self).__init__(parent, name, attrs)
-        self._attribute_list += ['model']
-        self._model = 'oculus_rift'
+This script instantiates the Oculus Rift plugin
+"""
+
+from .. import *
+from .. import exceptions
+
+if base.is_virtual_environment():
+    class Base(base.Base):
+        def __init__(self, parent):
+            base.Base.__init__(self, parent)
+
+        def setConfiguration(self, configuration):
+            from . import virtual_environment
+            self._main = virtual_environment.OculusDK2(self, configuration)
+
+        def start(self):
+            if not hasattr(self, '_main') or not self._main.checkMethods():
+                raise exceptions.PluginError()
+            self.run = self._main.run
+            self._main.start()
+
+elif base.is_console():
+    class Base(base.Base):
+        def __init__(self, parent):
+            base.Base.__init__(self, parent)
+
+        def getXMLParserClass(self):
+            from . import xml
+            return xml.XML

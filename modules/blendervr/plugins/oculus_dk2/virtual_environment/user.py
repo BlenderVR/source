@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# file: blendervr/plugins/oculus_rift/__init__.py
+# file: blendervr/plugins/oculus_dk2/virtual_environment/user.py
 
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
@@ -36,36 +36,35 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
-"""
-Oculus Rift Plugin
-*******************
+from ....player import device
 
-This script instantiates the Oculus Rift plugin
-"""
 
-from .. import *
-from .. import exceptions
+class User(device.Sender):
+    def __init__(self, parent, configuration):
+        _configuration = configuration.copy()
+        _configuration['users'] = _configuration['viewer']
 
-if base.is_virtual_environment():
-    class Base(base.Base):
-        def __init__(self, parent):
-            base.Base.__init__(self, parent)
+        super(User, self).__init__(parent, _configuration)
+        self._available = False
 
-        def setConfiguration(self, configuration):
-            from . import virtual_environment
-            self._main = virtual_environment.OculusRift(self, configuration)
+        if self.blenderVR.getComputerName() != _configuration['computer']:
+            return
 
-        def start(self):
-            if not hasattr(self, '_main') or not self._main.checkMethods():
-                raise exceptions.PluginError()
-            self.run = self._main.run
-            self._main.start()
+        self._available = True
+        self._viewer = self.blenderVR.getUserByName(configuration['viewer'])
 
-elif base.is_console():
-    class Base(base.Base):
-        def __init__(self, parent):
-            base.Base.__init__(self, parent)
 
-        def getXMLParserClass(self):
-            from . import xml
-            return xml.XML
+    def run(self, info):
+        try:
+            self.process(info)
+        except Exception as err:
+            self.logger.log_traceback(err)
+
+    def getName(self):
+        return self._viewer.getName()
+
+    def getUser(self):
+        return self._viewer
+
+    def isAvailable(self):
+        return self._available

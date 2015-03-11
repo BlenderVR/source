@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# file: blendervr/plugins/oculus_rift/virtual_environment/__init__.py
+# file: blendervr/plugins/oculus_dk2/virtual_environment/__init__.py
 
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
@@ -40,9 +40,9 @@ from .. import base
 from . import user
 
 
-class OculusRift(base.Base):
+class OculusDK2(base.Base):
     def __init__(self, parent, configuration):
-        super(OculusRift, self).__init__(parent)
+        super(OculusDK2, self).__init__(parent)
 
         self._user = None
         self._rift = None
@@ -53,7 +53,7 @@ class OculusRift(base.Base):
             assert(PyRift)
 
         except ImportError:
-            self.logger.info('No Oculus Rift python module available')
+            self.logger.info('Oculus DK2 plugin error: no websocket module available. Please refer to the Blender-VR documentation')
             self._available = False
             return
 
@@ -78,7 +78,7 @@ class OculusRift(base.Base):
         self._available = True
 
     def start(self):
-        super(OculusRift, self).start()
+        super(OculusDK2, self).start()
         try:
             from game_engine_rift.rift import PyRift
             from mathutils import Matrix
@@ -90,7 +90,7 @@ class OculusRift(base.Base):
             self.logger.log_traceback(err)
 
     def run(self):
-        super(OculusRift, self).run()
+        super(OculusDK2, self).run()
 
         try:
             self._updateMatrix()
@@ -118,15 +118,15 @@ class OculusRift(base.Base):
 
     def checkMethods(self):
         if not self._available:
-            self.logger.info('Oculus Rift python module not available !')
+            self.logger.info('Oculus DK2 python module not available !')
             return False
 
         if not self._user:
-            self.logger.info('Oculus Rift python module not available ! No valid user found for this computer.')
+            self.logger.info('Oculus DK2 python module not available ! No valid user found for this computer.')
             return False
 
         if not self._user.checkMethod(True):
-            self.logger.info('No Oculus Rift processor method available !')
+            self.logger.info('No Oculus DK2 processor method available !')
             del self._user
             self._user = None
             return False
