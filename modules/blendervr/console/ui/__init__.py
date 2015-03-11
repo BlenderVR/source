@@ -48,7 +48,6 @@ class UI(Console):
         self._port  = port
         self._print = lambda *args: True
 
-        from ...tools import controller
         try:
             self._controller = controller.Controller('localhost:' + str(self._port), 'UI')
         except ConnectionRefusedError:

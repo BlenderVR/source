@@ -40,25 +40,22 @@ import socket
 import sys
 import os
 from .. import base
-from ..console import protocol
-from ..tools import controller
+from ...console import protocol
+from ...tools import controller
+from ...tools import logger
 
 class Controller(base.Base):
 
     def __init__(self, parent):
         super(Controller, self).__init__(parent)
 
-        controller = sys.argv[(sys.argv.index('-') + 1)]
+        controller_host = sys.argv[(sys.argv.index('-') + 1)]
         # in case of space inside the name of the screen, the quotes and
         # the double-quotes remains in the argument
         screen_name = sys.argv[(sys.argv.index('-') + 2)].strip("'\"")
 
-        self._client = connector.Client(controller,
-                                    'blender_player', screen_name)
-        self._client.setCallback(self._waitForConfiguration)
-        self._client.setWait(True)
-
-        self.logger.addLoginWindow(self)
+        self._client = controller.Controller(controller_host, 'player', screen_name)
+        self.logger.addHandler(logger.Network(self._client))
 
         self._log_to_controller = False
         self._processor_command = False

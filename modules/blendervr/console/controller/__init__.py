@@ -39,6 +39,7 @@ import subprocess
 from . import ui
 from . import daemon
 from . import logger
+from . import player
 from .. import Console
 from ...tools import logger as tools_logger
 
@@ -216,6 +217,10 @@ class Controller(Console):
             loggerClient = logger.Logger(self, client)
             self._loggers.append(loggerClient)
             return loggerClient
+        if type == 'player':
+            playerClient = player.Player(self, client)
+            self._screens.appendClient(playerClient)
+            return playerClient
         self.logger.error('Cannot understand client type :', type)
 
     def _delete_client(self, client):

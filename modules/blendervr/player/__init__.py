@@ -97,8 +97,8 @@ class Main:
 
         try:
 
-            self._logger.removeHandler(self._default_logger)
-            del(self._default_logger)
+            self._logger.removeHandler(console_logger)
+            del(console_logger)
 
             configuration = self._controller.getConfiguration()
 
