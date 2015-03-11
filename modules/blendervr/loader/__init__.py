@@ -122,28 +122,24 @@ class Creator:
             print(self._output_blender_file)
 
 
-SHADER_PROGRAM = """uniform sampler2D bgl_RenderedTexture;
+SHADER_PROGRAM = """
+uniform sampler2D bgl_RenderedTexture;
 
 const vec4 kappa = vec4(1.0,1.7,0.7,15.0);
 
 uniform float screen_width;
 uniform float screen_height;
 
-const float scaleFactor = 0.8;
+const float scaleFactor = 0.6;
 
 const vec2 leftCenter = vec2(0.25, 0.5);
 const vec2 rightCenter = vec2(0.75, 0.5);
-
-const float separation = 0.01;
 
 // Scales input texture coordinates for distortion.
 vec2 hmdWarp(vec2 LensCenter, vec2 texCoord, vec2 Scale, vec2 ScaleIn) {
     vec2 theta = (texCoord - LensCenter) * ScaleIn;
     float rSq = theta.x * theta.x + theta.y * theta.y;
-    vec2 rvector = theta * (kappa.x +
-                            kappa.y * rSq +
-                            kappa.z * rSq * rSq +
-                            kappa.w * rSq * rSq * rSq);
+    vec2 rvector = theta * (kappa.x + kappa.y * rSq + kappa.z * rSq * rSq + kappa.w * rSq * rSq * rSq);
     vec2 tc = LensCenter + Scale * rvector;
     return tc;
 }
@@ -166,23 +162,17 @@ void main() {
     vec2 ScaleIn = vec2(2.0 * scaleFactor, 1.0 / as * scaleFactor);
 
     vec2 texCoord = gl_TexCoord[0].st;
-    vec2 texCoordSeparated = texCoord;
 
     vec2 tc = vec2(0);
     vec4 color = vec4(0);
 
-    // ad hoc enhanced separation to allow proper viewing factor 
-    float ad_hoc_enhance_stereo = 4.0;
-
     if (texCoord.x < 0.5) {
-        texCoordSeparated.x -= ad_hoc_enhance_stereo *separation;
-        tc = hmdWarp(leftCenter, texCoordSeparated, Scale, ScaleIn );
+        tc = hmdWarp(leftCenter, texCoord, Scale, ScaleIn );
         color = texture2D(bgl_RenderedTexture, tc);
         if (!validate(tc, 1))
             color = vec4(0);
     } else {
-        texCoordSeparated.x += ad_hoc_enhance_stereo *separation;
-        tc = hmdWarp(rightCenter, texCoordSeparated, Scale, ScaleIn);
+        tc = hmdWarp(rightCenter, texCoord, Scale, ScaleIn);
         color = texture2D(bgl_RenderedTexture, tc);
         if (!validate(tc, 0))
             color = vec4(0);

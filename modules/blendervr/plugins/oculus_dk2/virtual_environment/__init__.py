@@ -45,12 +45,12 @@ class OculusDK2(base.Base):
         super(OculusDK2, self).__init__(parent)
 
         self._user = None
-        self._rift = None
+        self._websocket = None
         self._matrix = None
 
         try:
-            from game_engine_rift.rift import PyRift
-            assert(PyRift)
+            from websocket import create_connection
+            assert(create_connection)
 
         except ImportError:
             self.logger.info('Oculus DK2 plugin error: no websocket module available. Please refer to the Blender-VR documentation')
@@ -80,10 +80,10 @@ class OculusDK2(base.Base):
     def start(self):
         super(OculusDK2, self).start()
         try:
-            from game_engine_rift.rift import PyRift
+            from websocket import create_connection
             from mathutils import Matrix
 
-            self._rift = PyRift()
+            self._websocket = create_connection("ws://localhost:8888/")
             self._matrix = Matrix.Identity(4)
 
         except Exception as err:
@@ -101,20 +101,26 @@ class OculusDK2(base.Base):
             self.logger.log_traceback(err)
 
     def _updateMatrix(self):
-        from mathutils import Quaternion
+        from mathutils import Quaternion, Matrix
+        import json
 
-        self._rift.poll()
-        self._matrix = Quaternion((self._rift.rotation[3],
-                                   self._rift.rotation[0],
-                                   self._rift.rotation[1],
-                                   self._rift.rotation[2])).to_matrix().to_4x4()
 
-        """
-        When we get position from Oculus we will do:
-        self._matrix = position * orientation
-        """
+        try:
+            self._websocket.send('n')
+            result = json.loads(self._websocket.recv())
 
-        self._matrix.invert()
+            self._matrix = Quaternion((result[7],
+                                       result[4],
+                                       result[5],
+                                       result[6])).to_matrix().to_4x4()
+
+            position = Matrix.Translation((result[1], result[2], result[3]))
+            self._matrix = position * self._matrix
+
+            self._matrix.invert()
+
+        except Exception as err:
+            self.logger.log_traceback(err)
 
     def checkMethods(self):
         if not self._available:
