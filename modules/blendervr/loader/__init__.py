@@ -78,25 +78,21 @@ class Creator:
             camera = scene.camera
 
             if camera:
-                if bpy.context.object == None:
-                    scene.objects.active = camera
+                scene.objects.active = camera
 
                 SENSOR = ELEMENTS_MAIN_PREFIX + 'Sensor'
-                bpy.ops.logic.sensor_add(type='ALWAYS', name=SENSOR,
-                                                        object=camera.name)
+                bpy.ops.logic.sensor_add(type='ALWAYS', name=SENSOR)
                 sensor = camera.game.sensors.get(SENSOR)
                 sensor.use_pulse_true_level = True
 
                 CONTROLLER = ELEMENTS_MAIN_PREFIX + 'Controller'
-                bpy.ops.logic.controller_add(type='PYTHON', name=CONTROLLER,
-                                                        object=camera.name)
+                bpy.ops.logic.controller_add(type='PYTHON', name=CONTROLLER)
                 controller = camera.game.controllers.get(CONTROLLER)
                 controller.mode = 'MODULE'
                 controller.module = 'blendervr.run'
 
                 ACTUATOR = ELEMENTS_MAIN_PREFIX + 'OculusDK2:Filter'
-                bpy.ops.logic.actuator_add(type='FILTER_2D', name=ACTUATOR,
-                                                        object=camera.name)
+                bpy.ops.logic.actuator_add(type='FILTER_2D', name=ACTUATOR)
                 actuator = camera.game.actuators.get(ACTUATOR)
                 actuator.mode = 'CUSTOMFILTER'
 
@@ -104,6 +100,9 @@ class Creator:
                 shader = bpy.data.texts.new(TEXT)
                 actuator.glsl_shader = shader
                 shader.from_string(SHADER_PROGRAM)
+
+                bpy.ops.object.game_property_new(type='FLOAT', name="screen_width")
+                bpy.ops.object.game_property_new(type='FLOAT', name="screen_height")
 
                 controller.link(sensor=sensor)
                 controller.link(actuator=actuator)
