@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# file: blendervr/plugins/oculus_rift/__init__.py
+
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
@@ -33,43 +36,36 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
-import os
-from .. import xml
+"""
+Oculus Rift Plugin
+*******************
 
-class XML(xml.XML):
+This script instantiates the Oculus Rift plugin
+"""
 
-    def __init__(self, parent, name, attrs):
-        super(XML, self).__init__(parent, name, attrs)
-        self._class_list += ['users']
-        self._users = None
+from .. import *
+from .. import exceptions
 
-        if 'users' in attrs:
-            self._users = attrs['users']
-        else:
-            self._users = None
+if base.is_virtual_environment():
+    class Base(base.Base):
+        def __init__(self, parent):
+            base.Base.__init__(self, parent)
 
-    def _getChildren(self, name, attrs):
-        if name == 'user':
-            user = User(self, name, attrs)
-            if self._users is None:
-                self._users = [user]
-            else:
-                self._users.append(user)
-            return user
+        def setConfiguration(self, configuration):
+            from . import virtual_environment
+            self._main = virtual_environment.OculusRift(self, configuration)
 
-        return super(XML, self)._getChildren(name, attrs)
+        def start(self):
+            if not hasattr(self, '_main') or not self._main.checkMethods():
+                raise exceptions.PluginError()
+            self.run = self._main.run
+            self._main.start()
 
+elif base.is_console():
+    class Base(base.Base):
+        def __init__(self, parent):
+            base.Base.__init__(self, parent)
 
-class User(xml.mono):
-    def __init__(self, parent, name, attrs):
-        super(User, self).__init__(parent, name, attrs)
-        self._attribute_list += ['viewer', 'processor_method', 'computer']
-
-        if 'viewer' not in attrs or \
-           'processor_method' not in attrs or \
-           'computer' not in attrs:
-            self.raise_error('Occulus Rift User must have a viewer a computer and a processor_method!')
-
-        self._viewer = attrs.get('viewer')
-        self._computer = attrs.get('computer')
-        self._processor_method = attrs.get('processor_method')
+        def getXMLParserClass(self):
+            from . import xml
+            return xml.XML

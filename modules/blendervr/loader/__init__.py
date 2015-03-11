@@ -91,13 +91,13 @@ class Creator:
                 controller.mode = 'MODULE'
                 controller.module = 'blendervr.run'
 
-                ACTUATOR = ELEMENTS_MAIN_PREFIX + 'Occulus:Filter'
+                ACTUATOR = ELEMENTS_MAIN_PREFIX + 'Oculus:Filter'
                 bpy.ops.logic.actuator_add(type='FILTER_2D', name=ACTUATOR,
                                                         object=camera.name)
                 actuator = camera.game.actuators.get(ACTUATOR)
                 actuator.mode = 'CUSTOMFILTER'
 
-                TEXT = ELEMENTS_MAIN_PREFIX + 'Occulus:GLSL'
+                TEXT = ELEMENTS_MAIN_PREFIX + 'Oculus:GLSL'
                 shader = bpy.data.texts.new(TEXT)
                 actuator.glsl_shader = shader
                 shader.from_string(SHADER_PROGRAM)

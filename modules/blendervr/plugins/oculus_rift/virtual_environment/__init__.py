@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# file: blendervr/plugins/occulus_rift/virtual_environment/__init__.py
+# file: blendervr/plugins/oculus_rift/virtual_environment/__init__.py
 
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
@@ -40,9 +40,9 @@ from .. import base
 from . import user
 
 
-class OcculusRift(base.Base):
+class OculusRift(base.Base):
     def __init__(self, parent, configuration):
-        super(OcculusRift, self).__init__(parent)
+        super(OculusRift, self).__init__(parent)
 
         self._user = None
         self._rift = None
@@ -53,7 +53,7 @@ class OcculusRift(base.Base):
             assert(PyRift)
 
         except ImportError:
-            self.logger.info('No Occulus Rift python module available')
+            self.logger.info('No Oculus Rift python module available')
             self._available = False
             return
 
@@ -78,7 +78,7 @@ class OcculusRift(base.Base):
         self._available = True
 
     def start(self):
-        super(OcculusRift, self).start()
+        super(OculusRift, self).start()
         try:
             from game_engine_rift.rift import PyRift
             from mathutils import Matrix
@@ -90,7 +90,7 @@ class OcculusRift(base.Base):
             self.logger.log_traceback(err)
 
     def run(self):
-        super(OcculusRift, self).run()
+        super(OculusRift, self).run()
 
         try:
             self._updateMatrix()
@@ -110,7 +110,7 @@ class OcculusRift(base.Base):
                                    self._rift.rotation[2])).to_matrix().to_4x4()
 
         """
-        When we get position from Occulus we will do:
+        When we get position from Oculus we will do:
         self._matrix = position * orientation
         """
 
@@ -118,15 +118,15 @@ class OcculusRift(base.Base):
 
     def checkMethods(self):
         if not self._available:
-            self.logger.info('Occulus Rift python module not available !')
+            self.logger.info('Oculus Rift python module not available !')
             return False
 
         if not self._user:
-            self.logger.info('Occulus Rift python module not available ! No valid user found for this computer.')
+            self.logger.info('Oculus Rift python module not available ! No valid user found for this computer.')
             return False
 
         if not self._user.checkMethod(True):
-            self.logger.info('No Occulus Rift processor method available !')
+            self.logger.info('No Oculus Rift processor method available !')
             del self._user
             self._user = None
             return False

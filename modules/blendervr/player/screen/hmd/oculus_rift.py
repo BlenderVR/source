@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# file: blendervr/player/screen/hmd/oculus_rift.py
+
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
 ## contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
@@ -33,10 +36,53 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
+import mathutils
+import bge
 from . import base
+from ... import exceptions
+
+""" @package hmd
+Manager of Oculus Rift screens with blenderVR
+"""
+
+warning_for_unsure_projection_displayed = False
 
 class Device(base.Device):
-    def __init__(self, parent, name, attrs):
-        super(Device, self).__init__(parent, name, attrs)
-        self._attribute_list += ['model']
-        self._model = 'occulus_rift'
+
+    def __init__(self, parent, configuration):
+        super(Device, self).__init__(parent, configuration)
+        self._plugin = None
+
+    def start(self):
+        super(Device, self).start()
+
+        import sys
+
+        self._plugin = self.blenderVR.getPlugin('oculus_rift')
+        if self._plugin is None:
+            self.logger.error("Oculus Rift plugin (oculus_rift) not setup in the configuration file, HMD device won't work")
+            #self.blenderVR.quit("Oculus Rift plugin (oculus_rift) not setup in the configuration file, HMD device won't work")
+            return
+
+        try:
+            import bge
+
+            width = bge.render.getWindowWidth()
+            height = bge.render.getWindowHeight()
+
+            cont = bge.logic.getCurrentController()
+
+            cont.owner["screen_width"] = width
+            cont.owner["screen_height"] = height
+
+            ELEMENTS_MAIN_PREFIX = 'blenderVR:'
+            ACTUATOR = ELEMENTS_MAIN_PREFIX + 'Oculus:Filter'
+
+            actuator = cont.actuators.get(ACTUATOR)
+            if not actuator:
+                self.logger.error('Error: Oculus Rift 2D Filter Actuator not found ({0})'.format(ACTUATOR))
+            else:
+                cont.activate(actuator)
+
+        except Exception as err:
+            self.logger.error(err)
