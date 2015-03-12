@@ -57,8 +57,6 @@ class Controller(base.Base):
         self._client = controller.Controller(controller_host, 'player', screen_name)
         self.logger.addHandler(logger.Network(self._client))
 
-        self.logger.error('Yop !')
-
         self._processor_command = False
         self._file_logging = None
 
@@ -72,8 +70,15 @@ class Controller(base.Base):
             else:
                 self._processControllerCommand(command, argument)
 
-    def flush(self):
-        pass
+    def run(self):
+        while True:
+            try:
+                data = self._client.receive(False)
+            except closedSocket:
+                self.blenderVR.quit('Loosed the console')
+            if data == False:
+                break
+            self._processControllerCommand(*data)
 
     def _processControllerCommand(self, command, argument):
         if command == 'log_level':
@@ -112,10 +117,6 @@ class Controller(base.Base):
     def sendToConsole(self, command, argument):
         message = protocol.composeMessage(command, argument)
         self._sendToConsole('virtual_environment_to_console', message)
-
-    def run(self):
-        if not self._client.run():
-            self.blenderVR.quit('Loosed the console')
 
     def _sendToConsole(self, command, argument=''):
         try:

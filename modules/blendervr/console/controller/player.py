@@ -42,7 +42,6 @@ import sys
 class Player(base.Client):
     def __init__(self, parent, client):
         base.Client.__init__(self, parent, client)
-        self.logger.error(self.logger.POSITION)
 
     def getName(self):
         return self._client.getName()
@@ -52,7 +51,6 @@ class Player(base.Client):
         self.logger.debug('Connexion of a player:', self._client)
 
     def cb_data(self):
-        self.logger.error(self.logger.POSITION)
         result = self._client.receive()
         if result:
             command, argument = result
