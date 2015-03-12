@@ -59,7 +59,7 @@ class OSC(bc_base.Base):
 
         self._global.define_commands()
 
-        self.logger.debug('room is not implemented for the moment !')
+        self.logger.debug('room acoustic through OSC is not implemented for the moment !')
         if 'room' in configuration and False:
             for attribut in global_attributs:
                 if attribut in configuration['room']:

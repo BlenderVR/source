@@ -75,6 +75,9 @@ if is_virtual_environment():
         def start(self):
             return
 
+        def quit(self):
+            return
+
         def run(self):
             for interactor in self._interactors:
                 interactor.run()

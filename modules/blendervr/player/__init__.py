@@ -337,6 +337,8 @@ class Main:
         :param reason:
         :type reason: `str`
         """
+        self.getProcessor().quit()
+
         if hasattr(self, '_connector'):
             self._connector.quit(reason)
 
