@@ -89,6 +89,9 @@ class Base(base.Base):
             return self._buffers[bufferName]['user']
         return None
 
+    def start(self):
+        pass
+
     def run(self):
         try:
             # Force the window to keep the focus by setting mouse position

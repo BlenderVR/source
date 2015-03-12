@@ -83,6 +83,14 @@ if is_virtual_environment():
                 interactor.run()
 
         def user_position(self, info):
+            """
+            Update the users' position and orientation as well as the operators
+
+            .. note:
+
+            This function name shouldn't change since it's used as a fallback
+            for the Oculus DK2 users
+            """
             for user in info['users']:
                 user.setPosition(info['matrix'])
             for interactor in self._interactors:
