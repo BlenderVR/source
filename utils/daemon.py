@@ -154,7 +154,7 @@ class Daemon:
         :param argument: Value depends on the command
         """
         blenderVR_modules = self._blenderVR_modules
-        if command == 'blender_player':
+        if command == 'blenderplayer':
             self._executable = argument['executable']
             self._executable_options = argument['options']
             self._environment = argument['environments']

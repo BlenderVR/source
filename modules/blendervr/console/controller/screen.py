@@ -42,6 +42,7 @@ import copy
 import subprocess
 import sys
 from . import daemon
+from . import player
 
 class Screen(base.Base):
     def __init__(self, parent, name):
@@ -51,7 +52,7 @@ class Screen(base.Base):
         self._loader_file = None
 
         self._clients = {'daemon': None,
-                         'blender_player': None}
+                         'player': None}
 
     def __del__(self):
         self.kill()
@@ -60,9 +61,9 @@ class Screen(base.Base):
         from ...tools import gentlyAskStopProcess
         gentlyAskStopProcess(self._process)
         self._process = None
-        if self._clients['blender_player']:
-            self._clients['blender_player'].kill()
-            self._clients['blender_player'] = None
+        if self._clients['player']:
+            self._clients['player'].kill()
+            self._clients['player'] = None
         if self._clients['daemon']:
             self._clients['daemon'].kill()
             self._clients['daemon'] = None
@@ -94,27 +95,26 @@ class Screen(base.Base):
         else:
             self._log_to_clear = ''
         self._anchor = system['anchor']
-        self._blender_player = {'executable':
-                                        system['blenderplayer']['executable'],
-                                'environments': {}}
+        self._blenderplayer = {'executable': system['blenderplayer']['executable'],
+                               'environments': {}}
 
         self._daemon = {'command': [],
                         'environments': {}}
 
         for name, value in system['daemon']['environments'].items():
             if system['daemon']['transmit']:
-                self._blender_player['environments'][name] = str(value)
+                self._blenderplayer['environments'][name] = str(value)
             self._daemon['environments'][name] = str(value)
 
         if hasattr(system['blenderplayer']['environments'], 'items'):
             for name, value in system['blenderplayer']['environments'].items():
-                self._blender_player['environments'][name] = str(value)
+                self._blenderplayer['environments'][name] = str(value)
 
         if hasattr(screen_conf['display']['environments'], 'items'):
             for name, value in screen_conf['display']['environments'].items():
-                self._blender_player['environments'][name] = str(value)
+                self._blenderplayer['environments'][name] = str(value)
 
-        self._blender_player['options'] = screen_conf['display']['options']
+        self._blenderplayer['options'] = screen_conf['display']['options']
 
         login = system['login']
         if login['remote_command']:
@@ -175,9 +175,19 @@ class Screen(base.Base):
                 return
             self._clients['daemon'] = client
             self.logger.info("Daemon for screen '" + self._name + "' started")
-            for field in ['blender_player', 'log_to_clear']:
+            for field in ['blenderplayer', 'log_to_clear']:
                 client.send(field, getattr(self, '_' + field))
             self._send_loader_file()
+        if isinstance(client, player.Player):
+            if self._clients['player'] is not None:
+                self.logger.error('Too many connexions of the player ...')
+                return
+            self._clients['player'] = client
+            self._send_log_informations()
+            self._send_log_to_file_information()
+            for field in ['screen', 'complements', 'network', 'blender_file', 'processor_files']:
+                client.send(field, getattr(self, '_' + field))
+            client.send('base configuration ending')
 
     def _cannot_start_daemon(self):
         self._process = None
@@ -201,3 +211,17 @@ class Screen(base.Base):
     def _send_loader_file(self):
         if (self._clients['daemon'] is not None) and (self._loader_file is not None):
             self._clients['daemon'].send('loader_file', self._loader_file)
+
+    def send_to_player(self, command, argument = ''):
+        if self._clients['player']:
+            self._clients['player'].send(command, argument)
+
+    def _send_log_informations(self):
+        self.send_to_blender_player('log_level', self.profile.getValue(['screens', self._name, 'log', 'level']))
+        self.send_to_blender_player('log_to_controller', self.is_log_window_opened())
+
+    def _send_log_to_file_information(self):
+        if self.profile.getValue(['screens', self._name, 'log', 'file']):
+            self.send_to_blender_player('log_file', self._log_file)
+        else:
+            self.send_to_blender_player('log_file', '')

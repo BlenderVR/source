@@ -63,29 +63,13 @@ class Controller(base.Base):
 
         self._configuration = {'screen_name': screen_name}
 
-        if not self._client.run():
-            self.blenderVR.quit('Loosed the console')
-
-    def _waitForConfiguration(self, command, argument):
-        if command == 'base configuration ending':
-            self._client.setCallback(self._processControllerCommand)
-            self._client.setWait(False)
-            return
-
-        if command in ['screen', 'complements', 'network',
-                        'blender_file', 'processor_files']:
-            self._configuration[command] = argument
-        else:
-            self._processControllerCommand(command, argument)
-
-    def write(self, *messages):
-        if not self._log_to_controller:
-            return
-        elements = []
-        for message in messages:
-            elements.append(str(message))
-        for message in (' '.join(elements)).split('\n'):
-            self._sendToConsole('log', message.rstrip(' \n\r'))
+        command = None
+        while command != 'base configuration ending':
+            command, argument = self._client.receive()
+            if command in ['screen', 'complements', 'network', 'blender_file', 'processor_files']:
+                self._configuration[command] = argument
+            else:
+                self._processControllerCommand(command, argument)
 
     def flush(self):
         pass
