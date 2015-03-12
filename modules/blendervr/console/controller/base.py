@@ -64,7 +64,7 @@ class Client(Base):
     def getClient(self):
         return self._client
 
-    def send(self, command, argument):
+    def send(self, command, argument = ''):
         if self._client:
             self._client.send(command, argument)
         

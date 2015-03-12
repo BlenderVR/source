@@ -40,7 +40,7 @@ class Screens(base.Base):
         base.Base.__init__(self, parent)
         self._screens = {}
 
-    def setConfiguration(self, configuration):
+    def setConfiguration(self, configuration, complements, port):
         # TODO: use list difference instead of scanning ...
         for name in list(self._screens.keys()):
             if name not in configurations:
@@ -50,11 +50,27 @@ class Screens(base.Base):
                 obj = None
 
         from . import screen
-
+        self._master_name = None
         for name, configuration in configuration.items():
+            if not self._master_name:
+                self._master_name = name
             if name not in self._screens:
                 self._screens[name] = screen.Screen(self, name)
-            self._screens[name].setConfiguration(configuration)
+            self._screens[name].setConfiguration(configuration, complements)
+
+        #TODO : remove connexion and slaves !
+        self.getMaster().setHierarchy({'port' : port,
+                                       'nodes': list(self._screens.keys())})
+
+        slave_informations = {'port'  : port,
+                              'master': self.getMaster().getHostname()}
+        for name, obj in self._screens.items():
+            if name != self._master_name:
+                obj.setHierarchy(slave_informations)
+        obj = None
+
+    def getMaster(self):
+        return self._screens[self._master_name]
 
     def __del__(self):
         del(self._screens)

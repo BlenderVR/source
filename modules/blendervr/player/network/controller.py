@@ -57,7 +57,8 @@ class Controller(base.Base):
         self._client = controller.Controller(controller_host, 'player', screen_name)
         self.logger.addHandler(logger.Network(self._client))
 
-        self._log_to_controller = False
+        self.logger.error('Yop !')
+
         self._processor_command = False
         self._file_logging = None
 
@@ -77,28 +78,23 @@ class Controller(base.Base):
     def _processControllerCommand(self, command, argument):
         if command == 'log_level':
             self.logger.setLevel(argument)
-        elif command == 'log_to_controller':
-            self._log_to_controller = argument
         elif command == 'quit':
             self.blenderVR.quit('Asked by the user through the console')
         elif command == 'console_to_virtual_environment':
-            if self.blenderVR.getProcessor() is not None \
-                                        and self.blenderVR.isMaster():
+            if self.blenderVR.getProcessor() is not None and self.blenderVR.isMaster():
                 command, argument = protocol.decomposeMessage(argument)
-                self.blenderVR.getProcessor().receivedFromConsole(command,
-                                                                    argument)
+                self.blenderVR.getProcessor().receivedFromConsole(command, argument)
         elif command == 'log_file':
             if argument:
-                if not self._file_logging:
-                    path_name = os.path.dirname(argument)
-                    if not os.path.isdir(path_name):
-                        os.makedirs(path_name)
+                if self._file_logging:
+                    self.logger.removeHandler(self._file_logging)
+                self.logger.addHandler(logger.Network(self._client))
+                path_name = os.path.dirname(argument)
+                if not os.path.isdir(path_name):
+                    os.makedirs(path_name)
 
-                    import logging
-                    self._file_logging = logging.FileHandler(argument)
-                    self._file_logging.setFormatter(logging.Formatter(
-                                '%(asctime)s %(levelname)s: %(message)s'))
-                    self.logger.addHandler(self._file_logging)
+                self._file_logging = logger.File(argument)
+                self.logger.addHandler(self._file_logging)
             else:
                 if self._file_logging:
                     self.logger.removeHandler(self._file_logging)

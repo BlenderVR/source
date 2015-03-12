@@ -71,18 +71,28 @@ class Screen(base.Base):
     def getName(self):
         return self._name
 
-    def setConfiguration(self, configuration):
+    def getHostname(self):
+        return self._hostname
+
+    def setHierarchy(self, informations):
+        self._network = informations
+
+    def is_master(self):
+        return ('slaves' in self._network)
+
+    def setConfiguration(self, configuration, complements):
         screen_conf   = configuration['screen']
         computer_conf = configuration['computer']
         system        = computer_conf['system']
+
+        self._complements = complements
 
         self._hostname    = computer_conf['hostname']
         dev_type = screen_conf['device_type']
         if not dev_type:
             self.logger.error('Unknown device type !')
             return
-        self._screen = {'graphic_buffer':
-                                screen_conf['display']['graphic_buffer'],
+        self._screen = {'graphic_buffer': screen_conf['display']['graphic_buffer'],
                          'viewport': screen_conf['display']['viewport'],
                          'device_type': dev_type,
                          dev_type: screen_conf[dev_type],
@@ -183,7 +193,6 @@ class Screen(base.Base):
                 self.logger.error('Too many connexions of the player ...')
                 return
             self._clients['player'] = client
-            self._send_log_informations()
             self._send_log_to_file_information()
             for field in ['screen', 'complements', 'network', 'blender_file', 'processor_files']:
                 client.send(field, getattr(self, '_' + field))
@@ -212,16 +221,12 @@ class Screen(base.Base):
         if (self._clients['daemon'] is not None) and (self._loader_file is not None):
             self._clients['daemon'].send('loader_file', self._loader_file)
 
-    def send_to_player(self, command, argument = ''):
+    def send_to_blenderplayer(self, command, argument = ''):
         if self._clients['player']:
             self._clients['player'].send(command, argument)
 
-    def _send_log_informations(self):
-        self.send_to_blender_player('log_level', self.profile.getValue(['screens', self._name, 'log', 'level']))
-        self.send_to_blender_player('log_to_controller', self.is_log_window_opened())
-
     def _send_log_to_file_information(self):
         if self.profile.getValue(['screens', self._name, 'log', 'file']):
-            self.send_to_blender_player('log_file', self._log_file)
+            self.send_to_blenderplayer('log_file', self._log_file)
         else:
-            self.send_to_blender_player('log_file', '')
+            self.send_to_blenderplayer('log_file', '')
