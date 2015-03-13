@@ -133,13 +133,18 @@ class Main:
             if 'users' not in configuration['complements']:
                 self.logger.fatal('Cannot find any "user" information')
 
-            if 'computer' not in configuration['complements']:
-                self.logger.fatal('Cannot find any "computer" information')
+            if 'screens_computer_map' not in configuration['complements']:
+                self.logger.fatal('Cannot find the "computer screen lookup" information')
 
-            self._computer_name = configuration['complements']['computer']['name']
+            computer = configuration['complements']['screens_computer_map'].get(self._screen_name)
+            if not computer:
+                self.logger.fatal('Cannot find computer information for screen {0}'.format(self._screen_name))
+
+            self._computer_name = computer['name']
+
             # Configure the system paths
-            self._setSystemPath(configuration['complements']['computer'])
-            del(configuration['complements']['computer'])
+            self._setSystemPath(computer)
+            del(configuration['complements']['screens_computer_map'])
 
             # Configure the users
             from . import user

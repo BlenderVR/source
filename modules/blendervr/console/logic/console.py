@@ -129,6 +129,8 @@ class Logic:
             screenSet = self._screenSets[current]
             masterScreen = screenSet[0]
             configurations = {}
+            screens_computer_map = {}
+
             for screen_name in screenSet:
                 if screen_name not in configuration_screens:
                     self.logger.warning('Cannot find ' + screen_name +
@@ -151,10 +153,13 @@ class Logic:
                             'screen': configuration_screens[screen_name],
                             'computer': configuration_computers[computer_name]}
 
+                screens_computer_map[screen_name] = configuration_computers[computer_name]
+
             complements = {'users': self._configuration['users'],
                            'plugins': self._configuration['plugins'],
                            'processors': self._configuration['processors'],
-                           'computer': configuration_computers[computer_name]}
+                           'screens_computer_map': screens_computer_map}
+
             self._screens.set_screens(configurations,
                                       self._net_console,
                                       masterScreen,
