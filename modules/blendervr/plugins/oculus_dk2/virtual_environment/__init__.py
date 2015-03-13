@@ -44,9 +44,7 @@ class OculusDK2(base.Base):
     def __init__(self, parent, configuration):
         super(OculusDK2, self).__init__(parent)
 
-        self._user = None
-        self._websocket = None
-        self._matrix = None
+        self._devices = []
 
         try:
             from websocket import create_connection
@@ -69,9 +67,7 @@ class OculusDK2(base.Base):
                     if _user.isAvailable():
                         viewer = _user.getUser()
                         if viewer is not None:
-                            self._user = _user
-                            # each computer can only have one user/viewer
-                            break
+                            self._devices.append(_user)
                 except:
                     self.logger.log_traceback(False)
 
@@ -79,62 +75,28 @@ class OculusDK2(base.Base):
 
     def start(self):
         super(OculusDK2, self).start()
-        try:
-            from websocket import create_connection
-            from mathutils import Matrix
 
-            self._websocket = create_connection("ws://localhost:8888/")
-            self._matrix = Matrix.Identity(4)
-
-        except Exception as err:
-            self.logger.log_traceback(err)
+        for device in self._devices:
+            device.start()
 
     def run(self):
         super(OculusDK2, self).run()
 
-        try:
-            self._updateMatrix()
-            info = {'matrix' : self._matrix}
-            self._user.run(info)
-
-        except Exception as err:
-            self.logger.log_traceback(err)
-
-    def _updateMatrix(self):
-        from mathutils import Quaternion, Matrix
-        import json
-
-
-        try:
-            self._websocket.send('n')
-            result = json.loads(self._websocket.recv())
-
-            self._matrix = Quaternion((result[7],
-                                       result[4],
-                                       result[5],
-                                       result[6])).to_matrix().to_4x4()
-
-            position = Matrix.Translation((result[1], result[2], result[3]))
-            self._matrix = position * self._matrix
-
-            self._matrix.invert()
-
-        except Exception as err:
-            self.logger.log_traceback(err)
+        for device in self._devices:
+            device.run()
 
     def checkMethods(self):
         if not self._available:
             self.logger.info('Oculus DK2 python module not available !')
             return False
 
-        if not self._user:
-            self.logger.info('Oculus DK2 python module not available ! No valid user found for this computer.')
+        if not self._devices:
+            self.logger.info('Oculus DK2 python module not available ! No valid user found.')
             return False
 
-        if not self._user.checkMethod(True):
-            self.logger.info('No Oculus DK2 processor method available !')
-            del self._user
-            self._user = None
-            return False
+        for device in self._devices:
+            if not device.checkMethod(True):
+                self.logger.info('No Oculus DK2 processor method available for user {0}!'.format(device.getName()))
+                del device
 
         return True

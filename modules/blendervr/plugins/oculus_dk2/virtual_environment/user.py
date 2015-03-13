@@ -44,18 +44,21 @@ class User(device.Sender):
         _configuration = configuration.copy()
         _configuration['users'] = _configuration['viewer']
 
-        super(User, self).__init__(parent, _configuration)
-        self._available = False
+        self._websocket = None
+        self._matrix = None
 
-        if self.blenderVR.getComputerName() != _configuration['computer']:
-            return
+        super(User, self).__init__(parent, _configuration)
+        self._viewer = self.blenderVR.getUserByName(configuration['viewer'])
+        self._host = configuration['host']
 
         self._available = True
-        self._viewer = self.blenderVR.getUserByName(configuration['viewer'])
 
+        # TODO, check if host is a valid one
 
-    def run(self, info):
+    def run(self):
         try:
+            self._updateMatrix()
+            info = {'matrix' : self._matrix}
             self.process(info)
         except Exception as err:
             self.logger.log_traceback(err)
@@ -68,3 +71,35 @@ class User(device.Sender):
 
     def isAvailable(self):
         return self._available
+
+    def start(self):
+        try:
+            from websocket import create_connection
+            from mathutils import Matrix
+
+            self._websocket = create_connection("ws://{0}:8888/".format(self._host))
+            self._matrix = Matrix.Identity(4)
+
+        except Exception as err:
+            self.logger.log_traceback(err)
+
+    def _updateMatrix(self):
+        from mathutils import Quaternion, Matrix
+        import json
+
+        try:
+            self._websocket.send('n')
+            result = json.loads(self._websocket.recv())
+
+            self._matrix = Quaternion((result[7],
+                                       result[4],
+                                       result[5],
+                                       result[6])).to_matrix().to_4x4()
+
+            position = Matrix.Translation((result[1], result[2], result[3]))
+            self._matrix = position * self._matrix
+
+            self._matrix.invert()
+
+        except Exception as err:
+            self.logger.log_traceback(err)
