@@ -1,4 +1,4 @@
-import ctypes, sys
+import ctypes, os, sys
 from ctypes import *
 
 _int_types = (c_int16, c_int32)
@@ -599,14 +599,14 @@ import struct
 
 suffix = "-x86"
 prefix = "win32"
-file = "OVR_C.dll"
+file = "OculusVR.dll"
 if 64 == 8 * struct.calcsize("P"):
     suffix = "-x86-64"
 if ("linux" in sys.platform):
-    file = "libOVR_C.so"
+    file = "libOculusVR.so"
     prefix = "linux"
 elif ("darwin" in sys.platform):
-    file = "libOVR_C.dylib"
+    file = "libOculusVR.dylib"
     prefix = "darwin"
 
 libfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), prefix + suffix, file)
@@ -615,10 +615,15 @@ _libs["OVR_C"] = load_library(libfile)
 
 # 1 libraries
 
+# End libraries
+
 # No modules
 
-ovrBool = c_char
+uintptr_t = c_ulong # /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/usr/include/sys/_types/_uintptr_t.h: 30
 
+ovrBool = c_char # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 37
+
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 96
 class struct_ovrVector2i_(Structure):
     pass
 
@@ -631,8 +636,9 @@ struct_ovrVector2i_._fields_ = [
     ('y', c_int),
 ]
 
-ovrVector2i = struct_ovrVector2i_
+ovrVector2i = struct_ovrVector2i_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 96
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 102
 class struct_ovrSizei_(Structure):
     pass
 
@@ -645,8 +651,9 @@ struct_ovrSizei_._fields_ = [
     ('h', c_int),
 ]
 
-ovrSizei = struct_ovrSizei_
+ovrSizei = struct_ovrSizei_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 102
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 109
 class struct_ovrRecti_(Structure):
     pass
 
@@ -659,11 +666,11 @@ struct_ovrRecti_._fields_ = [
     ('Size', ovrSizei),
 ]
 
-ovrRecti = struct_ovrRecti_
+ovrRecti = struct_ovrRecti_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 109
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 115
 class struct_ovrQuatf_(Structure):
-    def toList(self):
-      return (self.w, self.x, self.y, self.z)
+    pass
 
 struct_ovrQuatf_.__slots__ = [
     'x',
@@ -678,11 +685,11 @@ struct_ovrQuatf_._fields_ = [
     ('w', c_float),
 ]
 
-ovrQuatf = struct_ovrQuatf_
+ovrQuatf = struct_ovrQuatf_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 115
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 121
 class struct_ovrVector2f_(Structure):
-    def toList(self):
-      return (self.x, self.y)
+    pass
 
 struct_ovrVector2f_.__slots__ = [
     'x',
@@ -693,11 +700,11 @@ struct_ovrVector2f_._fields_ = [
     ('y', c_float),
 ]
 
-ovrVector2f = struct_ovrVector2f_
+ovrVector2f = struct_ovrVector2f_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 121
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 127
 class struct_ovrVector3f_(Structure):
-    def toList(self):
-      return (self.x, self.y, self.z)
+    pass
 
 struct_ovrVector3f_.__slots__ = [
     'x',
@@ -710,18 +717,11 @@ struct_ovrVector3f_._fields_ = [
     ('z', c_float),
 ]
 
-ovrVector3f = struct_ovrVector3f_
+ovrVector3f = struct_ovrVector3f_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 127
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 133
 class struct_ovrMatrix4f_(Structure):
-    def toList(self, Transpose = False):
-      mm = []
-      for i in range(0, 4):
-        for j in range(0, 4):
-          if (Transpose):
-            mm.append(self.M[i][j])
-          else:
-            mm.append(self.M[j][i])
-      return tuple(mm)
+    pass
 
 struct_ovrMatrix4f_.__slots__ = [
     'M',
@@ -730,8 +730,9 @@ struct_ovrMatrix4f_._fields_ = [
     ('M', (c_float * 4) * 4),
 ]
 
-ovrMatrix4f = struct_ovrMatrix4f_
+ovrMatrix4f = struct_ovrMatrix4f_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 133
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 140
 class struct_ovrPosef_(Structure):
     pass
 
@@ -744,8 +745,9 @@ struct_ovrPosef_._fields_ = [
     ('Position', ovrVector3f),
 ]
 
-ovrPosef = struct_ovrPosef_
+ovrPosef = struct_ovrPosef_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 140
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 151
 class struct_ovrPoseStatef_(Structure):
     pass
 
@@ -766,8 +768,9 @@ struct_ovrPoseStatef_._fields_ = [
     ('TimeInSeconds', c_double),
 ]
 
-ovrPoseStatef = struct_ovrPoseStatef_
+ovrPoseStatef = struct_ovrPoseStatef_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 151
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 166
 class struct_ovrFovPort_(Structure):
     pass
 
@@ -784,95 +787,103 @@ struct_ovrFovPort_._fields_ = [
     ('RightTan', c_float),
 ]
 
-ovrFovPort = struct_ovrFovPort_
+ovrFovPort = struct_ovrFovPort_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 166
 
-enum_anon_1 = c_int
+enum_anon_2 = c_int # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 179
 
-ovrHmd_None = 0
+ovrHmd_None = 0 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 179
 
-ovrHmd_DK1 = 3
+ovrHmd_DK1 = 3 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 179
 
-ovrHmd_DKHD = 4
+ovrHmd_DKHD = 4 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 179
 
-ovrHmd_DK2 = 6
+ovrHmd_DK2 = 6 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 179
 
-ovrHmd_Other = (ovrHmd_DK2 + 1)
+ovrHmd_Other = (ovrHmd_DK2 + 1) # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 179
 
-ovrHmdType = enum_anon_1
+ovrHmdType = enum_anon_2 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 179
 
-enum_anon_2 = c_int
+enum_anon_3 = c_int # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 208
 
-ovrHmdCap_Present = 1
+ovrHmdCap_Present = 1 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 208
 
-ovrHmdCap_Available = 2
+ovrHmdCap_Available = 2 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 208
 
-ovrHmdCap_Captured = 4
+ovrHmdCap_Captured = 4 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 208
 
-ovrHmdCap_ExtendDesktop = 8
+ovrHmdCap_ExtendDesktop = 8 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 208
 
-ovrHmdCap_NoMirrorToWindow = 8192
+ovrHmdCap_NoMirrorToWindow = 8192 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 208
 
-ovrHmdCap_DisplayOff = 64
+ovrHmdCap_DisplayOff = 64 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 208
 
-ovrHmdCap_LowPersistence = 128
+ovrHmdCap_LowPersistence = 128 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 208
 
-ovrHmdCap_DynamicPrediction = 512
+ovrHmdCap_DynamicPrediction = 512 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 208
 
-ovrHmdCap_NoVSync = 4096
+ovrHmdCap_DirectPentile = 1024 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 208
 
-ovrHmdCap_Writable_Mask = 13296
+ovrHmdCap_NoVSync = 4096 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 208
 
-ovrHmdCap_Service_Mask = 9200
+ovrHmdCap_Writable_Mask = 13040 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 208
 
-ovrHmdCaps = enum_anon_2
+ovrHmdCap_Service_Mask = 8944 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 208
 
-enum_anon_3 = c_int
+ovrHmdCaps = enum_anon_3 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 208
 
-ovrTrackingCap_Orientation = 16
+enum_anon_4 = c_int # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 222
 
-ovrTrackingCap_MagYawCorrection = 32
+ovrTrackingCap_Orientation = 16 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 222
 
-ovrTrackingCap_Position = 64
+ovrTrackingCap_MagYawCorrection = 32 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 222
 
-ovrTrackingCap_Idle = 256
+ovrTrackingCap_Position = 64 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 222
 
-ovrTrackingCaps = enum_anon_3
+ovrTrackingCap_Idle = 256 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 222
 
-enum_anon_4 = c_int
+ovrTrackingCaps = enum_anon_4 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 222
 
-ovrDistortionCap_Chromatic = 1
+enum_anon_5 = c_int # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 241
 
-ovrDistortionCap_TimeWarp = 2
+ovrDistortionCap_Chromatic = 1 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 241
 
-ovrDistortionCap_Vignette = 8
+ovrDistortionCap_TimeWarp = 2 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 241
 
-ovrDistortionCap_NoRestore = 16
+ovrDistortionCap_Vignette = 8 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 241
 
-ovrDistortionCap_FlipInput = 32
+ovrDistortionCap_NoRestore = 16 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 241
 
-ovrDistortionCap_SRGB = 64
+ovrDistortionCap_FlipInput = 32 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 241
 
-ovrDistortionCap_Overdrive = 128
+ovrDistortionCap_SRGB = 64 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 241
 
-ovrDistortionCap_HqDistortion = 0x100
+ovrDistortionCap_Overdrive = 128 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 241
 
-ovrDistortionCap_ProfileNoTimewarpSpinWaits = 65536
+ovrDistortionCap_HqDistortion = 256 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 241
 
-ovrDistortionCaps = enum_anon_4
+ovrDistortionCap_LinuxDevFullscreen = 512 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 241
 
-enum_anon_5 = c_int
+ovrDistortionCap_ComputeShader = 1024 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 241
 
-ovrEye_Left = 0
+ovrDistortionCap_ProfileNoTimewarpSpinWaits = 65536 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 241
 
-ovrEye_Right = 1
+ovrDistortionCaps = enum_anon_5 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 241
 
-ovrEye_Count = 2
+enum_anon_6 = c_int # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 251
 
-ovrEyeType = enum_anon_5
+ovrEye_Left = 0 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 251
 
+ovrEye_Right = 1 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 251
+
+ovrEye_Count = 2 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 251
+
+ovrEyeType = enum_anon_6 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 251
+
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 257
 class struct_ovrHmdStruct(Structure):
     pass
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 310
 class struct_ovrHmdDesc_(Structure):
     pass
 
@@ -927,24 +938,25 @@ struct_ovrHmdDesc_._fields_ = [
     ('DisplayId', c_int),
 ]
 
-ovrHmdDesc = struct_ovrHmdDesc_
+ovrHmdDesc = struct_ovrHmdDesc_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 310
 
-ovrHmd = POINTER(ovrHmdDesc)
+ovrHmd = POINTER(ovrHmdDesc) # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 313
 
-enum_anon_6 = c_int
+enum_anon_7 = c_int # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 323
 
-ovrStatus_OrientationTracked = 1
+ovrStatus_OrientationTracked = 1 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 323
 
-ovrStatus_PositionTracked = 2
+ovrStatus_PositionTracked = 2 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 323
 
-ovrStatus_CameraPoseTracked = 4
+ovrStatus_CameraPoseTracked = 4 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 323
 
-ovrStatus_PositionConnected = 32
+ovrStatus_PositionConnected = 32 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 323
 
-ovrStatus_HmdConnected = 128
+ovrStatus_HmdConnected = 128 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 323
 
-ovrStatusBits = enum_anon_6
+ovrStatusBits = enum_anon_7 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 323
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 333
 class struct_ovrSensorData_(Structure):
     pass
 
@@ -963,8 +975,9 @@ struct_ovrSensorData_._fields_ = [
     ('TimeInSeconds', c_float),
 ]
 
-ovrSensorData = struct_ovrSensorData_
+ovrSensorData = struct_ovrSensorData_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 333
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 371
 class struct_ovrTrackingState_(Structure):
     pass
 
@@ -974,6 +987,9 @@ struct_ovrTrackingState_.__slots__ = [
     'LeveledCameraPose',
     'RawSensorData',
     'StatusFlags',
+    'LastVisionProcessingTime',
+    'LastVisionFrameLatency',
+    'LastCameraFrameCounter',
 ]
 struct_ovrTrackingState_._fields_ = [
     ('HeadPose', ovrPoseStatef),
@@ -981,10 +997,14 @@ struct_ovrTrackingState_._fields_ = [
     ('LeveledCameraPose', ovrPosef),
     ('RawSensorData', ovrSensorData),
     ('StatusFlags', c_uint),
+    ('LastVisionProcessingTime', c_double),
+    ('LastVisionFrameLatency', c_double),
+    ('LastCameraFrameCounter', c_uint32),
 ]
 
-ovrTrackingState = struct_ovrTrackingState_
+ovrTrackingState = struct_ovrTrackingState_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 371
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 400
 class struct_ovrFrameTiming_(Structure):
     pass
 
@@ -1005,8 +1025,9 @@ struct_ovrFrameTiming_._fields_ = [
     ('EyeScanoutSeconds', c_double * 2),
 ]
 
-ovrFrameTiming = struct_ovrFrameTiming_
+ovrFrameTiming = struct_ovrFrameTiming_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 400
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 414
 class struct_ovrEyeRenderDesc_(Structure):
     pass
 
@@ -1015,82 +1036,112 @@ struct_ovrEyeRenderDesc_.__slots__ = [
     'Fov',
     'DistortedViewport',
     'PixelsPerTanAngleAtCenter',
-    'ViewAdjust',
+    'HmdToEyeViewOffset',
 ]
 struct_ovrEyeRenderDesc_._fields_ = [
     ('Eye', ovrEyeType),
     ('Fov', ovrFovPort),
     ('DistortedViewport', ovrRecti),
     ('PixelsPerTanAngleAtCenter', ovrVector2f),
-    ('ViewAdjust', ovrVector3f),
+    ('HmdToEyeViewOffset', ovrVector3f),
 ]
 
-ovrEyeRenderDesc = struct_ovrEyeRenderDesc_
+ovrEyeRenderDesc = struct_ovrEyeRenderDesc_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 414
 
-enum_anon_7 = c_int
+enum_anon_8 = c_int # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 436
 
-ovrRenderAPI_None = 0
+ovrRenderAPI_None = 0 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 436
 
-ovrRenderAPI_OpenGL = (ovrRenderAPI_None + 1)
+ovrRenderAPI_OpenGL = (ovrRenderAPI_None + 1) # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 436
 
-ovrRenderAPI_Android_GLES = (ovrRenderAPI_OpenGL + 1)
+ovrRenderAPI_Android_GLES = (ovrRenderAPI_OpenGL + 1) # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 436
 
-ovrRenderAPI_D3D9 = (ovrRenderAPI_Android_GLES + 1)
+ovrRenderAPI_D3D9 = (ovrRenderAPI_Android_GLES + 1) # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 436
 
-ovrRenderAPI_D3D10 = (ovrRenderAPI_D3D9 + 1)
+ovrRenderAPI_D3D10 = (ovrRenderAPI_D3D9 + 1) # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 436
 
-ovrRenderAPI_D3D11 = (ovrRenderAPI_D3D10 + 1)
+ovrRenderAPI_D3D11 = (ovrRenderAPI_D3D10 + 1) # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 436
 
-ovrRenderAPI_Count = (ovrRenderAPI_D3D11 + 1)
+ovrRenderAPI_Count = (ovrRenderAPI_D3D11 + 1) # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 436
 
-ovrRenderAPIType = enum_anon_7
+ovrRenderAPIType = enum_anon_8 # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 436
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 445
+class struct_ovrRenderAPIConfigHeader_(Structure):
+    pass
+
+struct_ovrRenderAPIConfigHeader_.__slots__ = [
+    'API',
+    'BackBufferSize',
+    'Multisample',
+]
+struct_ovrRenderAPIConfigHeader_._fields_ = [
+    ('API', ovrRenderAPIType),
+    ('BackBufferSize', ovrSizei),
+    ('Multisample', c_int),
+]
+
+ovrRenderAPIConfigHeader = struct_ovrRenderAPIConfigHeader_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 445
+
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 452
 class struct_ovrRenderAPIConfig_(Structure):
     pass
 
 struct_ovrRenderAPIConfig_.__slots__ = [
-    'API',
-    'RTSize',
-    'Multisample',
+    'Header',
     'PlatformData',
 ]
 struct_ovrRenderAPIConfig_._fields_ = [
-    ('API', ovrRenderAPIType),
-    ('RTSize', ovrSizei),
-    ('Multisample', c_int),
-    ('PlatformData', c_uint32 * 16),
+    ('Header', ovrRenderAPIConfigHeader),
+    ('PlatformData', uintptr_t * 8),
 ]
 
-ovrRenderAPIConfig = struct_ovrRenderAPIConfig_
+ovrRenderAPIConfig = struct_ovrRenderAPIConfig_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 452
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 463
+class struct_ovrTextureHeader_(Structure):
+    pass
+
+struct_ovrTextureHeader_.__slots__ = [
+    'API',
+    'TextureSize',
+    'RenderViewport',
+    '_PAD0_',
+]
+struct_ovrTextureHeader_._fields_ = [
+    ('API', ovrRenderAPIType),
+    ('TextureSize', ovrSizei),
+    ('RenderViewport', ovrRecti),
+    ('_PAD0_', c_uint32),
+]
+
+ovrTextureHeader = struct_ovrTextureHeader_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 463
+
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 470
 class struct_ovrTexture_(Structure):
     pass
 
 struct_ovrTexture_.__slots__ = [
-    'API',
-    'TextureSize',
-    'RenderViewport',
-    'TexId',
+    'Header',
     'PlatformData',
 ]
 struct_ovrTexture_._fields_ = [
-    ('API', ovrRenderAPIType),
-    ('TextureSize', ovrSizei),
-    ('RenderViewport', ovrRecti),
-    ('TexId', c_uint32),
-    ('PlatformData', c_uint32 * 15),
+    ('Header', ovrTextureHeader),
+    ('PlatformData', uintptr_t * 8),
 ]
 
-ovrTexture = struct_ovrTexture_
+ovrTexture = struct_ovrTexture_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 470
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 515
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovr_InitializeRenderingShim'):
         continue
     ovr_InitializeRenderingShim = _lib.ovr_InitializeRenderingShim
     ovr_InitializeRenderingShim.argtypes = []
-    ovr_InitializeRenderingShim.restype = None
+    ovr_InitializeRenderingShim.restype = ovrBool
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 521
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovr_Initialize'):
         continue
@@ -1099,6 +1150,7 @@ for _lib in _libs.itervalues():
     ovr_Initialize.restype = ovrBool
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 523
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovr_Shutdown'):
         continue
@@ -1107,6 +1159,7 @@ for _lib in _libs.itervalues():
     ovr_Shutdown.restype = None
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 527
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovr_GetVersionString'):
         continue
@@ -1119,6 +1172,7 @@ for _lib in _libs.itervalues():
         ovr_GetVersionString.errcheck = ReturnString
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 531
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_Detect'):
         continue
@@ -1127,6 +1181,7 @@ for _lib in _libs.itervalues():
     ovrHmd_Detect.restype = c_int
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 536
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_Create'):
         continue
@@ -1135,6 +1190,7 @@ for _lib in _libs.itervalues():
     ovrHmd_Create.restype = ovrHmd
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 537
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_Destroy'):
         continue
@@ -1143,6 +1199,7 @@ for _lib in _libs.itervalues():
     ovrHmd_Destroy.restype = None
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 541
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_CreateDebug'):
         continue
@@ -1151,6 +1208,7 @@ for _lib in _libs.itervalues():
     ovrHmd_CreateDebug.restype = ovrHmd
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 546
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetLastError'):
         continue
@@ -1163,6 +1221,7 @@ for _lib in _libs.itervalues():
         ovrHmd_GetLastError.errcheck = ReturnString
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 555
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_AttachToWindow'):
         continue
@@ -1171,6 +1230,7 @@ for _lib in _libs.itervalues():
     ovrHmd_AttachToWindow.restype = ovrBool
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 562
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetEnabledCaps'):
         continue
@@ -1179,6 +1239,7 @@ for _lib in _libs.itervalues():
     ovrHmd_GetEnabledCaps.restype = c_uint
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 566
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_SetEnabledCaps'):
         continue
@@ -1187,6 +1248,7 @@ for _lib in _libs.itervalues():
     ovrHmd_SetEnabledCaps.restype = None
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 583
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_ConfigureTracking'):
         continue
@@ -1195,6 +1257,7 @@ for _lib in _libs.itervalues():
     ovrHmd_ConfigureTracking.restype = ovrBool
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 589
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_RecenterPose'):
         continue
@@ -1203,6 +1266,7 @@ for _lib in _libs.itervalues():
     ovrHmd_RecenterPose.restype = None
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 596
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetTrackingState'):
         continue
@@ -1211,6 +1275,7 @@ for _lib in _libs.itervalues():
     ovrHmd_GetTrackingState.restype = ovrTrackingState
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 607
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetFovTextureSize'):
         continue
@@ -1219,6 +1284,7 @@ for _lib in _libs.itervalues():
     ovrHmd_GetFovTextureSize.restype = ovrSizei
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 639
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_ConfigureRendering'):
         continue
@@ -1227,6 +1293,7 @@ for _lib in _libs.itervalues():
     ovrHmd_ConfigureRendering.restype = ovrBool
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 649
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_BeginFrame'):
         continue
@@ -1235,6 +1302,7 @@ for _lib in _libs.itervalues():
     ovrHmd_BeginFrame.restype = ovrFrameTiming
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 660
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_EndFrame'):
         continue
@@ -1243,14 +1311,25 @@ for _lib in _libs.itervalues():
     ovrHmd_EndFrame.restype = None
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 675
 for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrHmd_GetEyePose'):
+    if not hasattr(_lib, 'ovrHmd_GetEyePoses'):
         continue
-    ovrHmd_GetEyePose = _lib.ovrHmd_GetEyePose
-    ovrHmd_GetEyePose.argtypes = [ovrHmd, ovrEyeType]
-    ovrHmd_GetEyePose.restype = ovrPosef
+    ovrHmd_GetEyePoses = _lib.ovrHmd_GetEyePoses
+    ovrHmd_GetEyePoses.argtypes = [ovrHmd, c_uint, ovrVector3f * 2, ovrPosef * 2, POINTER(ovrTrackingState)]
+    ovrHmd_GetEyePoses.restype = None
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 684
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetHmdPosePerEye'):
+        continue
+    ovrHmd_GetHmdPosePerEye = _lib.ovrHmd_GetHmdPosePerEye
+    ovrHmd_GetHmdPosePerEye.argtypes = [ovrHmd, ovrEyeType]
+    ovrHmd_GetHmdPosePerEye.restype = ovrPosef
+    break
+
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 708
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetRenderDesc'):
         continue
@@ -1259,6 +1338,7 @@ for _lib in _libs.itervalues():
     ovrHmd_GetRenderDesc.restype = ovrEyeRenderDesc
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 724
 class struct_ovrDistortionVertex_(Structure):
     pass
 
@@ -1279,8 +1359,9 @@ struct_ovrDistortionVertex_._fields_ = [
     ('TanEyeAnglesB', ovrVector2f),
 ]
 
-ovrDistortionVertex = struct_ovrDistortionVertex_
+ovrDistortionVertex = struct_ovrDistortionVertex_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 724
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 734
 class struct_ovrDistortionMesh_(Structure):
     pass
 
@@ -1297,8 +1378,9 @@ struct_ovrDistortionMesh_._fields_ = [
     ('IndexCount', c_uint),
 ]
 
-ovrDistortionMesh = struct_ovrDistortionMesh_
+ovrDistortionMesh = struct_ovrDistortionMesh_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 734
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 746
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_CreateDistortionMesh'):
         continue
@@ -1307,6 +1389,16 @@ for _lib in _libs.itervalues():
     ovrHmd_CreateDistortionMesh.restype = ovrBool
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 750
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_CreateDistortionMeshDebug'):
+        continue
+    ovrHmd_CreateDistortionMeshDebug = _lib.ovrHmd_CreateDistortionMeshDebug
+    ovrHmd_CreateDistortionMeshDebug.argtypes = [ovrHmd, ovrEyeType, ovrFovPort, c_uint, POINTER(ovrDistortionMesh), c_float]
+    ovrHmd_CreateDistortionMeshDebug.restype = ovrBool
+    break
+
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 759
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_DestroyDistortionMesh'):
         continue
@@ -1315,6 +1407,7 @@ for _lib in _libs.itervalues():
     ovrHmd_DestroyDistortionMesh.restype = None
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 763
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetRenderScaleAndOffset'):
         continue
@@ -1323,6 +1416,7 @@ for _lib in _libs.itervalues():
     ovrHmd_GetRenderScaleAndOffset.restype = None
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 770
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetFrameTiming'):
         continue
@@ -1331,6 +1425,7 @@ for _lib in _libs.itervalues():
     ovrHmd_GetFrameTiming.restype = ovrFrameTiming
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 775
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_BeginFrameTiming'):
         continue
@@ -1339,6 +1434,7 @@ for _lib in _libs.itervalues():
     ovrHmd_BeginFrameTiming.restype = ovrFrameTiming
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 780
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_EndFrameTiming'):
         continue
@@ -1347,6 +1443,7 @@ for _lib in _libs.itervalues():
     ovrHmd_EndFrameTiming.restype = None
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 785
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_ResetFrameTiming'):
         continue
@@ -1355,6 +1452,7 @@ for _lib in _libs.itervalues():
     ovrHmd_ResetFrameTiming.restype = None
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 792
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetEyeTimewarpMatrices'):
         continue
@@ -1363,6 +1461,16 @@ for _lib in _libs.itervalues():
     ovrHmd_GetEyeTimewarpMatrices.restype = None
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 794
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetEyeTimewarpMatricesDebug'):
+        continue
+    ovrHmd_GetEyeTimewarpMatricesDebug = _lib.ovrHmd_GetEyeTimewarpMatricesDebug
+    ovrHmd_GetEyeTimewarpMatricesDebug.argtypes = [ovrHmd, ovrEyeType, ovrPosef, ovrMatrix4f * 2, c_double]
+    ovrHmd_GetEyeTimewarpMatricesDebug.restype = None
+    break
+
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 805
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrMatrix4f_Projection'):
         continue
@@ -1371,6 +1479,7 @@ for _lib in _libs.itervalues():
     ovrMatrix4f_Projection.restype = ovrMatrix4f
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 811
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrMatrix4f_OrthoSubProjection'):
         continue
@@ -1379,6 +1488,7 @@ for _lib in _libs.itervalues():
     ovrMatrix4f_OrthoSubProjection.restype = ovrMatrix4f
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 816
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovr_GetTimeInSeconds'):
         continue
@@ -1387,6 +1497,7 @@ for _lib in _libs.itervalues():
     ovr_GetTimeInSeconds.restype = c_double
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 819
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovr_WaitTillTime'):
         continue
@@ -1395,6 +1506,7 @@ for _lib in _libs.itervalues():
     ovr_WaitTillTime.restype = c_double
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 826
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_ProcessLatencyTest'):
         continue
@@ -1403,6 +1515,7 @@ for _lib in _libs.itervalues():
     ovrHmd_ProcessLatencyTest.restype = ovrBool
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 830
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetLatencyTestResult'):
         continue
@@ -1415,6 +1528,16 @@ for _lib in _libs.itervalues():
         ovrHmd_GetLatencyTestResult.errcheck = ReturnString
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 834
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_GetLatencyTest2DrawColor'):
+        continue
+    ovrHmd_GetLatencyTest2DrawColor = _lib.ovrHmd_GetLatencyTest2DrawColor
+    ovrHmd_GetLatencyTest2DrawColor.argtypes = [ovrHmd, c_ubyte * 3]
+    ovrHmd_GetLatencyTest2DrawColor.restype = ovrBool
+    break
+
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 849
 class struct_ovrHSWDisplayState_(Structure):
     pass
 
@@ -1429,8 +1552,9 @@ struct_ovrHSWDisplayState_._fields_ = [
     ('DismissibleTime', c_double),
 ]
 
-ovrHSWDisplayState = struct_ovrHSWDisplayState_
+ovrHSWDisplayState = struct_ovrHSWDisplayState_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 849
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 868
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetHSWDisplayState'):
         continue
@@ -1439,6 +1563,7 @@ for _lib in _libs.itervalues():
     ovrHmd_GetHSWDisplayState.restype = None
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 888
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_DismissHSWDisplay'):
         continue
@@ -1447,14 +1572,7 @@ for _lib in _libs.itervalues():
     ovrHmd_DismissHSWDisplay.restype = ovrBool
     break
 
-for _lib in _libs.itervalues():
-    if not hasattr(_lib, 'ovrhmd_EnableHSWDisplaySDKRender'):
-        continue
-    ovrhmd_EnableHSWDisplaySDKRender = _lib.ovrhmd_EnableHSWDisplaySDKRender
-    ovrhmd_EnableHSWDisplaySDKRender.argtypes = [ovrHmd, ovrBool]
-    ovrhmd_EnableHSWDisplaySDKRender.restype = None
-    break
-
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 892
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetBool'):
         continue
@@ -1463,6 +1581,7 @@ for _lib in _libs.itervalues():
     ovrHmd_GetBool.restype = ovrBool
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 895
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_SetBool'):
         continue
@@ -1471,6 +1590,7 @@ for _lib in _libs.itervalues():
     ovrHmd_SetBool.restype = ovrBool
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 899
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetInt'):
         continue
@@ -1479,6 +1599,7 @@ for _lib in _libs.itervalues():
     ovrHmd_GetInt.restype = c_int
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 902
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_SetInt'):
         continue
@@ -1487,6 +1608,7 @@ for _lib in _libs.itervalues():
     ovrHmd_SetInt.restype = ovrBool
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 906
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetFloat'):
         continue
@@ -1495,6 +1617,7 @@ for _lib in _libs.itervalues():
     ovrHmd_GetFloat.restype = c_float
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 909
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_SetFloat'):
         continue
@@ -1503,6 +1626,7 @@ for _lib in _libs.itervalues():
     ovrHmd_SetFloat.restype = ovrBool
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 913
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetFloatArray'):
         continue
@@ -1511,6 +1635,7 @@ for _lib in _libs.itervalues():
     ovrHmd_GetFloatArray.restype = c_uint
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 917
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_SetFloatArray'):
         continue
@@ -1519,6 +1644,7 @@ for _lib in _libs.itervalues():
     ovrHmd_SetFloatArray.restype = ovrBool
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 923
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_GetString'):
         continue
@@ -1531,6 +1657,7 @@ for _lib in _libs.itervalues():
         ovrHmd_GetString.errcheck = ReturnString
     break
 
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 927
 for _lib in _libs.itervalues():
     if not hasattr(_lib, 'ovrHmd_SetString'):
         continue
@@ -1539,217 +1666,135 @@ for _lib in _libs.itervalues():
     ovrHmd_SetString.restype = ovrBool
     break
 
-try:
-    OVR_KEY_USER = 'User'
-except:
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 936
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_StartPerfLog'):
+        continue
+    ovrHmd_StartPerfLog = _lib.ovrHmd_StartPerfLog
+    ovrHmd_StartPerfLog.argtypes = [ovrHmd, String, String]
+    ovrHmd_StartPerfLog.restype = ovrBool
+    break
+
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 938
+for _lib in _libs.itervalues():
+    if not hasattr(_lib, 'ovrHmd_StopPerfLog'):
+        continue
+    ovrHmd_StopPerfLog = _lib.ovrHmd_StopPerfLog
+    ovrHmd_StopPerfLog.argtypes = [ovrHmd]
+    ovrHmd_StopPerfLog.restype = ovrBool
+    break
+
+GLuint = c_uint32 # /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/System/Library/Frameworks/OpenGL.framework/Headers/gltypes.h: 19
+
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI_GL.h: 45
+class struct_ovrGLConfigData_s(Structure):
     pass
 
-try:
-    OVR_KEY_NAME = 'Name'
-except:
+struct_ovrGLConfigData_s.__slots__ = [
+    'Header',
+]
+struct_ovrGLConfigData_s._fields_ = [
+    ('Header', ovrRenderAPIConfigHeader),
+]
+
+ovrGLConfigData = struct_ovrGLConfigData_s # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI_GL.h: 45
+
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI_GL.h: 48
+class union_ovrGLConfig(Union):
     pass
 
-try:
-    OVR_KEY_GENDER = 'Gender'
-except:
+union_ovrGLConfig.__slots__ = [
+    'Config',
+    'OGL',
+]
+union_ovrGLConfig._fields_ = [
+    ('Config', ovrRenderAPIConfig),
+    ('OGL', ovrGLConfigData),
+]
+
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI_GL.h: 63
+class struct_ovrGLTextureData_s(Structure):
     pass
 
-try:
-    OVR_KEY_PLAYER_HEIGHT = 'PlayerHeight'
-except:
+struct_ovrGLTextureData_s.__slots__ = [
+    'Header',
+    'TexId',
+]
+struct_ovrGLTextureData_s._fields_ = [
+    ('Header', ovrTextureHeader),
+    ('TexId', GLuint),
+]
+
+ovrGLTextureData = struct_ovrGLTextureData_s # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI_GL.h: 63
+
+# /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI_GL.h: 73
+class union_ovrGLTexture_s(Union):
     pass
 
-try:
-    OVR_KEY_EYE_HEIGHT = 'EyeHeight'
-except:
-    pass
+union_ovrGLTexture_s.__slots__ = [
+    'Texture',
+    'OGL',
+]
+union_ovrGLTexture_s._fields_ = [
+    ('Texture', ovrTexture),
+    ('OGL', ovrGLTextureData),
+]
 
-try:
-    OVR_KEY_IPD = 'IPD'
-except:
-    pass
+ovrGLTexture = union_ovrGLTexture_s # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI_GL.h: 73
 
-try:
-    OVR_KEY_NECK_TO_EYE_DISTANCE = 'NeckEyeDistance'
-except:
-    pass
+ovrVector2i_ = struct_ovrVector2i_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 96
 
-try:
-    OVR_DEFAULT_GENDER = 'Unknown'
-except:
-    pass
+ovrSizei_ = struct_ovrSizei_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 102
 
-try:
-    OVR_DEFAULT_PLAYER_HEIGHT = 1.778
-except:
-    pass
+ovrRecti_ = struct_ovrRecti_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 109
 
-try:
-    OVR_DEFAULT_EYE_HEIGHT = 1.675
-except:
-    pass
+ovrQuatf_ = struct_ovrQuatf_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 115
 
-try:
-    OVR_DEFAULT_IPD = 0.064
-except:
-    pass
+ovrVector2f_ = struct_ovrVector2f_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 121
 
-try:
-    OVR_DEFAULT_NECK_TO_EYE_HORIZONTAL = 0.0805
-except:
-    pass
+ovrVector3f_ = struct_ovrVector3f_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 127
 
-try:
-    OVR_DEFAULT_NECK_TO_EYE_VERTICAL = 0.075
-except:
-    pass
+ovrMatrix4f_ = struct_ovrMatrix4f_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 133
 
-try:
-    OVR_DEFAULT_EYE_RELIEF_DIAL = 3
-except:
-    pass
+ovrPosef_ = struct_ovrPosef_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 140
 
-ovrVector2i_ = struct_ovrVector2i_
+ovrPoseStatef_ = struct_ovrPoseStatef_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 151
 
-ovrSizei_ = struct_ovrSizei_
+ovrFovPort_ = struct_ovrFovPort_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 166
 
-ovrRecti_ = struct_ovrRecti_
+ovrHmdStruct = struct_ovrHmdStruct # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 257
 
-ovrQuatf_ = struct_ovrQuatf_
+ovrHmdDesc_ = struct_ovrHmdDesc_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 310
 
-ovrVector2f_ = struct_ovrVector2f_
+ovrSensorData_ = struct_ovrSensorData_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 333
 
-ovrVector3f_ = struct_ovrVector3f_
+ovrTrackingState_ = struct_ovrTrackingState_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 371
 
-ovrMatrix4f_ = struct_ovrMatrix4f_
+ovrFrameTiming_ = struct_ovrFrameTiming_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 400
 
-ovrPosef_ = struct_ovrPosef_
+ovrEyeRenderDesc_ = struct_ovrEyeRenderDesc_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 414
 
-ovrPoseStatef_ = struct_ovrPoseStatef_
+ovrRenderAPIConfigHeader_ = struct_ovrRenderAPIConfigHeader_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 445
 
-ovrFovPort_ = struct_ovrFovPort_
+ovrRenderAPIConfig_ = struct_ovrRenderAPIConfig_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 452
 
-ovrHmdStruct = struct_ovrHmdStruct
+ovrTextureHeader_ = struct_ovrTextureHeader_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 463
 
-ovrHmdDesc_ = struct_ovrHmdDesc_
+ovrTexture_ = struct_ovrTexture_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 470
 
-ovrSensorData_ = struct_ovrSensorData_
+ovrDistortionVertex_ = struct_ovrDistortionVertex_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 724
 
-ovrTrackingState_ = struct_ovrTrackingState_
+ovrDistortionMesh_ = struct_ovrDistortionMesh_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 734
 
-ovrFrameTiming_ = struct_ovrFrameTiming_
+ovrHSWDisplayState_ = struct_ovrHSWDisplayState_ # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI.h: 849
 
-ovrEyeRenderDesc_ = struct_ovrEyeRenderDesc_
+ovrGLConfigData_s = struct_ovrGLConfigData_s # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI_GL.h: 45
 
-ovrRenderAPIConfig_ = struct_ovrRenderAPIConfig_
+ovrGLConfig = union_ovrGLConfig # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI_GL.h: 48
 
-ovrTexture_ = struct_ovrTexture_
+ovrGLTextureData_s = struct_ovrGLTextureData_s # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI_GL.h: 63
 
-ovrDistortionVertex_ = struct_ovrDistortionVertex_
+ovrGLTexture_s = union_ovrGLTexture_s # /Users/bdavis/git/OculusRiftInAction/libraries/OculusSDK/LibOVR/Src/OVR_CAPI_GL.h: 73
 
-ovrDistortionMesh_ = struct_ovrDistortionMesh_
-
-ovrHSWDisplayState_ = struct_ovrHSWDisplayState_
-
-
-class Hmd():
-    @staticmethod
-    def initialize():
-        if (0 == ovr_Initialize()):
-            raise SystemError("Unable to initialize the Oculus SDK")
-
-    @staticmethod
-    def shutdown():
-        ovr_Shutdown()
-
-    @staticmethod
-    def detect():
-        return ovrHmd_Detect()
-
-    def __init__(self, index = 0, debug = False):
-        if (debug != False):
-            self.hmd = ovrHmd_CreateDebug(debug)
-        else:
-            self.hmd = ovrHmd_Create(index)
-
-    def destroy(self):
-        ovrHmd_Destroy(self.hmd)
-        self.hmd = None
-
-    def get_last_error(self):
-        return ovrHmd_GetLastError(self.hmd);
-
-    def get_enabled_caps(self):
-        return ovrHmd_GetEnabledCaps(self.hmd);
-
-    def set_enabled_caps(self, caps):
-        return ovrHmd_SetEnabledCaps(self.hmd, caps);
-
-    def configure_tracking(self, supported_caps = 
-                     ovrTrackingCap_Orientation |
-                     ovrTrackingCap_MagYawCorrection |
-                     ovrTrackingCap_Position, 
-                     required_caps = 0):
-        if (0 == ovrHmd_ConfigureTracking(self.hmd, supported_caps, required_caps)):
-            raise SystemError("Unable to start the sensor")
-
-    def recenter_pose(self):
-        return ovrHmd_RecenterPose(self.hmd)
-
-    def get_tracking_state(self, absTime = 0):
-        return ovrHmd_GetTrackingState(self.hmd, absTime)
-
-    def get_fov_texture_size(self, eye, fov_port, pixels_per_display_pixel = 1.0):
-        return ovrHmd_GetFovTextureSize(self.hmd, eye, fov_port, pixels_per_display_pixel);
-
-    def configure_rendering(self, config, fovPorts, 
-                            distortion_caps = 
-                            ovrDistortionCap_Chromatic |
-                            ovrDistortionCap_TimeWarp |
-                            ovrDistortionCap_Vignette):
-        result = [ ovrEyeRenderDesc(), ovrEyeRenderDesc() ]
-        out_arr  = (ovrEyeRenderDesc * 2)(*result)
-        in_arr = (ovrFovPort * 2)(*fovPorts)
-
-        if (0 == ovrHmd_ConfigureRendering(self.hmd, byref(config), distortion_caps, in_arr, out_arr)):
-            raise SystemError("Unable to configure rendering")
-        return out_arr
-
-    def begin_frame(self, frame_index = 0):
-        return ovrHmd_BeginFrame(self.hmd, frame_index)
-
-    def get_eye_pose(self, eye):
-        return ovrHmd_GetEyePose(self.hmd, eye)
-
-    def end_frame(self, poses, textures):
-        pose_arr = (ovrPosef * 2)(*poses)
-        tex_arr = (ovrTexture * 2)(*textures)
-        return ovrHmd_EndFrame(self.hmd, pose_arr, tex_arr);
-
-    def get_render_desc(self, eye, fov):
-        return ovrHmd_GetRenderDesc(self.hmd, eye, fov)
-
-    @staticmethod
-    def get_perspective(fov, near, far, right_handed):
-        return ovrMatrix4f_Projection(fov, near, far, '\x01' if right_handed else '\x00')
-
-    @staticmethod
-    def get_orthographic(perspective, scale, distance, eye_x_offset):
-        return ovrMatrix4f_Projection(perspective, scale, distance, eye_x_offset)
-
-    @staticmethod
-    def get_time_in_seconds():
-        return ovr_GetTimeInSeconds()
-
-    @staticmethod
-    def wait_till_time(time_in_seconds):
-        return ovr_WaitTillTime(time_in_seconds)
-
-    def get_float(self, name, default):
-        return ovrHmd_GetFloat(self.hmd, name, default)
-
-    def get_string(self, name, default):
-        return ovrHmd_GetString(self.hmd, name, default)
-    
 # No inserted files
 
