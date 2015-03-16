@@ -3,7 +3,7 @@ Copyright (C) LIMSI-CNRS (2014)
 blenderVR website: https://blendervr.limsi.fr
 
 contributor(s) : Jorge Gascon, Damien Touraine, David Poirier-Quinot,
-Laurent Pointal, Julian Adenauer,
+Laurent Pointal, Julian Adenauer, Dalai Felinto
 
 This software is a computer program whose purpose is to distribute
 blender to render on Virtual Reality device systems.
@@ -34,19 +34,15 @@ same conditions as regards security.
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL license and that you accept its terms.
 
-BEWARE: blenderVR requires a patched version of Blender. The patch can be found in 'patch/blender_revision_????????.patch'.
 
-How to use blenderVR - LIMSI :
+How to use blenderVR - LIMSI
+----------------------------
 There is as many blender running than there is screen in the virtual environment (wall, HMD, occulus ...). Thus, there can be several blender running on a single computer. For instance, that is used inside SMART-I², where all four screens (ie. : 2 physical screens multiply by 2 - 1 stereoscopic on each screen) are rendered by the same computer.
 Moreover, a Vvirtual environment may display scenes for several users. For instance, EVE, allows two users working at the same time on the same screens. Each user has its own independant stereoscopic point of view on the scene.
 Thus, the XML configuration file (look at configuration/main.xml to get documentation on the configuraion file) fully describe the Virtual Environment : users, screens, VRPN connexion ...
 
 blenderVR contains several files.
-All .py files represent the classes and the modules used by blenderVR. The main module is blendervr. You just have to import this module to load blenderVR. Moreover, you should run blendervr.run() each frame to update "external" modules (VRPN, OSC ...).
+All .py files represent the classes and the modules used by blenderVR. The main module is blendervr.
 
-blenderVR is running through blenderVR script.
-
-For blenderVR to work, you should add this python code to a Logic Controller that is run 'always' (ie. : each frame).
-=============================================================
-import blendervr
-blendervr.run()
+Follow the installation guide in our user manual:
+http://blender-vr-manual.readthedocs.org/installation/installation.html
