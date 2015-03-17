@@ -51,6 +51,7 @@ class Controller(Console):
         self._blender_file       = None 
         self._loader_file        = None
         self._processor_files    = None
+        self._screenSets         = []
 
         self._anchor             = None
         self._previous_state     = None
