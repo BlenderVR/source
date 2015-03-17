@@ -71,7 +71,7 @@ path = os.path.join(path, 'blender')
 
 if not os.path.isdir(path): os.makedirs(path)
 
-profile_file = os.path.join(path, 'vr', 'profile_1.0.pickle')
+profile_file = os.path.join(path, 'vr', 'profile_1.1.pickle')
 
 # Prepare command-line arguments parsing, then parse it.
 parser = argparse.ArgumentParser()
