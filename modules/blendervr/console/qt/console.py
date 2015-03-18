@@ -79,6 +79,7 @@ class GUI(common_GUI):
         self._console_ui.link_processor_to_blender.toggled.connect(
                                         self.cb_set_link_processor_to_blender)
         self._console_ui.set_screen_set.clicked.connect(self.cb_set_screen_set)
+        self._console_ui.select_screen_set.currentIndexChanged.connect(self.cb_set_screen_set)
         self._console_ui.menuProcessor.triggered.connect(
                                         self.cb_processor_window)
 
@@ -171,6 +172,7 @@ class GUI(common_GUI):
             file_name = file_name[0]
         if file_name:
             self._console_ui.configuration_file.setText(file_name)
+            self.cb_load_configuration_file()
 
     def _get_configuration_paths_list(self):
         paths = self.profile.getValue(['config', 'path'])
