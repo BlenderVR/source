@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
 <blenderVR>
-  <!-- Documentation can be found on blenderVR web site: http://blendervr.limsi.fr/doku.php?id=doc:config -->
+  <!-- Documentation can be found on blenderVR manual: http://blender-vr-manual.readthedocs.org/components/configuration-file.html -->
 
-  <starter>
-  <!-- <starter blender='path to blender executable'> -->
+  <starter blender='#### path to blender executable ####'>
     <config name='Console'>console</config>
     <config name='DK2 Debug'>oculus dk2 debug</config>
     <config name='DK2 Full'>oculus dk2 full</config>
@@ -14,18 +13,20 @@
   </users>
 
   <computers>
+
     <system>
       <!-- <blenderplayer executable='path to blenderplayer executable'/> -->
     </system>
     <computer name='Any' hostname='*'>
-      <!-- Replace $INSTALL_DIR by your own path towards blenderVR directory-->
+      <!-- #### Replace $INSTALL_DIR by your own path towards blenderVR directory #### -->
         <library path="$INSTALL_DIR/venv/lib/python3.4/site-packages" />
-        <library path="$INSTALL_DIR/venv/lib/python3.4/site-packages/websocket_client-0.26.0-py3.4.egg" />
-        <library path="$INSTALL_DIR/venv/lib/python3.4/site-packages/six-1.9.0-py3.4.egg" />
+        <library path="$INSTALL_DIR/venv/lib/python3.4/site-packages/websocket_client-0.26.0-py3.4.egg-info" />
     </computer>
+
   </computers>
 
   <screens>
+
     <screen name="console" computer="Any">
       <display options="-w 720 450 720 450">
         <environment>DISPLAY=:0</environment>
@@ -83,8 +84,7 @@
   <plugins>
 
     <oculus_dk2>
-      <user host="localhost" processor_method="user_position_right" viewer='user B' computer='Right'/>
-      <user host="169.254.249.166" processor_method="user_position_left" viewer='user A' computer='Left'/>
+      <user host="localhost" processor_method="user_position" viewer='user A' computer='Right'/>
     </oculus_dk2>
 
   </plugins>
