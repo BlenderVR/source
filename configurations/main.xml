@@ -4,7 +4,7 @@
 
   <starter>
   <!-- <starter blender='path to blender executable'> -->
-    <config name='dual'>console half left, console half right</config>
+    <config name='split'>console half left, console half right</config>
     <config name='console'>console</config>
   </starter>
 
