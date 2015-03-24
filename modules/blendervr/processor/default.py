@@ -36,7 +36,8 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
-from .. import *
+import blendervr
+from blendervr import *
 
 if is_virtual_environment():
 
