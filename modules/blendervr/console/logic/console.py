@@ -227,7 +227,7 @@ class Logic:
             command = [sys.executable, self._update_loader_script, '--',
                                                             blender_file]
             if self.profile.getValue(['debug', 'executables']):
-                self.logger.error('Get loader script name:', ' '.join(command))
+                self.logger.debug('Get loader script name:', ' '.join(command))
             process = subprocess.Popen(command, stdin=subprocess.PIPE,
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             process.wait()
@@ -338,7 +338,7 @@ class Logic:
                         self._update_loader_script, '--',
                         self._blender_file] + self._processor_files
             if self.profile.getValue(['debug', 'executables']):
-                self.logger.error('Update loader scripe:', ' '.join(command))
+                self.logger.debug('Update loader script:', ' '.join(command))
 
             for index, argument in enumerate(command):
                 if ' ' in argument:
