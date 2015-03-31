@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<blenderVR>
+  <!-- Documentation can be found on blenderVR web site: http://blendervr.limsi.fr/doku.php?id=doc:config -->
+
+  <!-- MODIFY ACCORDING TO YOUR OWN PATH -->
+  <starter blender='/Users/MyName/blender/bin/blender.app/Contents/MacOS/blender'>
+    <config name='split'>console half left, console half right</config>
+    <config name='console'>console</config>
+  </starter>
+
+  <users>
+    <user name="user A"/>
+  </users>
+
+  <computers>
+    <system>
+      <!-- MODIFY ACCORDING TO YOUR OWN PATH -->
+      <blenderplayer executable='/Users/MyName/blender/bin/blenderplayer.app/Contents/MacOS/blenderplayer'/>
+    </system>
+    <computer name='Any' hostname='*' />
+  </computers>
+
+  <screens>
+    <screen name="console" computer="Any">
+      <display options="-w 400 400">
+        <environment>DISPLAY=:0.0</environment>
+        <graphic_buffer buffer="mono" user='user A' eye="middle"/>
+      </display>
+      <wall>
+        <corner name="topRightCorner">1.0, 1.0, -1.0</corner>
+        <corner name="topLeftCorner">-1.0, 1.0, -1.0</corner>
+        <corner name="bottomRightCorner">1.0, -1.0, -1.0</corner>
+      </wall>
+    </screen>
+
+    <screen name="console half left" computer="Any">
+      <display options="-w 400 400 200 300">
+        <environment>DISPLAY=:0.0</environment>
+        <graphic_buffer user='user A'/>
+      </display>
+      <wall>
+        <corner name="topRightCorner">0.0, 1.0, -1.0</corner>
+        <corner name="topLeftCorner">-1.0, 1.0, -1.0</corner>
+        <corner name="bottomRightCorner">0.0, -1.0, -1.0</corner>
+      </wall>
+    </screen>
+
+    <screen name="console half right" computer="Any">
+      <display options="-w 400 400 600 300">
+        <environment>DISPLAY=:0.0</environment>
+        <graphic_buffer user='user A'/>
+      </display>
+      <wall>
+        <corner name="topRightCorner">1.0, 1.0, -1.0</corner>
+        <corner name="topLeftCorner">0.0, 1.0, -1.0</corner>
+        <corner name="bottomRightCorner">1.0, -1.0, -1.0</corner>
+      </wall>
+    </screen>
+
+  </screens>
+
+  <plugins>
+
+    <vrpn>
+    <!-- Example of VRPN device definition, processor_method callback
+    is to be defined in the .processor.py attached to the blender scene -->
+    <analog device="device0" host="localhost" processor_method="space_navigator_analog"/>
+    <button device="device0" host="localhost" processor_method="space_navigator_button"/>
+    </vrpn>
+
+    <!-- Example of OSC setup -->
+    <osc host='localhost' port='3819' configuration='Laptop SPAT'>
+      <user listener='Binaural 2' viewer='user A' />
+      <user listener='Binaural 1' viewer='user B' />
+      <user listener='Ambisonic' />
+      <user listener='Stereo' />
+      <room warmth='32' />
+    </osc>
+
+  </plugins>
+
+</blenderVR>
