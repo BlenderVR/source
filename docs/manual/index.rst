@@ -16,6 +16,7 @@ Processor File
    :maxdepth: 1
 
    processor-file/examples.rst
+   processor-file/osc_api.rst
 
 
 Source Code

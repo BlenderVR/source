@@ -38,8 +38,8 @@
 
 from . import base
 #import bge
-#import mathutils
-#import math
+import mathutils
+import math
 
 
 class User(base.Base):
@@ -70,8 +70,15 @@ class User(base.Base):
 
     def run(self):
         if self._viewer is not None:
-            self.position(self._viewer.getPosition()
-                          * self._viewer.getVehiclePosition())
+            # self.position(self._viewer.getPosition()
+            #               * self._viewer.getVehiclePosition())
+            # DPQ modified, remains: dirty (inverse up and down in OSC engine
+            # need to work on it + check if it does not impact CAVE rendering
+            self._viewer.getVehiclePosition()
+            mat_rot = mathutils.Matrix.Rotation(math.radians(180.0), 4, 'X')
+            matVehicle = mat_rot * self._viewer.getVehiclePosition()
+            self.position(matVehicle.inverted()
+                          * self._viewer.getPosition())
         super(User, self).run()
 
     def getName(self):

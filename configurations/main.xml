@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <blenderVR>
-  <!-- Documentation can be found on blenderVR web site: http://blendervr.limsi.fr/doku.php?id=doc:config -->
+  <!-- Documentation can be found on blenderVR manual: http://blender-vr-manual.readthedocs.org/components/configuration-file.html -->
 
   <starter>
   <!-- <starter blender='path to blender executable'> -->
@@ -77,10 +77,12 @@
       <button device="GTK" host="localhost" processor_method="buttons"/>
     </vrpn>
 
-    <osc host='localhost' port='3819' configuration='ambisonic EVE'>
-      <user listener='binaural 1' viewer='user A' />
+    <osc host='localhost' port='3819' configuration='Laptop SPAT'>
+      <user listener='Binaural 1' viewer='user A' />
+      <!-- <user listener='Binaural 2' viewer='user B' /> -->
       <user listener='Ambisonic' />
-      <room warmth='32' />
+      <user listener='Stereo' />
+      <!-- <room warmth='32' /> -->
     </osc>
 
   </plugins>

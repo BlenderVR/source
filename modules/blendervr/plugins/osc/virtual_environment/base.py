@@ -137,6 +137,12 @@ class Base(base.Base):
             if attribut['value'] != value:
                 attribut['value'] = value
                 attribut['update'] = True
+                # DPQ modified: to avoid slaves to send their own routing table
+                # to the OSC audio engine. Need to check/clean if it does not
+                # impact the OSC plugin in any other way:
+                if not self.blenderVR.isMaster() and attribut['cmd'] == 'name':
+                    attribut['update'] = False
+                # ----
             return
         raise exceptions.OSC_Invalid_Type(str(value) + ' is not a string')
 
@@ -162,7 +168,17 @@ class Base(base.Base):
                 attribut['cmd'] = name
             setattr(self, name, MethodType(getattr(self, '_command_'
                                             + attribut['type']), attribut))
+
             attribut['update'] = True
+
+            # DPQ modified - To forbid slave to handle OSC init messages (e.g. users name, configuration, etc.)
+            # the 'position' still has to be initialized for correct sound rendering
+            if not self.blenderVR.isMaster():
+                if attribut['cmd'] != 'position':
+                    attribut['update'] = False
+            # !!!  check if it does not prevent user update in networked
+            # mode with an oculus on remote host
+
             if 'value' not in attribut:
                 if attribut['type'] == 'none':
                     attribut['value'] = None

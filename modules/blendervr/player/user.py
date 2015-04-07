@@ -74,6 +74,13 @@ class User(Base):
         return self._name
 
     def getPosition(self):
+        """
+        get user position in the virtual environment.
+
+        Args: None
+
+        Returns: 4x4 mathutils.Matrix (rotation and location).
+        """
         return self._position
 
     def getVehiclePosition(self, internal=False):

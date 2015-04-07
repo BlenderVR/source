@@ -275,7 +275,6 @@ class Main:
         try:
             self._processor.run()
             self._keyboardAndMouse.run()
-            self._plugin_hook('run')
         except SystemExit:
             pass
         except:
@@ -296,6 +295,7 @@ class Main:
         try:
             self._controller.run()
             self._connector.run()
+            self._plugin_hook('run')
             self._screen.run()
             self._connector.endFrame()
             self._connector.barrier()
