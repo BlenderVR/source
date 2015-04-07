@@ -37,7 +37,7 @@
 ##
 
 """
-Main module of the Blender-VR application
+Main module of the BlenderVR application
 """
 
 

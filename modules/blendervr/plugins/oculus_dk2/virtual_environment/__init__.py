@@ -51,7 +51,7 @@ class OculusDK2(base.Base):
             assert(create_connection)
 
         except ImportError:
-            self.logger.info('Oculus DK2 plugin error: no websocket module available. Please refer to the Blender-VR documentation')
+            self.logger.info('Oculus DK2 plugin error: no websocket module available. Please refer to the BlenderVR documentation')
             self._available = False
             return
 

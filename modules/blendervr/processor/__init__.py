@@ -39,7 +39,7 @@
 """
 Handle all the processors, which are defined per project.
 
-A processor is a python module that allows Blender-VR to run special
+A processor is a python module that allows BlenderVR to run special
 code for specific project.
 
 It can, for example, load OSC modules, or link the HMD to the scene camera.
