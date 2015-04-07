@@ -48,7 +48,7 @@ class User(device.Sender):
         self._matrix = None
 
         super(User, self).__init__(parent, _configuration)
-        self._viewer = self.blenderVR.getUserByName(configuration['viewer'])
+        self._viewer = self.BlenderVR.getUserByName(configuration['viewer'])
         self._host = configuration['host']
 
         self._available = True

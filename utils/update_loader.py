@@ -14,8 +14,8 @@ import sys
 import os
 import builtins
 
-builtins.blenderVR_root = os.path.dirname(os.path.dirname(__file__))
-sys.path.append(os.path.join(blenderVR_root, 'modules'))
+builtins.BlenderVR_root = os.path.dirname(os.path.dirname(__file__))
+sys.path.append(os.path.join(BlenderVR_root, 'modules'))
 
 import blendervr.tools.logger
 logger = blendervr.tools.logger.getLogger('loader creation')

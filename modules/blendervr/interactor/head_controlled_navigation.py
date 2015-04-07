@@ -180,7 +180,7 @@ if is_virtual_environment():
             self._interactor_name = COMMON_NAME
 
             if one_per_user:
-                for user_name, user in self.blenderVR.getAllUsers().items():
+                for user_name, user in self.BlenderVR.getAllUsers().items():
                     user._HCNav = _HCNav(self, user, method)
             elif hasattr(method, '__call__'):
                 self._local = _HCNav(self, None, method)
@@ -199,7 +199,7 @@ if is_virtual_environment():
                                                                 power, max)
                 return
             if user is None:
-                for user_name, user in self.blenderVR.getAllUsers().items():
+                for user_name, user in self.BlenderVR.getAllUsers().items():
                     user._HCNav.setPositionFactors(component, attenuation,
                                                                 power, max)
             else:
@@ -213,7 +213,7 @@ if is_virtual_environment():
                 self._local.setOrientationFactors(attenuation, power, max)
                 return
             if user is None:
-                for user_name, user in self.blenderVR.getAllUsers().items():
+                for user_name, user in self.BlenderVR.getAllUsers().items():
                     user._HCNav.setOrientationFactors(attenuation, power, max)
             else:
                 user._HCNav.setOrientationFactors(attenuation, power, max)
@@ -223,7 +223,7 @@ if is_virtual_environment():
                 self._local.setHeadNeckLocation(location)
                 return
             if user is None:
-                for user_name, user in self.blenderVR.getAllUsers().items():
+                for user_name, user in self.BlenderVR.getAllUsers().items():
                     user._HCNav.setHeadNeckLocation(location)
             else:
                 user._HCNav.setHeadNeckLocation(location)
@@ -233,7 +233,7 @@ if is_virtual_environment():
                 self._local.update(state)
                 return
             if user is None:
-                for user_name, user in self.blenderVR.getAllUsers().items():
+                for user_name, user in self.BlenderVR.getAllUsers().items():
                     user._HCNav.update(state)
             else:
                 user._HCNav.update(state)
@@ -253,7 +253,7 @@ if is_virtual_environment():
             user._HCNav.setHeadLocation(info['matrix'], info)
 
         def getNavigationState(self):
-            for user_name, user in self.blenderVR.getAllUsers().items():
+            for user_name, user in self.BlenderVR.getAllUsers().items():
                 if user._HCNav.getNavigationState():
                     return True
             return False

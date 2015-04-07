@@ -36,7 +36,7 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
-if blenderVR_QT == 'PyQt4':
+if BlenderVR_QT == 'PyQt4':
     from PyQt4 import QtGui, QtCore
 else:
     from PySide import QtGui, QtCore

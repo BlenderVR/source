@@ -75,7 +75,7 @@ class Sender(Base):
         self._users = []
         if 'users' in configuration and configuration['users'] is not None:
             try:
-                self._users.append(self.blenderVR.getUserByName(
+                self._users.append(self.BlenderVR.getUserByName(
                                                     configuration['users']))
             except exceptions.User:
                 raise exceptions.Processor_Invalid_Device(
@@ -83,10 +83,10 @@ class Sender(Base):
                                     + configuration['processor_method']
                                     + '": ' + configuration['users'])
         else:
-            self._users = list(self.blenderVR.getAllUsers().values())
+            self._users = list(self.BlenderVR.getAllUsers().values())
 
     def checkMethod(self, display_missing):
-        processor = self.blenderVR.getProcessor()
+        processor = self.BlenderVR.getProcessor()
         if not hasattr(processor, self._processor_method_name):
             if display_missing:
                 self.logger.warning('processor does not have "'

@@ -50,7 +50,7 @@ class Profile:
             with open(self._configuration_file, 'rb') as node:
                 self._data = pickle.load(node)
         except:
-            self._data = {'root': blenderVR_root}
+            self._data = {'root': BlenderVR_root}
             self._write()
 
     def lock(self, lock):

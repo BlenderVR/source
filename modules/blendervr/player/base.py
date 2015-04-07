@@ -44,5 +44,5 @@ class Base(base.Base):
         base.Base.__init__(self, parent)
 
     @property
-    def blenderVR(self):
+    def BlenderVR(self):
         return self.getMainRunningModule()

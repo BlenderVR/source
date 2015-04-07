@@ -54,8 +54,8 @@ if is_virtual_environment():
         def __init__(self, parent):
             Interactor.__init__(self, parent)
             self._activated = False
-            users = self.blenderVR.getScreenUsers()
-            if self.blenderVR.isMaster() and (len(users) == 1):
+            users = self.BlenderVR.getScreenUsers()
+            if self.BlenderVR.isMaster() and (len(users) == 1):
                 self._user = users[0]
                 self._window = (bge.render.getWindowWidth(),
                                 bge.render.getWindowHeight())

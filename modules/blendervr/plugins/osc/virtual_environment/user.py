@@ -47,7 +47,7 @@ class User(base.Base):
         super(User, self).__init__(parent, 'user', id)
 
         if configuration['viewer'] is not None:
-            self._viewer = self.blenderVR.getUserByName(configuration['viewer'])
+            self._viewer = self.BlenderVR.getUserByName(configuration['viewer'])
         else:
             self._viewer = None
         self._listener_name = configuration['listener']
@@ -66,7 +66,7 @@ class User(base.Base):
         self.define_commands()
         self.name(self._listener_name)
         if self._viewer is not None:
-            self._viewer.blenderVR_OSC = self
+            self._viewer.BlenderVR_OSC = self
 
     def run(self):
         if self._viewer is not None:

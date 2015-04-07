@@ -70,7 +70,7 @@ if is_virtual_environment():
         def setAsObjectToSynchronize(self, name):
             """
             """
-            self.blenderVR.addObjectToSynchronize(self, name)
+            self.BlenderVR.addObjectToSynchronize(self, name)
 
         def start(self):
             return
@@ -107,7 +107,7 @@ if is_virtual_environment():
             """
             Send command to run in the slaves nodes
             """
-            self.blenderVR._sendToSlaves(command, argument)
+            self.BlenderVR._sendToSlaves(command, argument)
 
         def receivedFromMaster(self, command, argument):
             self.logger.debug('Unknown command received from master:', command)
@@ -117,7 +117,7 @@ if is_virtual_environment():
             """
             Send command to run in the console
             """
-            self.blenderVR._controller.sendToConsole(command, argument)
+            self.BlenderVR._controller.sendToConsole(command, argument)
 
         def receivedFromConsole(self, command, argument):
             """
@@ -148,7 +148,7 @@ elif is_console():
             try:
                 from . import profile
                 self._profile = profile.Profile(
-                            os.path.join(blenderVR_profilePath, 'processor',
+                            os.path.join(BlenderVR_profilePath, 'processor',
                             self._getProfileName()))
             except:
                 self._profile = None

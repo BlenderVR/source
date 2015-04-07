@@ -90,7 +90,7 @@ class GUI(common_GUI):
                                             self._console_ui.log_window,
                                             self._console_ui.log_level_selector)
 
-        self._window.setWindowTitle('blenderVR (v' + str(version) + ')')
+        self._window.setWindowTitle('BlenderVR (v' + str(version) + ')')
         self._options = options.GUI(self)
 
         self._console_ui.menuWindows.addAction(self._options.getMenu())
@@ -276,13 +276,13 @@ class GUI(common_GUI):
         self._console_ui.status_bar.showMessage(message)
 
     def _display_status(self, state, states):
-        self._options.blenderVR_state_changed(False)
+        self._options.BlenderVR_state_changed(False)
         if state == 'stopped':
             label_content = 'stopped'
             background = QtGui.QColor(127, 0, 0)
             self._console_ui.stop.setEnabled(False)
             self._console_ui.start.setEnabled(True)
-            self._options.blenderVR_state_changed(True)
+            self._options.BlenderVR_state_changed(True)
         elif state == 'starting':
             label_content = 'starting'
             background = QtGui.QColor(255, 127, 0)

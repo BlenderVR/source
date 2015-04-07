@@ -42,8 +42,8 @@ if is_virtual_environment():
 
     import bge
 
-    if 'interactors' not in bge.logic.globalDict['blenderVR']:
-        bge.logic.globalDict['blenderVR']['interactors'] = {}
+    if 'interactors' not in bge.logic.globalDict['BlenderVR']:
+        bge.logic.globalDict['BlenderVR']['interactors'] = {}
 
 
     from ..player import base
@@ -63,14 +63,14 @@ if is_virtual_environment():
 
         # # Interactions between rendering nodes
         # def sendToSlaves(self, command, argument = ''):
-        #     self.blenderVR._sendToSlaves(command, argument)
+        #     self.BlenderVR._sendToSlaves(command, argument)
 
         # def receivedFromMaster(self, command, argument):
         #     return False
 
         # Interactions with the console
         def sendToConsole(self, command, argument = ''):
-            self.blenderVR._controller.sendToConsole(command, argument)
+            self.BlenderVR._controller.sendToConsole(command, argument)
 
         def receivedFromConsole(self, command, argument):
             return False

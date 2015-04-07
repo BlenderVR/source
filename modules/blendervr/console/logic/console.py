@@ -66,7 +66,7 @@ class Logic:
         self._server_listen_tag = self.addListenTo(self._server.fileno(),
                                                    self._connect_client)
         from ... import version
-        self.logger.info('blenderVR version:', version)
+        self.logger.info('BlenderVR version:', version)
 
     def quit(self):
         pass
@@ -264,7 +264,7 @@ class Logic:
     def compile_BC(self):
         try:
             import compileall
-            compileall.compile_dir(os.path.join(blenderVR_root, 'modules',
+            compileall.compile_dir(os.path.join(BlenderVR_root, 'modules',
                                                 'blendervr'), quiet=True)
         except:
             self.logger.log_traceback(False)
@@ -313,7 +313,7 @@ class Logic:
                     if self.profile.getValue(['files', 'processor']) != \
                                                         processor_file_name:
                         if not os.path.isfile(processor_file_name):
-                            processor_file_name = os.path.join(blenderVR_root,
+                            processor_file_name = os.path.join(BlenderVR_root,
                                                 'modules', 'blendervr',
                                                 'processor', 'default.py')
                         self.profile.setValue(['files', 'processor'],

@@ -56,7 +56,7 @@ class GUI(base.Base, common_GUI):
         self._options_ui = gui.load(os.path.join(getModulePath(),
                                     'designer', 'options.ui'), self._window)
 
-        self._window.setWindowTitle('blenderVR options')
+        self._window.setWindowTitle('BlenderVR options')
 
         self._options_ui.debug_daemon.stateChanged.connect(
                                                     self.cb_debug_daemon)
@@ -113,7 +113,7 @@ class GUI(base.Base, common_GUI):
     def cb_reload_processor(self):
         self.getConsole().update_user_files()
 
-    def blenderVR_state_changed(self, state):
+    def BlenderVR_state_changed(self, state):
         self._options_ui.restart_daemons.setEnabled(state)
         self._options_ui.reload_processor.setEnabled(state)
 

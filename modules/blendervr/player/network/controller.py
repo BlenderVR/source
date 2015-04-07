@@ -68,7 +68,7 @@ class Controller(base.Base):
         self._configuration = {'screen_name': screen_name}
 
         if not self._client.run():
-            self.blenderVR.quit('Loosed the console')
+            self.BlenderVR.quit('Loosed the console')
 
     def _waitForConfiguration(self, command, argument):
         if command == 'base configuration ending':
@@ -100,12 +100,12 @@ class Controller(base.Base):
         elif command == 'log_to_controller':
             self._log_to_controller = argument
         elif command == 'quit':
-            self.blenderVR.quit('Asked by the user through the console')
+            self.BlenderVR.quit('Asked by the user through the console')
         elif command == 'console_to_virtual_environment':
-            if self.blenderVR.getProcessor() is not None \
-                                        and self.blenderVR.isMaster():
+            if self.BlenderVR.getProcessor() is not None \
+                                        and self.BlenderVR.isMaster():
                 command, argument = protocol.decomposeMessage(argument)
-                self.blenderVR.getProcessor().receivedFromConsole(command,
+                self.BlenderVR.getProcessor().receivedFromConsole(command,
                                                                     argument)
         elif command == 'log_file':
             if argument:
@@ -139,10 +139,10 @@ class Controller(base.Base):
 
     def run(self):
         if not self._client.run():
-            self.blenderVR.quit('Loosed the console')
+            self.BlenderVR.quit('Loosed the console')
 
     def _sendToConsole(self, command, argument=''):
         try:
             self._client.send(command, argument)
         except socket.error:
-            self.blenderVR.quit('Loosed the controller')
+            self.BlenderVR.quit('Loosed the controller')

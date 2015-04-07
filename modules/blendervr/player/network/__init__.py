@@ -47,20 +47,20 @@ from . import connector
 from . import synchronizer
 
 
-def getNetworks(blenderVR, config):
+def getNetworks(BlenderVR, config):
     global connector_object, synchronizer_object
 
     if connector_object is None:
         if 'master' in config:
-            connector_object = connector.Slave(blenderVR, config)
+            connector_object = connector.Slave(BlenderVR, config)
         else:
-            connector_object = connector.Master(blenderVR, config)
+            connector_object = connector.Master(BlenderVR, config)
 
     if synchronizer_object is None:
         if 'master' in config:
-            synchronizer_object = synchronizer.Slave(blenderVR)
+            synchronizer_object = synchronizer.Slave(BlenderVR)
         else:
-            synchronizer_object = synchronizer.Master(blenderVR)
+            synchronizer_object = synchronizer.Master(BlenderVR)
 
     connector_object._synchronizer = synchronizer_object
     synchronizer_object._connector = connector_object

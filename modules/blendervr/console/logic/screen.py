@@ -93,7 +93,7 @@ class Logic:
                          'keep_focus': screen_conf['keep_focus']}
 
         self._log_file = os.path.join(system['log']['path'],
-                                'blenderVR_' + self.getName() + '.log')
+                                'BlenderVR_' + self.getName() + '.log')
         if system['log']['clear_previous']:
             self._log_to_clear = self._log_file
         else:
@@ -309,7 +309,7 @@ class Logic:
 ###########################################################
     #  BlenderPlayer commands
 
-    def set_blenderVR_state(self, state):
+    def set_BlenderVR_state(self, state):
         if state != (self._state != 'stopped'):
             if self._clients['daemon']:
                 self._clients['daemon'].send('state', state)

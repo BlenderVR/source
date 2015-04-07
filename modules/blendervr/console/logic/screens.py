@@ -115,15 +115,15 @@ class Logic:
 
     def start_simulation(self):
         for name, obj in self._screens.items():
-            obj.set_blenderVR_state(True)
+            obj.set_BlenderVR_state(True)
 
     def stop_simulation(self):
         for name, obj in self._screens.items():
             if name != self._master_name:
-                obj.set_blenderVR_state(False)
+                obj.set_BlenderVR_state(False)
         import time
         time.sleep(0.5)
-        self.getMaster().set_blenderVR_state(False)
+        self.getMaster().set_BlenderVR_state(False)
 
     def send_to_blender_player(self, command, message):
         self.getMaster().send_to_blender_player(command, message)

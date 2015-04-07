@@ -182,7 +182,7 @@ class Master(Connector):
                 client = None
             del(clients)
             del(self._socket)
-            self.blenderVR._quitByNetwork(reason)
+            self.BlenderVR._quitByNetwork(reason)
 
     def send(self, session, buff):
         if not self.isReady():
@@ -217,7 +217,7 @@ class Master(Connector):
             del(self._clients[client])
         else:
             message = 'Loosed connexion to a client'
-        self.blenderVR.quit(message)
+        self.BlenderVR.quit(message)
 
     def _sendSize(self, size):
         self._sending(struct.pack(SIZE_FORMAT, size))
@@ -251,7 +251,7 @@ class Slave(Connector):
                                 socket.TCP_NODELAY, 1)  # improve speed ...
                 ##TODO: specify encoding!
                 self._socket.send(
-                    self.blenderVR.getScreenName().ljust(ID_SIZE).encode())
+                    self.BlenderVR.getScreenName().ljust(ID_SIZE).encode())
             except socket.error as error:
                 assert error    # avoid unused
                 del(self._socket)
@@ -271,7 +271,7 @@ class Slave(Connector):
         while True:
             command = self.receiveFrom(self._socket, COMMAND_SIZE)
             if command == self.CMD_MSG:
-                command = self.blenderVR._messageFromMaster
+                command = self.BlenderVR._messageFromMaster
             elif command == self.CMD_SYNCHRO:
                 command = self._synchronizer.process
             else:     # self.CMD_FINISHED
@@ -303,7 +303,7 @@ class Slave(Connector):
             except:
                 self.logger.log_traceback(False)
                 pass
-            self.blenderVR._quitByNetwork(reason)
+            self.BlenderVR._quitByNetwork(reason)
 
     def _receiveSize(self):
         size = struct.unpack_from(SIZE_FORMAT,
@@ -311,4 +311,4 @@ class Slave(Connector):
         return size[0]
 
     def _loosedConnexion(self, socket):
-        self.blenderVR.quit('Lost connexion to master')
+        self.BlenderVR.quit('Lost connexion to master')

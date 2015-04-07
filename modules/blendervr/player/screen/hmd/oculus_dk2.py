@@ -42,7 +42,7 @@ from . import base
 from ... import exceptions
 
 """ @package hmd
-Manager of Oculus DK2 screens with blenderVR
+Manager of Oculus DK2 screens with BlenderVR
 """
 
 warning_for_unsure_projection_displayed = False
@@ -58,10 +58,10 @@ class Device(base.Device):
 
         import sys
 
-        self._plugin = self.blenderVR.getPlugin('oculus_dk2')
+        self._plugin = self.BlenderVR.getPlugin('oculus_dk2')
         if self._plugin is None:
             self.logger.error("Oculus DK2 plugin (oculus_dk2) not setup in the configuration file, HMD device won't work")
-            #self.blenderVR.quit("Oculus DK2 plugin (oculus_dk2) not setup in the configuration file, HMD device won't work")
+            #self.BlenderVR.quit("Oculus DK2 plugin (oculus_dk2) not setup in the configuration file, HMD device won't work")
             return
 
         try:
@@ -75,7 +75,7 @@ class Device(base.Device):
             cont.owner["screen_width"] = width
             cont.owner["screen_height"] = height
 
-            ELEMENTS_MAIN_PREFIX = 'blenderVR:'
+            ELEMENTS_MAIN_PREFIX = 'BlenderVR:'
             ACTUATOR = ELEMENTS_MAIN_PREFIX + 'OculusDK2:Filter'
 
             actuator = cont.actuators.get(ACTUATOR)

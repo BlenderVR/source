@@ -42,7 +42,7 @@ from . import base
 from .. import exceptions
 
 """ @package wall
-Manager of wall screens (such as CAVE(TM) systems) with blenderVR ...
+Manager of wall screens (such as CAVE(TM) systems) with BlenderVR ...
 """
 
 
@@ -57,7 +57,7 @@ class Device(base.Base):
     def _updateMatrixForBuffer(self, bufferName, camera, depth):
 
         user = self._buffers[bufferName]['user']
-        scale = self.blenderVR.getScale()
+        scale = self.BlenderVR.getScale()
 
         # Then, we transfer from the Camera referenceFrame (ie. : vehicle one)
         # to local screen reference frame

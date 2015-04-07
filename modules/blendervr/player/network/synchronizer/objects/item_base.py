@@ -60,7 +60,7 @@ class Base(base.Base):
     def __del__(self):
         try:
             self._item.endObject()
-            if not self.blenderVR.isMaster():
+            if not self.BlenderVR.isMaster():
                 bge.logic.getCurrentScene().resume()
         except:
             pass

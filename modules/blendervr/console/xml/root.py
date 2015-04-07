@@ -42,12 +42,12 @@ class XML(base.XML):
         self._class_list  = ['blendervr']
 
     def _getChildren(self, name, attrs):
-        ROOT_ELEMENT = 'blenderVR'
+        ROOT_ELEMENT = 'BlenderVR'
         if name == ROOT_ELEMENT:
             if hasattr(self, '_blendervr'):
                 self.raise_error('Too many virtual environments defined inside configuration file')
-            from .blendervr import XML as blenderVR_XML
-            self._blendervr = blenderVR_XML(self, name, attrs)
+            from .blendervr import XML as BlenderVR_XML
+            self._blendervr = BlenderVR_XML(self, name, attrs)
             return self._blendervr
         return super(XML, self)._getChildren(name, attrs)
 

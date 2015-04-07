@@ -92,7 +92,7 @@ class Synchronizer(base.Base):
             except KeyError:
                 self.logger.warning('unrocognized type : ' + item_type)
                 module = self._item_types['default']
-            if self.blenderVR.isMaster():
+            if self.BlenderVR.isMaster():
                 self._items[item_id] = module.Master(self, item)
             else:
                 self._items[item_id] = module.Slave(self, item)

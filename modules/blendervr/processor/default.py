@@ -45,9 +45,9 @@ if is_virtual_environment():
         def __init__(self, parent):
             super(Processor, self).__init__(parent)
 
-            if self.blenderVR.isMaster():
+            if self.BlenderVR.isMaster():
                 import bge
-                self.blenderVR.getSceneSynchronizer().getItem(
+                self.BlenderVR.getSceneSynchronizer().getItem(
                                             bge.logic).activate(True, True)
 
 elif is_creating_loader():

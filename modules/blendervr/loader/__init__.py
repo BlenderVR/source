@@ -41,7 +41,7 @@ import os
 from .. import *
 from ..tools import logger
 
-ELEMENTS_MAIN_PREFIX = 'blenderVR:'
+ELEMENTS_MAIN_PREFIX = 'BlenderVR:'
 
 
 def main():

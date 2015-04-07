@@ -188,4 +188,4 @@ class XML(common_system.XML):
     def _default(self):
         super(XML, self)._default()
         if self._root is None:
-            self._root = blenderVR_root
+            self._root = BlenderVR_root

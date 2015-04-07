@@ -63,7 +63,7 @@ class Base(base.Base):
         self._buffers = {}
         self._users = []
         for information in buffers:
-            user = self.blenderVR.getUserByName(information['user'])
+            user = self.BlenderVR.getUserByName(information['user'])
             if user not in self._users:
                 self._users.append(user)
             if information['eye'] == 'left':
@@ -124,7 +124,7 @@ class Base(base.Base):
                 self._updateMatrixForBuffer('mono', camera, depth)
 
         except:
-            self.blenderVR.stopDueToError()
+            self.BlenderVR.stopDueToError()
 
     def getUsers(self):
         return self._users

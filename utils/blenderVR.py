@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# file: utils/blenderVR.py
+# file: utils/BlenderVR.py
 
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
@@ -50,9 +50,9 @@ import __main__
 
 def main():
     import builtins
-    builtins.blenderVR_QT = blenderVR_QT
+    builtins.BlenderVR_QT = BlenderVR_QT
 
-    sys.path.append(os.path.join(blenderVR_root, 'modules'))
+    sys.path.append(os.path.join(BlenderVR_root, 'modules'))
 
     if __main__.environments.d_version:
         try:
@@ -91,11 +91,11 @@ def main():
 
 try:
     import PyQt4
-    blenderVR_QT = 'PyQt4'
+    BlenderVR_QT = 'PyQt4'
 except:
     try:
         import PySide
-        blenderVR_QT = 'PySide'
+        BlenderVR_QT = 'PySide'
     except:
         print('No graphic library available : quitting !')
         sys.exit()

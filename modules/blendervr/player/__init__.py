@@ -70,13 +70,13 @@ class Main:
 
         import builtins
         from ..tools import getModulePath
-        builtins.blenderVR_root = os.path.dirname(
+        builtins.BlenderVR_root = os.path.dirname(
                         os.path.dirname(os.path.dirname(getModulePath())))
 
         configuration = {}
         try:
             from ..tools import logger
-            self._logger = logger.getLogger('blenderVR')
+            self._logger = logger.getLogger('BlenderVR')
 
             # Define connexions until the controller is running ...
             console_logger = logger.Console()
@@ -111,8 +111,8 @@ class Main:
 
             # Load global dictionnary because we will use it later !
             bge.logic.loadGlobalDict()
-            if 'blenderVR' not in bge.logic.globalDict:
-                bge.logic.globalDict['blenderVR'] = {}
+            if 'BlenderVR' not in bge.logic.globalDict:
+                bge.logic.globalDict['BlenderVR'] = {}
 
             self._paused = ''
 
@@ -340,9 +340,9 @@ class Main:
         """Main quit method
 
         This method must be call instead of any other method to properly
-        quit blenderVR.
+        quit BlenderVR.
         Otherwise, you may have problem of not closed socket next time you
-        run blenderVR.
+        run BlenderVR.
         The reason is printed inside the log file of displayed on the console
 
         :param reason:
@@ -400,7 +400,7 @@ class Main:
     def stopDueToError(self):
         self.logger.log_traceback(True)
         self.logger.error('Due to previous error, we cannot continue '
-                          'to run blenderVR !')
+                          'to run BlenderVR !')
         self._stopAll()
 
     @property

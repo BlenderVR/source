@@ -69,7 +69,7 @@ ECG_VALUES = [2.2115759e+00, 1.9184524e+00, 1.6262298e+00, 1.3363817e+00,
 class Splash(base.Base):
     def __init__(self, parent):
         super(Splash, self).__init__(parent)
-        utils_path = os.path.join(blenderVR_root, 'utils')
+        utils_path = os.path.join(BlenderVR_root, 'utils')
         font_path = os.path.join(utils_path, 'font.ttf')
         self._font_id = blf.load(font_path)
         self._ecg_values = ECG_VALUES
@@ -80,7 +80,7 @@ class Splash(base.Base):
         self._extinction = 3.0
 
         self._official_splash = (bge.logic.getCurrentScene().name ==
-                                                "blenderVR Splash Screen")
+                                                "BlenderVR Splash Screen")
 
         if self._official_splash:
             return
@@ -89,7 +89,7 @@ class Splash(base.Base):
         logofile = open(logo_path, 'r')
         magic = logofile.readline().strip()
         if magic != 'P3':
-            self.logger.warning('Cannot load blenderVR Logo !')
+            self.logger.warning('Cannot load BlenderVR Logo !')
             return
         comment = logofile.readline()
         assert comment    # avoid unused warning
@@ -215,7 +215,7 @@ class Splash(base.Base):
                 glDisable(GL_TEXTURE_2D)
             else:
                 glColor4f(1.0, 0.3, 0.3, 1.0)
-                self._draw_text("blenderVR", 3)
+                self._draw_text("BlenderVR", 3)
 
         # BLF drawing routine
         glColor4f(0.3, 0.3, 1.0, 1.0)

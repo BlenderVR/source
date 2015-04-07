@@ -41,7 +41,7 @@ Main module of the BlenderVR application
 """
 
 
-# Beware: you must alswo change blenderVR console executable to change the
+# Beware: you must alswo change BlenderVR console executable to change the
 # profile pickle file to load
 version = 1.0
 
@@ -84,7 +84,7 @@ def is_console():
 def run():
     if is_virtual_environment():
         import bge
-        bge.logic.blenderVR.run()
+        bge.logic.BlenderVR.run()
     else:
         pass
 
@@ -94,7 +94,7 @@ def main():
         try:
             import bge
             from .player import Main
-            bge.logic.blenderVR = Main()
+            bge.logic.BlenderVR = Main()
         except:
             pass
 

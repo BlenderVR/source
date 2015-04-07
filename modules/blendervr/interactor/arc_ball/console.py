@@ -66,7 +66,7 @@ if is_virtual_environment():
             self._object = None
             self._objectPosition = mathutils.Matrix()
             self._grabbed = False
-            users = self.blenderVR.getScreenUsers()
+            users = self.BlenderVR.getScreenUsers()
 
         def selectObject(self, _object):
             if not self._grabbed:

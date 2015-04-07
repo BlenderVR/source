@@ -63,8 +63,8 @@ class Daemon:
 
 
     """
-    def __init__(self, blenderVR_modules):
-        self._blenderVR_modules = blenderVR_modules
+    def __init__(self, BlenderVR_modules):
+        self._BlenderVR_modules = BlenderVR_modules
 
         self._controller = sys.argv[1]
         self._screen_name = sys.argv[2].strip("'\"")
@@ -137,24 +137,24 @@ class Daemon:
         :type command: str
         :param argument: Value depends on the command
         """
-        blenderVR_modules = self._blenderVR_modules
+        BlenderVR_modules = self._BlenderVR_modules
         if command == 'blender_player':
             self._executable = argument['executable']
             self._executable_options = argument['options']
             self._environment = argument['environments']
             if 'PYTHONPATH' in self._environment:
-                if blenderVR_modules not in self._environment['PYTHONPATH']:
-                    self._environment['PYTHONPATH'] = blenderVR_modules \
+                if BlenderVR_modules not in self._environment['PYTHONPATH']:
+                    self._environment['PYTHONPATH'] = BlenderVR_modules \
                             + os.pathsep + self._environment['PYTHONPATH']
             else:
-                self._environment['PYTHONPATH'] = blenderVR_modules
+                self._environment['PYTHONPATH'] = BlenderVR_modules
         elif command == 'log_to_clear':
             self._log_to_clear = argument
         elif command == 'state':
             if argument:
                 try:
                     import compileall
-                    compileall.compile_dir(os.path.join(blenderVR_modules,
+                    compileall.compile_dir(os.path.join(BlenderVR_modules,
                                                 'blendervr'), quiet=True)
                 except:
                     pass
@@ -306,11 +306,11 @@ def main():
         os.dup(0)
 
     # Find the installation root, and make blender package available.
-    blenderVR_root = os.path.dirname(os.path.dirname(__file__))
-    blenderVR_modules = os.path.join(blenderVR_root, 'modules')
-    sys.path.append(blenderVR_modules)
+    BlenderVR_root = os.path.dirname(os.path.dirname(__file__))
+    BlenderVR_modules = os.path.join(BlenderVR_root, 'modules')
+    sys.path.append(BlenderVR_modules)
 
-    Daemon(blenderVR_modules).main()
+    Daemon(BlenderVR_modules).main()
 
 
 if __name__ == "__main__":

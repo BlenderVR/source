@@ -56,7 +56,7 @@ if blendervr.is_virtual_environment():
                 self._laser = Laser(self, controller.owner,
                                                 controller.sensors[laser])
 
-            if self.blenderVR.isMaster() and head_navigator is not None:
+            if self.BlenderVR.isMaster() and head_navigator is not None:
                 if type(head_navigator) is not dict:
                     head_navigator = {}
                 if 'method' not in head_navigator:
@@ -69,7 +69,7 @@ if blendervr.is_virtual_environment():
                 self._navigator = HCNav(self, method=head_navigator['method'],
                                 one_per_user=head_navigator['one_per_user'])
                 self._navigator.setDefaultUser(
-                                        self.blenderVR.getUserByName('user A'))
+                                        self.BlenderVR.getUserByName('user A'))
                 self.registerInteractor(self._navigator)
 
             if use_viewpoint:
@@ -94,7 +94,7 @@ if blendervr.is_virtual_environment():
         def texts(self, info):
             self.logger.debug(info['message'])
             if info['message'] == 'COMPUTER QUIT':
-                self.blenderVR.quit("because user asked !")
+                self.BlenderVR.quit("because user asked !")
             if hasattr(self, '_navigator'):
                 cmd = None
                 if info['message'] == 'COMPUTER CALIBRATION':
@@ -114,7 +114,7 @@ if blendervr.is_virtual_environment():
             if not hasattr(self, '_navigator'):
                 return
             if users is None:
-                users = list(self.blenderVR.getAllUsers().values())
+                users = list(self.BlenderVR.getAllUsers().values())
             for user in users:
                 self._navigator.update(self._navigator.RESET, user)
                 user.resetVehiclePosition()
@@ -122,7 +122,7 @@ if blendervr.is_virtual_environment():
         def keyboardAndMouse(self, info):
             try:
                 if info['key'] == ord('q'):
-                    self.blenderVR.quit("pressed 'q' key")
+                    self.BlenderVR.quit("pressed 'q' key")
                 if (info['key'] == ord('v')
                         and info['state'] == device.STATE_PRESS
                         and hasattr(self, '_viewpoint')):

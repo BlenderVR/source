@@ -65,15 +65,15 @@ if is_virtual_environment():
             self._name = name
 
             if 'landmarks' not in \
-                            bge.logic.globalDict['blenderVR']['interactors']:
-                bge.logic.globalDict['blenderVR']['interactors']['landmarks'] = {}
+                            bge.logic.globalDict['BlenderVR']['interactors']:
+                bge.logic.globalDict['BlenderVR']['interactors']['landmarks'] = {}
 
-            self._positions = bge.logic.globalDict['blenderVR']['interactors']['landmarks']
+            self._positions = bge.logic.globalDict['BlenderVR']['interactors']['landmarks']
 
             self.sendToConsole(self._name, protocol.composeMessage(USERS,
-                                list(self.blenderVR.getAllUsers().keys())))
-            users = self.blenderVR.getScreenUsers()
-            if self.blenderVR.isMaster() and (len(users) == 1):
+                                list(self.BlenderVR.getAllUsers().keys())))
+            users = self.BlenderVR.getScreenUsers()
+            if self.BlenderVR.isMaster() and (len(users) == 1):
                 self._user = users[0]
                 self.sendToConsole(self._name, protocol.composeMessage(USER,
                                 self._user.getName()))
@@ -108,7 +108,7 @@ if is_virtual_environment():
                     self._send()
             if command == USER:
                 try:
-                    self._user = self.blenderVR.getUserByName(argument)
+                    self._user = self.BlenderVR.getUserByName(argument)
                 except:
                     pass
             return True

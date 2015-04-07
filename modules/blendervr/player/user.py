@@ -64,7 +64,7 @@ class User(Base):
 
         self._parent = None
 
-        self.blenderVR.addObjectToSynchronize(self,
+        self.BlenderVR.addObjectToSynchronize(self,
                                     'userSynchronization-' + self._name)
 
     def getID(self):

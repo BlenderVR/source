@@ -42,7 +42,7 @@ from .. import base
 from ... import exceptions
 
 """ @package hmd
-Manager of Head Mounted Display (HMD) screens with blenderVR ...
+Manager of Head Mounted Display (HMD) screens with BlenderVR ...
 """
 
 warning_for_unsure_projection_displayed = False
@@ -73,7 +73,7 @@ class Device(base.Base):
 
     def _updateMatrixForBuffer(self, bufferName, camera, depth):
 
-        scale = self.blenderVR.getScale()
+        scale = self.BlenderVR.getScale()
         user = self._buffers[bufferName]['user']
 
         screen_configuration = self._screens_informations[bufferName]

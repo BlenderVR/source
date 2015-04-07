@@ -36,7 +36,7 @@ load_module('PyQt4', PyQt4)
 load_module('PySide', PySide)
 
 # globals
-load_global('blenderVR_QT', 'PyQt4')
+load_global('BlenderVR_QT', 'PyQt4')
 import blendervr
 load_global('blendervr', blendervr)
 

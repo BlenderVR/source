@@ -6,4 +6,4 @@ class logic:
     def endGame():
         pass
 
-    globalDict = {'blenderVR':{}}
+    globalDict = {'BlenderVR':{}}

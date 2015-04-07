@@ -64,7 +64,7 @@ if blendervr.is_virtual_environment():
             self.attachLaserToCamera()
 
             self._scene.pre_draw.append(self.display_laser)
-            self.blenderVR.addObjectToSynchronize(self, 'laser beam')
+            self.BlenderVR.addObjectToSynchronize(self, 'laser beam')
 
         def allowDisallowObjects(self, allow, objects=None):
             if objects is None:
