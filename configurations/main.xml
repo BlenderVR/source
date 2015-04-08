@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<blenderVR>
-  <!-- Documentation can be found on blenderVR manual: http://blender-vr-manual.readthedocs.org/components/configuration-file.html -->
+<BlenderVR>
+  <!-- Documentation can be found on BlenderVR manual: http://blender-vr-manual.readthedocs.org/components/configuration-file.html -->
 
   <starter>
   <!-- <starter blender='path to blender executable'> -->
@@ -87,4 +87,4 @@
 
   </plugins>
 
-</blenderVR>
+</BlenderVR>

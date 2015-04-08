@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<blenderVR>
-  <!-- Documentation can be found on blenderVR web site: http://blendervr.limsi.fr/doku.php?id=doc:config -->
+<BlenderVR>
+  <!-- Documentation can be found on BlenderVR web site: http://blendervr.limsi.fr/doku.php?id=doc:config -->
 
   <!-- MODIFY ACCORDING TO YOUR OWN PATH -->
   <starter blender='D:/My/BlenderVRBuild/blender/blender.exe'>
@@ -88,4 +88,4 @@
 
   </plugins>
 
-</blenderVR>
+</BlenderVR>

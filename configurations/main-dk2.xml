@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<blenderVR>
-  <!-- Documentation can be found on blenderVR manual: http://blender-vr-manual.readthedocs.org/components/configuration-file.html -->
+<BlenderVR>
+  <!-- Documentation can be found on BlenderVR manual: http://blender-vr-manual.readthedocs.org/components/configuration-file.html -->
 
   <starter blender='#### path to blender executable ####'>
     <config name='Console'>console</config>
@@ -18,7 +18,7 @@
       <!-- <blenderplayer executable='path to blenderplayer executable'/> -->
     </system>
     <computer name='Any' hostname='*'>
-      <!-- #### Replace $INSTALL_DIR by your own path towards blenderVR directory #### -->
+      <!-- #### Replace $INSTALL_DIR by your own path towards BlenderVR directory #### -->
         <library path="$INSTALL_DIR/venv/lib/python3.4/site-packages" />
         <library path="$INSTALL_DIR/venv/lib/python3.4/site-packages/websocket_client-0.26.0-py3.4.egg-info" />
     </computer>
@@ -89,4 +89,4 @@
 
   </plugins>
 
-</blenderVR>
+</BlenderVR>
