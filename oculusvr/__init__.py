@@ -86,7 +86,7 @@ class UserString:
     def capitalize(self): return self.__class__(self.data.capitalize())
     def center(self, width, *args):
         return self.__class__(self.data.center(width, *args))
-    def count(self, sub, start=0, end=sys.maxint):
+    def count(self, sub, start=0, end=sys.maxsize):
         return self.data.count(sub, start, end)
     def decode(self, encoding=None, errors=None): # XXX improve this?
         if encoding:
@@ -104,13 +104,13 @@ class UserString:
                 return self.__class__(self.data.encode(encoding))
         else:
             return self.__class__(self.data.encode())
-    def endswith(self, suffix, start=0, end=sys.maxint):
+    def endswith(self, suffix, start=0, end=sys.maxsize):
         return self.data.endswith(suffix, start, end)
     def expandtabs(self, tabsize=8):
         return self.__class__(self.data.expandtabs(tabsize))
-    def find(self, sub, start=0, end=sys.maxint):
+    def find(self, sub, start=0, end=sys.maxsize):
         return self.data.find(sub, start, end)
-    def index(self, sub, start=0, end=sys.maxint):
+    def index(self, sub, start=0, end=sys.maxsize):
         return self.data.index(sub, start, end)
     def isalpha(self): return self.data.isalpha()
     def isalnum(self): return self.data.isalnum()
@@ -130,9 +130,9 @@ class UserString:
         return self.data.partition(sep)
     def replace(self, old, new, maxsplit=-1):
         return self.__class__(self.data.replace(old, new, maxsplit))
-    def rfind(self, sub, start=0, end=sys.maxint):
+    def rfind(self, sub, start=0, end=sys.maxsize):
         return self.data.rfind(sub, start, end)
-    def rindex(self, sub, start=0, end=sys.maxint):
+    def rindex(self, sub, start=0, end=sys.maxsize):
         return self.data.rindex(sub, start, end)
     def rjust(self, width, *args):
         return self.__class__(self.data.rjust(width, *args))
@@ -144,7 +144,7 @@ class UserString:
     def rsplit(self, sep=None, maxsplit=-1):
         return self.data.rsplit(sep, maxsplit)
     def splitlines(self, keepends=0): return self.data.splitlines(keepends)
-    def startswith(self, prefix, start=0, end=sys.maxint):
+    def startswith(self, prefix, start=0, end=sys.maxsize):
         return self.data.startswith(prefix, start, end)
     def strip(self, chars=None): return self.__class__(self.data.strip(chars))
     def swapcase(self): return self.__class__(self.data.swapcase())
@@ -365,7 +365,7 @@ class LibraryLoader(object):
                 return ctypes.CDLL(path, ctypes.RTLD_GLOBAL)
             else:
                 return ctypes.cdll.LoadLibrary(path)
-        except OSError,e:
+        except OSError as e:
             raise ImportError(e)
 
     def getpaths(self,libname):
@@ -1102,28 +1102,28 @@ struct_ovrTexture_._fields_ = [
 ]
 
 ovrTexture = struct_ovrTexture_
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovr_InitializeRenderingShim'):
         continue
     ovr_InitializeRenderingShim = _lib.ovr_InitializeRenderingShim
     ovr_InitializeRenderingShim.argtypes = []
     ovr_InitializeRenderingShim.restype = ovrBool
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovr_Initialize'):
         continue
     ovr_Initialize = _lib.ovr_Initialize
     ovr_Initialize.argtypes = []
     ovr_Initialize.restype = ovrBool
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovr_Shutdown'):
         continue
     ovr_Shutdown = _lib.ovr_Shutdown
     ovr_Shutdown.argtypes = []
     ovr_Shutdown.restype = None
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovr_GetVersionString'):
         continue
     ovr_GetVersionString = _lib.ovr_GetVersionString
@@ -1134,35 +1134,35 @@ for _lib in _libs.itervalues():
         ovr_GetVersionString.restype = String
         ovr_GetVersionString.errcheck = ReturnString
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_Detect'):
         continue
     ovrHmd_Detect = _lib.ovrHmd_Detect
     ovrHmd_Detect.argtypes = []
     ovrHmd_Detect.restype = c_int
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_Create'):
         continue
     ovrHmd_Create = _lib.ovrHmd_Create
     ovrHmd_Create.argtypes = [c_int]
     ovrHmd_Create.restype = ovrHmd
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_Destroy'):
         continue
     ovrHmd_Destroy = _lib.ovrHmd_Destroy
     ovrHmd_Destroy.argtypes = [ovrHmd]
     ovrHmd_Destroy.restype = None
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_CreateDebug'):
         continue
     ovrHmd_CreateDebug = _lib.ovrHmd_CreateDebug
     ovrHmd_CreateDebug.argtypes = [ovrHmdType]
     ovrHmd_CreateDebug.restype = ovrHmd
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_GetLastError'):
         continue
     ovrHmd_GetLastError = _lib.ovrHmd_GetLastError
@@ -1173,91 +1173,91 @@ for _lib in _libs.itervalues():
         ovrHmd_GetLastError.restype = String
         ovrHmd_GetLastError.errcheck = ReturnString
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_AttachToWindow'):
         continue
     ovrHmd_AttachToWindow = _lib.ovrHmd_AttachToWindow
     ovrHmd_AttachToWindow.argtypes = [ovrHmd, c_void_p, POINTER(ovrRecti), POINTER(ovrRecti)]
     ovrHmd_AttachToWindow.restype = ovrBool
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_GetEnabledCaps'):
         continue
     ovrHmd_GetEnabledCaps = _lib.ovrHmd_GetEnabledCaps
     ovrHmd_GetEnabledCaps.argtypes = [ovrHmd]
     ovrHmd_GetEnabledCaps.restype = c_uint
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_SetEnabledCaps'):
         continue
     ovrHmd_SetEnabledCaps = _lib.ovrHmd_SetEnabledCaps
     ovrHmd_SetEnabledCaps.argtypes = [ovrHmd, c_uint]
     ovrHmd_SetEnabledCaps.restype = None
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_ConfigureTracking'):
         continue
     ovrHmd_ConfigureTracking = _lib.ovrHmd_ConfigureTracking
     ovrHmd_ConfigureTracking.argtypes = [ovrHmd, c_uint, c_uint]
     ovrHmd_ConfigureTracking.restype = ovrBool
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_RecenterPose'):
         continue
     ovrHmd_RecenterPose = _lib.ovrHmd_RecenterPose
     ovrHmd_RecenterPose.argtypes = [ovrHmd]
     ovrHmd_RecenterPose.restype = None
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_GetTrackingState'):
         continue
     ovrHmd_GetTrackingState = _lib.ovrHmd_GetTrackingState
     ovrHmd_GetTrackingState.argtypes = [ovrHmd, c_double]
     ovrHmd_GetTrackingState.restype = ovrTrackingState
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_GetFovTextureSize'):
         continue
     ovrHmd_GetFovTextureSize = _lib.ovrHmd_GetFovTextureSize
     ovrHmd_GetFovTextureSize.argtypes = [ovrHmd, ovrEyeType, ovrFovPort, c_float]
     ovrHmd_GetFovTextureSize.restype = ovrSizei
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_ConfigureRendering'):
         continue
     ovrHmd_ConfigureRendering = _lib.ovrHmd_ConfigureRendering
     ovrHmd_ConfigureRendering.argtypes = [ovrHmd, POINTER(ovrRenderAPIConfig), c_uint, ovrFovPort * 2, ovrEyeRenderDesc * 2]
     ovrHmd_ConfigureRendering.restype = ovrBool
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_BeginFrame'):
         continue
     ovrHmd_BeginFrame = _lib.ovrHmd_BeginFrame
     ovrHmd_BeginFrame.argtypes = [ovrHmd, c_uint]
     ovrHmd_BeginFrame.restype = ovrFrameTiming
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_EndFrame'):
         continue
     ovrHmd_EndFrame = _lib.ovrHmd_EndFrame
     ovrHmd_EndFrame.argtypes = [ovrHmd, ovrPosef * 2, ovrTexture * 2]
     ovrHmd_EndFrame.restype = None
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_GetEyePoses'):
         continue
     ovrHmd_GetEyePoses = _lib.ovrHmd_GetEyePoses
     ovrHmd_GetEyePoses.argtypes = [ovrHmd, c_uint, ovrVector3f * 2, ovrPosef * 2, POINTER(ovrTrackingState)]
     ovrHmd_GetEyePoses.restype = None
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_GetHmdPosePerEye'):
         continue
     ovrHmd_GetHmdPosePerEye = _lib.ovrHmd_GetHmdPosePerEye
     ovrHmd_GetHmdPosePerEye.argtypes = [ovrHmd, ovrEyeType]
     ovrHmd_GetHmdPosePerEye.restype = ovrPosef
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_GetRenderDesc'):
         continue
     ovrHmd_GetRenderDesc = _lib.ovrHmd_GetRenderDesc
@@ -1302,112 +1302,112 @@ struct_ovrDistortionMesh_._fields_ = [
 ]
 
 ovrDistortionMesh = struct_ovrDistortionMesh_
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_CreateDistortionMesh'):
         continue
     ovrHmd_CreateDistortionMesh = _lib.ovrHmd_CreateDistortionMesh
     ovrHmd_CreateDistortionMesh.argtypes = [ovrHmd, ovrEyeType, ovrFovPort, c_uint, POINTER(ovrDistortionMesh)]
     ovrHmd_CreateDistortionMesh.restype = ovrBool
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_CreateDistortionMeshDebug'):
         continue
     ovrHmd_CreateDistortionMeshDebug = _lib.ovrHmd_CreateDistortionMeshDebug
     ovrHmd_CreateDistortionMeshDebug.argtypes = [ovrHmd, ovrEyeType, ovrFovPort, c_uint, POINTER(ovrDistortionMesh), c_float]
     ovrHmd_CreateDistortionMeshDebug.restype = ovrBool
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_DestroyDistortionMesh'):
         continue
     ovrHmd_DestroyDistortionMesh = _lib.ovrHmd_DestroyDistortionMesh
     ovrHmd_DestroyDistortionMesh.argtypes = [POINTER(ovrDistortionMesh)]
     ovrHmd_DestroyDistortionMesh.restype = None
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_GetRenderScaleAndOffset'):
         continue
     ovrHmd_GetRenderScaleAndOffset = _lib.ovrHmd_GetRenderScaleAndOffset
     ovrHmd_GetRenderScaleAndOffset.argtypes = [ovrFovPort, ovrSizei, ovrRecti, ovrVector2f * 2]
     ovrHmd_GetRenderScaleAndOffset.restype = None
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_GetFrameTiming'):
         continue
     ovrHmd_GetFrameTiming = _lib.ovrHmd_GetFrameTiming
     ovrHmd_GetFrameTiming.argtypes = [ovrHmd, c_uint]
     ovrHmd_GetFrameTiming.restype = ovrFrameTiming
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_BeginFrameTiming'):
         continue
     ovrHmd_BeginFrameTiming = _lib.ovrHmd_BeginFrameTiming
     ovrHmd_BeginFrameTiming.argtypes = [ovrHmd, c_uint]
     ovrHmd_BeginFrameTiming.restype = ovrFrameTiming
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_EndFrameTiming'):
         continue
     ovrHmd_EndFrameTiming = _lib.ovrHmd_EndFrameTiming
     ovrHmd_EndFrameTiming.argtypes = [ovrHmd]
     ovrHmd_EndFrameTiming.restype = None
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_ResetFrameTiming'):
         continue
     ovrHmd_ResetFrameTiming = _lib.ovrHmd_ResetFrameTiming
     ovrHmd_ResetFrameTiming.argtypes = [ovrHmd, c_uint]
     ovrHmd_ResetFrameTiming.restype = None
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_GetEyeTimewarpMatrices'):
         continue
     ovrHmd_GetEyeTimewarpMatrices = _lib.ovrHmd_GetEyeTimewarpMatrices
     ovrHmd_GetEyeTimewarpMatrices.argtypes = [ovrHmd, ovrEyeType, ovrPosef, ovrMatrix4f * 2]
     ovrHmd_GetEyeTimewarpMatrices.restype = None
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_GetEyeTimewarpMatricesDebug'):
         continue
     ovrHmd_GetEyeTimewarpMatricesDebug = _lib.ovrHmd_GetEyeTimewarpMatricesDebug
     ovrHmd_GetEyeTimewarpMatricesDebug.argtypes = [ovrHmd, ovrEyeType, ovrPosef, ovrMatrix4f * 2, c_double]
     ovrHmd_GetEyeTimewarpMatricesDebug.restype = None
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrMatrix4f_Projection'):
         continue
     ovrMatrix4f_Projection = _lib.ovrMatrix4f_Projection
     ovrMatrix4f_Projection.argtypes = [ovrFovPort, c_float, c_float, ovrBool]
     ovrMatrix4f_Projection.restype = ovrMatrix4f
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrMatrix4f_OrthoSubProjection'):
         continue
     ovrMatrix4f_OrthoSubProjection = _lib.ovrMatrix4f_OrthoSubProjection
     ovrMatrix4f_OrthoSubProjection.argtypes = [ovrMatrix4f, ovrVector2f, c_float, c_float]
     ovrMatrix4f_OrthoSubProjection.restype = ovrMatrix4f
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovr_GetTimeInSeconds'):
         continue
     ovr_GetTimeInSeconds = _lib.ovr_GetTimeInSeconds
     ovr_GetTimeInSeconds.argtypes = []
     ovr_GetTimeInSeconds.restype = c_double
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovr_WaitTillTime'):
         continue
     ovr_WaitTillTime = _lib.ovr_WaitTillTime
     ovr_WaitTillTime.argtypes = [c_double]
     ovr_WaitTillTime.restype = c_double
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_ProcessLatencyTest'):
         continue
     ovrHmd_ProcessLatencyTest = _lib.ovrHmd_ProcessLatencyTest
     ovrHmd_ProcessLatencyTest.argtypes = [ovrHmd, c_ubyte * 3]
     ovrHmd_ProcessLatencyTest.restype = ovrBool
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_GetLatencyTestResult'):
         continue
     ovrHmd_GetLatencyTestResult = _lib.ovrHmd_GetLatencyTestResult
@@ -1418,7 +1418,7 @@ for _lib in _libs.itervalues():
         ovrHmd_GetLatencyTestResult.restype = String
         ovrHmd_GetLatencyTestResult.errcheck = ReturnString
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_GetLatencyTest2DrawColor'):
         continue
     ovrHmd_GetLatencyTest2DrawColor = _lib.ovrHmd_GetLatencyTest2DrawColor
@@ -1440,77 +1440,77 @@ struct_ovrHSWDisplayState_._fields_ = [
 ]
 
 ovrHSWDisplayState = struct_ovrHSWDisplayState_
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_GetHSWDisplayState'):
         continue
     ovrHmd_GetHSWDisplayState = _lib.ovrHmd_GetHSWDisplayState
     ovrHmd_GetHSWDisplayState.argtypes = [ovrHmd, POINTER(ovrHSWDisplayState)]
     ovrHmd_GetHSWDisplayState.restype = None
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_DismissHSWDisplay'):
         continue
     ovrHmd_DismissHSWDisplay = _lib.ovrHmd_DismissHSWDisplay
     ovrHmd_DismissHSWDisplay.argtypes = [ovrHmd]
     ovrHmd_DismissHSWDisplay.restype = ovrBool
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_GetBool'):
         continue
     ovrHmd_GetBool = _lib.ovrHmd_GetBool
     ovrHmd_GetBool.argtypes = [ovrHmd, String, ovrBool]
     ovrHmd_GetBool.restype = ovrBool
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_SetBool'):
         continue
     ovrHmd_SetBool = _lib.ovrHmd_SetBool
     ovrHmd_SetBool.argtypes = [ovrHmd, String, ovrBool]
     ovrHmd_SetBool.restype = ovrBool
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_GetInt'):
         continue
     ovrHmd_GetInt = _lib.ovrHmd_GetInt
     ovrHmd_GetInt.argtypes = [ovrHmd, String, c_int]
     ovrHmd_GetInt.restype = c_int
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_SetInt'):
         continue
     ovrHmd_SetInt = _lib.ovrHmd_SetInt
     ovrHmd_SetInt.argtypes = [ovrHmd, String, c_int]
     ovrHmd_SetInt.restype = ovrBool
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_GetFloat'):
         continue
     ovrHmd_GetFloat = _lib.ovrHmd_GetFloat
     ovrHmd_GetFloat.argtypes = [ovrHmd, String, c_float]
     ovrHmd_GetFloat.restype = c_float
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_SetFloat'):
         continue
     ovrHmd_SetFloat = _lib.ovrHmd_SetFloat
     ovrHmd_SetFloat.argtypes = [ovrHmd, String, c_float]
     ovrHmd_SetFloat.restype = ovrBool
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_GetFloatArray'):
         continue
     ovrHmd_GetFloatArray = _lib.ovrHmd_GetFloatArray
     ovrHmd_GetFloatArray.argtypes = [ovrHmd, String, POINTER(c_float), c_uint]
     ovrHmd_GetFloatArray.restype = c_uint
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_SetFloatArray'):
         continue
     ovrHmd_SetFloatArray = _lib.ovrHmd_SetFloatArray
     ovrHmd_SetFloatArray.argtypes = [ovrHmd, String, POINTER(c_float), c_uint]
     ovrHmd_SetFloatArray.restype = ovrBool
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_GetString'):
         continue
     ovrHmd_GetString = _lib.ovrHmd_GetString
@@ -1521,21 +1521,21 @@ for _lib in _libs.itervalues():
         ovrHmd_GetString.restype = String
         ovrHmd_GetString.errcheck = ReturnString
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_SetString'):
         continue
     ovrHmd_SetString = _lib.ovrHmd_SetString
     ovrHmd_SetString.argtypes = [ovrHmd, String, String]
     ovrHmd_SetString.restype = ovrBool
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_StartPerfLog'):
         continue
     ovrHmd_StartPerfLog = _lib.ovrHmd_StartPerfLog
     ovrHmd_StartPerfLog.argtypes = [ovrHmd, String, String]
     ovrHmd_StartPerfLog.restype = ovrBool
     break
-for _lib in _libs.itervalues():
+for _lib in _libs.values():
     if not hasattr(_lib, 'ovrHmd_StopPerfLog'):
         continue
     ovrHmd_StopPerfLog = _lib.ovrHmd_StopPerfLog
