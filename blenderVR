@@ -134,10 +134,13 @@ if environments.root is not None:
 elif checkRoot(os.path.dirname(os.path.realpath(__file__))):
     root = os.path.dirname(os.path.realpath(__file__))
 else:
-    with open(profile_file, 'rb') as node:
-        configuration = pickle.load(node)
-        if 'root' in configuration:
-            root = configuration['root']
+    try:
+        with open(profile_file, 'rb') as node:
+            configuration = pickle.load(node)
+    except FileNotFoundError:
+        configuration = {}
+    if 'root' in configuration:
+        root = configuration['root']
 
 if not checkRoot(root):
     print('Cannot find blenderVR root !')
@@ -159,13 +162,14 @@ if environments.version:
 # TODO: thinking of adding the global log level inside the configuration
 # First, process the configuration part of the console
 if environments.launch == 'configuration':
-    configuration = None
-    with open(profile_file, 'rb') as node:
-        configuration = pickle.load(node)
+    try:
+        with open(profile_file, 'rb') as node:
+            configuration = pickle.load(node)
+    except FileNotFoundError:
+        configuration = {}
     if environments.display:
         if not configuration:
             print('Empty profile file:', profile_file)
-            configuration = []
         else:
             import pprint
             print("Configuration:")
