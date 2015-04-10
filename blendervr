@@ -138,12 +138,12 @@ if not isValidRoot(root):
 # Modify all scipts environment by inserting a new builtin name.
 builtins.BlenderVR_root = root
 
-# Start main() function from utils/BlenderVR.py module.
+# Start main() function from utils/blendervr.py module.
 try:
     import imp
-    (fileobj, file_name, data) = imp.find_module('BlenderVR',
+    (fileobj, file_name, data) = imp.find_module('console',
                                         [os.path.join(root, 'utils')])
-    module = imp.load_module('BlenderVR', fileobj, file_name, data)
+    module = imp.load_module('console', fileobj, file_name, data)
     module.main()
 except SystemExit:
     pass

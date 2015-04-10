@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# file: utils/BlenderVR.py
+# file: utils/console.py
 
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
@@ -37,10 +37,10 @@
 ##
 
 """
-Blender-VR Console
+BlenderVR Console
 ******************
 
-Blender-VR console mode
+BlenderVR console mode
 """
 
 import sys
