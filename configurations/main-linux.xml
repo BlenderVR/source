@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<BlenderVR>
+<blendervr>
   <!-- Documentation can be found on BlenderVR web site: http://blendervr.limsi.fr/doku.php?id=doc:config -->
 
   <!-- MODIFY ACCORDING TO YOUR OWN PATH -->
@@ -79,4 +79,4 @@
 
   </plugins>
 
-</BlenderVR>
+</blendervr>

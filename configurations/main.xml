@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<BlenderVR>
+<blendervr>
   <!-- Documentation can be found on BlenderVR manual: http://blender-vr-manual.readthedocs.org/components/configuration-file.html -->
 
   <starter>
@@ -87,4 +87,4 @@
 
   </plugins>
 
-</BlenderVR>
+</blendervr>
