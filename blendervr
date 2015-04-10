@@ -151,7 +151,7 @@ except:
     import traceback
     traceback.print_exc()
 
-    print('Unable to load module BlenderVR !')
-    print('Try defining BLENDER_VR_ROOT before launching BlenderVR '
-                '(BLENDER_VR_ROOT=\'path\' ' + sys.argv[0] + ') !')
+    print('Cannot find BlenderVR root !')
+    print('Try adding --BlenderVR-root option to BlenderVR (' + sys.argv[0]
+            + ' --BlenderVR-root="path") !')
     sys.exit()
