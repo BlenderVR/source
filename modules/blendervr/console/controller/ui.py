@@ -107,5 +107,5 @@ class UI(base.Client):
 
     def status(self, command):
         if command == 'simulation':
-            self._client.send('status', composeMessage(command, False))
+            self._client.send('status', composeMessage(command, self.controller.getStatus()))
             return

@@ -87,3 +87,10 @@ class Screens(base.Base):
     def adapt_simulation_files_to_screen(self, loader_file, blender_file, processor_files):
         for name, obj in self._screens.items():
             obj.adapt_simulation_files_to_screen(loader_file, blender_file, processor_files)
+
+    def getStatus(self):
+        status = {}
+        for name, obj in self._screens.items():
+            status[name] = obj.getStatus()
+        return status
+        

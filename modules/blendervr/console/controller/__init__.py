@@ -349,3 +349,6 @@ class Controller(Console):
 
     def addLogMessage(self, message):
         self._logs.addMessage(message)
+
+    def getStatus(self):
+        return self._screens.getStatus()

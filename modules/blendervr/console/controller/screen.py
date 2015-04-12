@@ -53,6 +53,7 @@ class Screen(base.Base):
 
         self._clients = {'daemon': None,
                          'player': None}
+        self._status = 'stopped'
 
     def __del__(self):
         self.kill()
@@ -204,8 +205,7 @@ class Screen(base.Base):
 
 ###########################################################
     #  Misc
-    def adapt_simulation_files_to_screen(self, loader_file, blender_file,
-                                                            processor_files):
+    def adapt_simulation_files_to_screen(self, loader_file, blender_file, processor_files):
         self._loader_file = loader_file.unstrip(self._anchor)
         self._blender_file = blender_file.unstrip(self._anchor)
         self._processor_files = []
@@ -230,3 +230,6 @@ class Screen(base.Base):
             self.send_to_blenderplayer('log_file', self._log_file)
         else:
             self.send_to_blenderplayer('log_file', '')
+
+    def getStatus(self):
+        return self._status
