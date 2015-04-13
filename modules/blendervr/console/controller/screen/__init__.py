@@ -36,7 +36,7 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
-from . import base
+from .. import base
 import os
 import copy
 import subprocess
@@ -232,4 +232,6 @@ class Screen(base.Base):
             self.send_to_blenderplayer('log_file', '')
 
     def getStatus(self):
-        return self._status
+        if self._clients['player'] is not None:
+            return self._clients['player'].getStatus()
+        return 'stopped'

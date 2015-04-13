@@ -43,7 +43,10 @@ import sys
 class Status(Command):
     def __init__(self, connection):
         Command.__init__(self, connection)
+        self._default = self.simulation
         
     def simulation(self):
         return self.ask('status', 'simulation', True)
         
+    def configuration(self):
+        return self.ask('status', 'configuration', True)

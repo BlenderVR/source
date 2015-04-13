@@ -109,3 +109,7 @@ class UI(base.Client):
         if command == 'simulation':
             self._client.send('status', composeMessage(command, self.controller.getStatus()))
             return
+
+        if command == 'configuration':
+            self._client.send('status', composeMessage(command, self.profile.getWhole()))
+            return

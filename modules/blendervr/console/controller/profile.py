@@ -56,6 +56,9 @@ class Profile:
     def lock(self, lock):
         self._lock = lock
 
+    def getWhole(self):
+        return self._data
+        
     def dump(self):
         import pprint
         pprint.pprint(self._data)

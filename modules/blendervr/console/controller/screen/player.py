@@ -36,19 +36,22 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
-from . import base
+from .. import base
 import sys
 
 class Player(base.Client):
     def __init__(self, parent, client):
         base.Client.__init__(self, parent, client)
+        self._status = 'stopped'
 
+    def getStatus(self):
+        return self._status
+        
     def getName(self):
         return self._client.getName()
         
     def cb_connect(self):
-        return
-        self.logger.debug('Connexion of a player:', self._client)
+        self._status = 'starting'
 
     def cb_data(self):
         result = self._client.receive()
@@ -56,8 +59,13 @@ class Player(base.Client):
             command, argument = result
             if command == 'logger':
                 self.controller.addLogMessage(argument)
-            return
+                return
+            if command == 'running':
+                self._status = 'running'
+                return
 
     def cb_disconnect(self):
-        return
-        self.logger.debug('Disconnexion of a player:', self._client)
+        self._status = 'stopped'
+
+    def getStatus(self):
+        return self._status

@@ -36,17 +36,19 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
-from . import base
+from .. import base
 import sys
 
 class Daemon(base.Client):
     def __init__(self, parent, client):
         base.Client.__init__(self, parent, client)
+        self._status = 'stopped'
 
     def getName(self):
         return self._client.getName()
         
     def cb_connect(self):
+        self._status = 'started'
         return
         self.logger.debug('Connexion of a daemon:', self._client)
 
@@ -56,8 +58,12 @@ class Daemon(base.Client):
             command, argument = result
             if command == 'logger':
                 self.controller.addLogMessage(argument)
-            return
+                return
+            if command == 'forked':
+                self._status = 'forked'
+                return
 
     def cb_disconnect(self):
+        self._status = 'stopped'
         return
         self.logger.debug('Disconnexion of a daemon:', self._client)

@@ -218,7 +218,7 @@ def start(windowed, options):
         sys.exit()
     return process
 
-if environments.launch == 'all':
+if environments.launch == 'all' or environments.launch == None:
     environment = os.environ
     if 'PYTHONPATH' in environment:
         if moduleRoot not in environment['PYTHONPATH']:

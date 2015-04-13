@@ -37,9 +37,9 @@ import os
 import sys
 import subprocess
 from . import ui
-from . import daemon
 from . import logger
-from . import player
+from .screen import player
+from .screen import daemon
 from .. import Console
 from ...tools import logger as tools_logger
 
