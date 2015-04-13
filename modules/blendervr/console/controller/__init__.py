@@ -210,24 +210,28 @@ class Controller(Console):
             userInterface = ui.UI(self, client)
             self._uis.append(userInterface)
             return userInterface
-        if type == 'daemon':
-            daemonClient = daemon.Daemon(self, client)
-            self._screens.appendClient(daemonClient)
-            return daemonClient
         if type == 'logger':
             loggerClient = logger.Logger(self, client)
             self._loggers.append(loggerClient)
             return loggerClient
-        if type == 'player':
-            playerClient = player.Player(self, client)
-            self._screens.appendClient(playerClient)
-            return playerClient
+        if type == 'daemon' or type == 'player':
+            if type == 'daemon':
+                screenClient = daemon.Daemon(self, client)
+            else:
+                screenClient = player.Player(self, client)
+            self._screens.appendClient(screenClient)
+            return screenClient
         self.logger.error('Cannot understand client type :', type)
 
     def _delete_client(self, client):
         if client in self._uis:
             self._uis.remove(client)
             return
+        if client in self._loggers:
+            self._loggers.remove(client)
+            return
+        if isinstance(client, daemon.Daemon) or isinstance(client, player.Player):
+            self._screens.removeClient(client)
 
     def configuration(self):
         """

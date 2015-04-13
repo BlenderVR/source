@@ -199,6 +199,18 @@ class Screen(base.Base):
                 client.send(field, getattr(self, '_' + field))
             client.send('base configuration ending')
 
+    def removeClient(self, client):
+        if client == self._clients['daemon']:
+            self._clients['daemon'].kill()
+            self._clients['daemon'] = None
+            self.logger.debug('Remove daemon client ...')
+        elif client == self._clients['player']:
+            self._clients['player'].kill()
+            self._clients['player'] = None
+            self.logger.debug('Remove player client ...')
+        else:
+            self.logger.error('Cannot remove unknown network client ...')
+
     def _cannot_start_daemon(self):
         self._process = None
         self.logger.warning("Cannot start daemon for screen '" + self._name)

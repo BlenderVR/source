@@ -167,7 +167,7 @@ class Daemon:
         elif command == 'log_to_clear':
             self._log_to_clear = argument
         elif command == 'state':
-            if argument:
+            if argument == 'start':
                 try:
                     import compileall
                     compileall.compile_dir(os.path.join(blenderVR_modules,
@@ -175,7 +175,7 @@ class Daemon:
                 except:
                     pass
                 self._start_blender_player()
-            else:
+            if argument == 'stop':
                 self._stop_blender_player()
         elif command == 'loader_file':
             dirname = os.path.dirname(argument)

@@ -80,6 +80,11 @@ class Screens(base.Base):
         if name in self._screens:
             self._screens[name].appendClient(client)
 
+    def removeClient(self, client):
+        name = client.getName()
+        if name in self._screens:
+            self._screens[name].removeClient(client)
+
     def runAction(self, action, element):
         for name, obj in self._screens.items():
             obj.runAction(action, element)
