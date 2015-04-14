@@ -45,13 +45,14 @@ class OculusDK2(base.Base):
         super(OculusDK2, self).__init__(parent)
 
         self._devices = []
+        self.checkLibraryPath()
 
         try:
-            from websocket import create_connection
-            assert(create_connection)
+            from oculusvr import Hmd
+            assert(Hmd)
 
         except ImportError:
-            self.logger.info('Oculus DK2 plugin error: no websocket module available. Please refer to the BlenderVR documentation')
+            self.logger.info('Oculus DK2 plugin error: no \"oculusvr\" module available. Make sure you have the projec submodules. Please refer to the BlenderVR documentation')
             self._available = False
             return
 
@@ -100,3 +101,15 @@ class OculusDK2(base.Base):
                 del device
 
         return True
+
+    def checkLibraryPath(self):
+        """if library exists append it to sys.path"""
+        import sys
+        import os
+        from .... import tools
+
+        libs_path = tools.getLibsPath()
+        oculus_path = os.path.join(libs_path, "python-ovrsdk")
+
+        if oculus_path not in sys.path:
+            sys.path.append(oculus_path)

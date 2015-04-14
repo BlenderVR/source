@@ -36,6 +36,7 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
+from .. import base
 from ....player import device
 
 
@@ -44,24 +45,21 @@ class User(device.Sender):
         _configuration = configuration.copy()
         _configuration['users'] = _configuration['viewer']
 
-        self._websocket = None
+        self._oculus = Oculus(parent)
         self._matrix = None
 
         super(User, self).__init__(parent, _configuration)
         self._viewer = self.BlenderVR.getUserByName(configuration['viewer'])
-        self._host = configuration['host']
-
         self._available = True
 
-        # TODO, check if host is a valid one
-
     def run(self):
-        try:
-            self._updateMatrix()
-            info = {'matrix' : self._matrix}
-            self.process(info)
-        except Exception as err:
-            self.logger.log_traceback(err)
+        if self._available:
+            try:
+                self._updateMatrix()
+                info = {'matrix' : self._matrix}
+                self.process(info)
+            except Exception as err:
+                self.logger.log_traceback(err)
 
     def getName(self):
         return self._viewer.getName()
@@ -73,33 +71,78 @@ class User(device.Sender):
         return self._available
 
     def start(self):
+        from mathutils import Matrix
         try:
-            from websocket import create_connection
-            from mathutils import Matrix
-
-            self._websocket = create_connection("ws://{0}:8888/".format(self._host))
             self._matrix = Matrix.Identity(4)
-
-        except Exception as err:
-            self.logger.log_traceback(err)
+            self._oculus.start()
+        except Exception:
+            self._available = False
 
     def _updateMatrix(self):
         from mathutils import Quaternion, Matrix
-        import json
 
         try:
-            self._websocket.send('n')
-            result = json.loads(self._websocket.recv())
-
-            self._matrix = Quaternion((result[7],
-                                       result[4],
-                                       result[5],
-                                       result[6])).to_matrix().to_4x4()
-
-            position = Matrix.Translation((result[1], result[2], result[3]))
-            self._matrix = position * self._matrix
-
-            self._matrix.invert()
-
+            matrix = self._oculus.getMatrix()
+            if matrix:
+                self._matrix = matrix
         except Exception as err:
             self.logger.log_traceback(err)
+
+
+class Oculus(base.Base):
+    def __init__(self, parent):
+        super(Oculus, self).__init__(parent)
+
+        self._hmd = None
+        self._description = None
+
+    def start(self):
+        from oculusvr import (
+                Hmd,
+                cast,
+                POINTER,
+                )
+
+        try:
+            Hmd.initialize()
+        except SystemError as err:
+            self.logger.error("Oculus initialization failed, check the physical connections and run again")
+
+        if Hmd.detect() == 1:
+            self._hmd = Hmd()
+            self._description = cast(self._hmd.hmd, POINTER(ovrHmdDesc)).contents
+            self._frame = 0
+            self._eye_offset = [ [0.0, 0.0, 0.0], [0.0, 0.0, 0.0] ]
+            self._hmd.configure_tracking()
+
+            self.logger.info(self._description.ProductName)
+
+        else:
+            self.logger.error("Oculus not connected")
+            raise Exception
+
+    def getMatrix(self):
+        from mathutils import (
+                Quaternion,
+                Matrix,
+                )
+
+        if self._hmd and Hmd.detect() == 1:
+            self_frame += 1
+
+            poses = self._hmd.get_eye_poses(self._frame, self._eyes_offset)
+
+            # oculus may be returning the matrix for both eyes
+            # but we are using a single eye without offset
+
+            rotation_raw = poses[0].Orientation.toList()
+            position_raw = poses[0].Position.toList()
+
+            rotation = Quaternion(rotation_raw).to_matrix().to_4x4()
+            position = Matrix.Translation(position_raw)
+
+            matrix = position * rotation
+            matrix.invert()
+
+            return matrix
+        return None
