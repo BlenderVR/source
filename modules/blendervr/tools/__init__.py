@@ -55,3 +55,10 @@ def getRootPath():
     import os
     # hardcoded: returns the folder 3 levels up from this (//modules/blendervr/tools)
     return os.path.dirname(os.path.dirname(os.path.dirname(getModulePath())))
+
+
+def getLibsPath():
+    """The path for the external libs"""
+    import os
+    root_path = getRootPath()
+    return os.path.join(root_path, "libs")
