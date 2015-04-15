@@ -101,6 +101,8 @@ class Oculus(base.Base):
                 Hmd,
                 cast,
                 POINTER,
+                ovrHmdDesc,
+                ovrVector3f,
                 )
 
         try:
@@ -112,9 +114,11 @@ class Oculus(base.Base):
             self._hmd = Hmd()
             self._description = cast(self._hmd.hmd, POINTER(ovrHmdDesc)).contents
             self._frame = 0
-            self._eye_offset = [ [0.0, 0.0, 0.0], [0.0, 0.0, 0.0] ]
-            self._hmd.configure_tracking()
+            self._eyes_offset = [ ovrVector3f(), ovrVector3f() ]
+            self._eyes_offset[0] = 0.0, 0.0, 0.0
+            self._eyes_offset[1] = 0.0, 0.0, 0.0
 
+            self._hmd.configure_tracking()
             self.logger.info(self._description.ProductName)
 
         else:
