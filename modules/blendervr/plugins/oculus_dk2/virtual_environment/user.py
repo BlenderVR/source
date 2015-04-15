@@ -122,13 +122,14 @@ class Oculus(base.Base):
             raise Exception
 
     def getMatrix(self):
+        from oculusvr import Hmd
         from mathutils import (
                 Quaternion,
                 Matrix,
                 )
 
         if self._hmd and Hmd.detect() == 1:
-            self_frame += 1
+            self._frame += 1
 
             poses = self._hmd.get_eye_poses(self._frame, self._eyes_offset)
 
