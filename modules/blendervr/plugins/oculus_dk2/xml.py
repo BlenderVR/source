@@ -63,11 +63,12 @@ class XML(xml.XML):
 class User(xml.mono):
     def __init__(self, parent, name, attrs):
         super(User, self).__init__(parent, name, attrs)
-        self._attribute_list += ['viewer', 'processor_method', 'host']
+        self._attribute_list += ['viewer', 'processor_method', 'computer']
 
-        if 'viewer' not in attrs:
-            self.raise_error('Oculus DK2 User must have a viewer. And optionally a "processor_method" and a "host")!')
+        if 'viewer' not in attrs or \
+           'computer' not in attrs:
+            self.raise_error('Oculus DK2 User must have a viewer and a computer (and optionally a processor_method)!')
 
         self._viewer = attrs.get('viewer')
-        self._host = attrs.get('host', '127.0.0.1')
+        self._computer = attrs.get('computer')
         self._processor_method = attrs.get('processor_method', 'user_position')
