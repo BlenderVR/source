@@ -1,0 +1,3 @@
+[submodule "libs/python-ovrsdk"]
+	path = libs/python-ovrsdk
+	url = https://github.com/BlenderVR/python-ovrsdk.git

@@ -57,6 +57,12 @@ if is_virtual_environment():
 
             self._main = None
 
+        def setupMain(self, master_only):
+            """setup the plugin if it runs in master only"""
+            if not master_only or self.BlenderVR.isMaster():
+                self.run = self._main.run
+                self._main.start()
+
         def setConfiguration(self, configuration):
             pass
 

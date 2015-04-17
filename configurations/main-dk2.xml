@@ -18,9 +18,6 @@
       <!-- <blenderplayer executable='path to blenderplayer executable'/> -->
     </system>
     <computer name='Any' hostname='*'>
-      <!-- #### Replace $INSTALL_DIR by your own path towards BlenderVR directory #### -->
-        <library path="$INSTALL_DIR/venv/lib/python3.4/site-packages" />
-        <library path="$INSTALL_DIR/venv/lib/python3.4/site-packages/websocket_client-0.26.0-py3.4.egg-info" />
     </computer>
 
   </computers>
@@ -84,7 +81,7 @@
   <plugins>
 
     <oculus_dk2>
-      <user host="localhost" processor_method="user_position" viewer='user A' computer='Right'/>
+      <user processor_method="user_position" viewer='user A' computer='Any' />
     </oculus_dk2>
 
   </plugins>

@@ -40,7 +40,7 @@
 Oculus Rift Plugin
 *******************
 
-This script instantiates the Oculus Rift plugin
+This script instantiates the Oculus DK2 plugin
 """
 
 from .. import *
@@ -58,8 +58,7 @@ if base.is_virtual_environment():
         def start(self):
             if not hasattr(self, '_main') or not self._main.checkMethods():
                 raise exceptions.PluginError()
-            self.run = self._main.run
-            self._main.start()
+            self.setupMain(False)
 
 elif base.is_console():
     class Base(base.Base):
