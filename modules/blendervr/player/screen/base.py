@@ -62,6 +62,7 @@ class Base(base.Base):
         buffers = configuration['graphic_buffer']
         self._buffers = {}
         self._users = []
+
         for information in buffers:
             user = self.BlenderVR.getUserByName(information['user'])
             if user not in self._users:
@@ -90,9 +91,30 @@ class Base(base.Base):
         return None
 
     def start(self):
-        pass
+        scene = bge.logic.getCurrentScene()
+        scene.pre_draw_setup.append(self._preDrawSetup)
+        scene.pre_draw.append(self._preDraw)
 
-    def run(self):
+        # the start() function is called from a pre_draw_setup callback
+        # which means the pre_draw callbacks are still to be called
+        # to prevent an error in the first run we manually call _PreDrawSetup()
+        self._preDrawSetup()
+
+    def _preDrawSetup(self):
+        scene = bge.logic.getCurrentScene()
+        camera = scene.active_camera
+
+        self._camera = camera
+        self._worldPosition = camera.worldPosition.copy()
+        self._worldOrientation = camera.worldOrientation.copy()
+
+        self._run()
+
+    def _preDraw(self):
+        self._camera.worldPosition = self._worldPosition
+        self._camera.worldOrientation = self._worldOrientation
+
+    def _run(self):
         try:
             # Force the window to keep the focus by setting mouse position
             # in the middle of the window ...
@@ -200,24 +222,10 @@ class Base(base.Base):
 
         return result
 
-    def _setModelViewMatrix(self, camera, matrix):
-        from bgl import (
-                Buffer,
-                GL_FLOAT,
-                GL_MODELVIEW,
-                glMatrixMode,
-                glLoadMatrixf,
-                )
+    def _setModelViewMatrix(self, matrix):
+        matrix.invert()
+        self._camera.worldPosition = matrix.translation
+        self._camera.worldOrientation = matrix.to_quaternion()
 
-        matrix *= camera.modelview_matrix
-        buf = Buffer(GL_FLOAT, [4, 4])
-        for i in range(4):
-            for j in range(4):
-                # transposed
-                buf[i][j] = matrix[j][i]
-
-        glMatrixMode(GL_MODELVIEW)
-        glLoadMatrixf(buf)
-
-    def _setProjectionMatrix(self, camera, matrix):
-        camera.projection_matrix = matrix
+    def _setProjectionMatrix(self, matrix):
+        self._camera.projection_matrix = matrix

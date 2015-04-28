@@ -54,7 +54,7 @@ if not is_virtual_environment():
     sys.exit()
 
 import bge
-
+LEFT_EYE = bge.render.LEFT_EYE
 
 class Main:
 
@@ -223,7 +223,7 @@ class Main:
             self._screen.start()
 
             self.run = lambda *args: None
-            self._scene.pre_draw.append(self.wait_for_everybody)
+            self._scene.pre_draw_setup.append(self.wait_for_everybody)
 
         except exceptions.Common as error:
             self.logger.error(error)
@@ -254,13 +254,15 @@ class Main:
             self._controller.run()
             self._connector.wait_for_everybody()
             if self._connector.isReady():
-                self._previous_pre_draw = True
-                self._scene.pre_draw.remove(self.wait_for_everybody)
+                self._previous_pre_draw_setup = True
+                self._scene.pre_draw_setup.remove(self.wait_for_everybody)
                 if self.isMaster():
                     self.run = self._run_master
                 else:
                     self.run = self._run_slave
-                self._scene.pre_draw.append(self._pre_draw)
+
+                # this has to be preppended so the screen pre_draw_setup callback runs afterwards
+                self._scene.pre_draw_setup.insert(0, self._pre_draw_setup)
                 self._startSimulation()
         except SystemExit:
             pass
@@ -269,9 +271,11 @@ class Main:
 
     def _run_master(self):
         # Ensure that run is call only once per frame ...
-        if not self._previous_pre_draw:
+        if not self._previous_pre_draw_setup:
             return
-        self._previous_pre_draw = False
+
+        self._previous_pre_draw_setup = False
+
         try:
             self._processor.run()
             self._keyboardAndMouse.run()
@@ -291,19 +295,29 @@ class Main:
         except:
             self.stopDueToError()
 
-    def _pre_draw(self):
+    def _pre_draw_setup(self):
+        """
+        runs before scene culling
+        runs only once per frame
+        """
+
+        if bge.render.getStereoEye() != LEFT_EYE:
+            return
+
         try:
             self._controller.run()
             self._connector.run()
             self._plugin_hook('run')
-            self._screen.run()
             self._connector.endFrame()
             self._connector.barrier()
+
         except SystemExit:
             pass
+
         except:
             self.stopDueToError()
-        self._previous_pre_draw = True
+
+        self._previous_pre_draw_setup = True
 
     def getComputerName(self):
         return self._computer_name
@@ -422,9 +436,9 @@ class Main:
     def _stopAll(self):
         """Internal stop: do not use"""
         self.run = lambda *args: None
-        if hasattr(self, '_pre_draw') and \
-                            self._pre_draw in self._scene.pre_draw:
-            self._scene.pre_draw.remove(self._pre_draw)
+        if hasattr(self, '_pre_draw_setup') and \
+                            self._pre_draw_setup in self._scene.pre_draw_setup:
+            self._scene.pre_draw_setup.remove(self._pre_draw_setup)
 
     def _suspendResumeInternal(self):
         """Internal method to pause and resume the scene"""

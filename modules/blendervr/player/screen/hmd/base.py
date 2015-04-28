@@ -135,6 +135,5 @@ class Device(base.Base):
             screen_configuration['fromScreensOriginToLocalScreen'] \
             * user.getPosition() * user.getVehiclePosition()
 
-        self._setModelViewMatrix(camera, mathutils.Matrix.Translation(
-                                 viewPointPositionInScreenReferenceFrame) * screen_position)
-        self._setProjectionMatrix(camera, projection_matrix)
+        self._setModelViewMatrix((mathutils.Matrix.Translation(viewPointPositionInScreenReferenceFrame) * screen_position) * camera.modelview_matrix)
+        self._setProjectionMatrix(projection_matrix)

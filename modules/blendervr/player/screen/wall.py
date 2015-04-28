@@ -124,6 +124,6 @@ class Device(base.Base):
         projection_matrix[3][2] = - 1.0
         projection_matrix[3][3] = 0.0
 
-        self._setModelViewMatrix(camera, user.getVehiclePosition())
-        self._setProjectionMatrix(camera, projection_matrix * \
+        self._setModelViewMatrix(user.getVehiclePosition() * camera.modelview_matrix)
+        self._setProjectionMatrix(projection_matrix * \
                 from_vehicule_to_eye_by_screen * scaleToApplyToTheScene)
