@@ -67,6 +67,8 @@ class Creator:
     def process(self):
         if is_creating_loader():
             import bpy
+            from math import radians
+
             bpy.ops.wm.open_mainfile(filepath=self._input_blender_file)
 
             scene = bpy.context.scene
@@ -79,6 +81,9 @@ class Creator:
 
             if camera:
                 scene.objects.active = camera
+
+                camera.location = 0, 0, 0
+                camera.rotation_euler = radians(90), 0, 0
 
                 SENSOR = ELEMENTS_MAIN_PREFIX + 'Sensor'
                 bpy.ops.logic.sensor_add(type='ALWAYS', name=SENSOR)

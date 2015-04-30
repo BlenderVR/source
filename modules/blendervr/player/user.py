@@ -55,8 +55,10 @@ class User(Base):
         self._eye_separation = config['behavior']['eye_separation']
         self._default_position = mathutils.Matrix.Translation(
                             (config['behavior']['default_position']))
+        self._default_rotation = mathutils.Euler(
+                            (config['behavior']['default_rotation']))
 
-        self._position = self._default_position
+        self._position = self._default_position * self._default_rotation.to_matrix().to_4x4()
         self._vehicle_position = mathutils.Matrix()
 
         self._previous = {'user_position': 0,
