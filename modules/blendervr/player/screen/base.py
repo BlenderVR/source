@@ -95,6 +95,10 @@ class Base(base.Base):
         scene.pre_draw_setup.append(self._preDrawSetup)
         scene.pre_draw.append(self._preDraw)
 
+        # we need to nullify Blender's own attempt of creating
+        # its own shifted modelview matrix
+        bge.render.setEyeSeparation(0.0)
+
         # the start() function is called from a pre_draw_setup callback
         # which means the pre_draw callbacks are still to be called
         # to prevent an error in the first run we manually call _PreDrawSetup()
