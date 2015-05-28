@@ -58,7 +58,7 @@ class Device(base.Base):
     def _updateMatrixForBuffer(self, bufferName, camera, depth):
 
         user = self._buffers[bufferName]['user']
-        scale = self.BlenderVR.getScale()
+        vehicle_scale = self.BlenderVR.getScale()
 
         # Then, we transfer from the Camera referenceFrame (ie. : vehicle one)
         # to local screen reference frame
@@ -89,8 +89,8 @@ class Device(base.Base):
 
         viewPointPositionInScreenReferenceFrame = (eye_position[0], eye_position[1], head_position[2])
 
-        nearVal = camera.near * scale
-        farVal = camera.far * scale
+        nearVal = camera.near
+        farVal = camera.far
 
         horizontalShifting = viewPointPositionInScreenReferenceFrame[0]
         verticalShifting = viewPointPositionInScreenReferenceFrame[1]
@@ -124,7 +124,7 @@ class Device(base.Base):
         projection_matrix[3][3] = 0.0
 
         world_translation = Matrix.Translation(camera.worldPosition)
-        modelview_matrix = world_translation * Matrix.Translation((horizontalShifting, verticalShifting, depthShifting) * scale)
+        modelview_matrix = world_translation * Matrix.Translation(Vector((horizontalShifting, verticalShifting, depthShifting)) * vehicle_scale)
         modelview_matrix = user.getVehiclePosition() * modelview_matrix
         modelview_matrix.invert()
 
