@@ -90,6 +90,7 @@ class Creator:
                 controller = camera.game.controllers.get(CONTROLLER)
                 controller.mode = 'MODULE'
                 controller.module = 'blendervr.run'
+                controller.use_priority = True
 
                 ACTUATOR = ELEMENTS_MAIN_PREFIX + 'OculusDK2:Filter'
                 bpy.ops.logic.actuator_add(type='FILTER_2D', name=ACTUATOR)
