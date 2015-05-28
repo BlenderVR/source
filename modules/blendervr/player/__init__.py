@@ -378,12 +378,15 @@ class Main:
         In such case, you can check with this method"""
         return self._connector.isMaster()
 
-    def getScale(self):
+    @property
+    def scale(self):
         """Get the scale between the virtual World and the Vehicule"""
         return self._scale
 
-    def setScale(self, value):
-        self._scale = value
+    @scale.setter
+    def scale(self, scale):
+        """Set the scale between the virtual World and the Vehicule"""
+        self._scale = scale
 
     def isPaused(self):
         if len(self._paused) > 0:

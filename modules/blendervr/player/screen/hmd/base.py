@@ -73,7 +73,7 @@ class Device(base.Base):
 
     def _updateMatrixForBuffer(self, bufferName, camera, depth):
 
-        scale = self.BlenderVR.getScale()
+        scale = self.BlenderVR.scale
         user = self._buffers[bufferName]['user']
 
         screen_configuration = self._screens_informations[bufferName]

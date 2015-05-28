@@ -58,7 +58,7 @@ class Device(base.Base):
     def _updateMatrixForBuffer(self, bufferName, camera, depth):
 
         user = self._buffers[bufferName]['user']
-        vehicle_scale = self.BlenderVR.getScale()
+        vehicle_scale = self.BlenderVR.scale
 
         # Then, we transfer from the Camera referenceFrame (ie. : vehicle one)
         # to local screen reference frame
