@@ -65,6 +65,7 @@ class Main:
         """ Constructor : load all necessary elements """
         self.run = lambda *args: None
         self._scene = bge.logic.getCurrentScene()
+        self._scale = 1
 
         self._is_stereo = ('-s' in sys.argv)
 
@@ -378,11 +379,11 @@ class Main:
         return self._connector.isMaster()
 
     def getScale(self):
-        """Get the scale between the virtual World and the Vehicule
+        """Get the scale between the virtual World and the Vehicule"""
+        return self._scale
 
-        This method always return 1 for the moment: we have to improve the
-        scale management !"""
-        return 1
+    def setScale(self, value):
+        self._scale = value
 
     def isPaused(self):
         if len(self._paused) > 0:
