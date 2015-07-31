@@ -89,12 +89,12 @@ class Sender(Base):
         processor = self.BlenderVR.getProcessor()
         if not hasattr(processor, self._processor_method_name):
             if display_missing:
-                self.logger.warning('processor does not have "'
+                self.logger.warning('current processor does not have "'
                                     + self._processor_method_name
                                     + '" method')
             return False
         if display_missing:
-            self.logger.info('using processor method: "'
+            self.logger.info('using default processor method: "'
                              + self._processor_method_name + '"')
         self._processor_method = getattr(processor, self._processor_method_name)
         return True
