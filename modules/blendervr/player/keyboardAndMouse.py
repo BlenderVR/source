@@ -58,7 +58,10 @@ class KeyboardAndMouse(device.Sender):
         super(KeyboardAndMouse, self).__init__(parent,
                                 {'processor_method': 'keyboardAndMouse'})
         # Backup the data
-        self._keyboard = copy.copy(bge.logic.keyboard.events)
+        # self._keyboard = copy.copy(bge.logic.keyboard.events)
+        # active_events = bge.logic.keyboard.active_events
+        # self.logger.debug('keyboard',self._keyboard)
+        # self.logger.debug('active',active_events)
         self._mouse_events = None
         self._mouse_position = None
         self._screen = None
@@ -91,17 +94,13 @@ class KeyboardAndMouse(device.Sender):
             self.process(screen)
 
         # Processing keyboard !
-        keyboard = bge.logic.keyboard.events
-        if self._keyboard != keyboard:
-
-            for key in keyboard.keys():
-                if keyboard[key] != self._keyboard[key]:
+        active_events = bge.logic.keyboard.active_events
+        if active_events:
+            for key in active_events.keys():
                     info = {'key': key,
-                            'state': KeyboardAndMouse._getState(keyboard[key]),
+                            'state': KeyboardAndMouse._getState(active_events[key]),
                             'time': now}
                     self.process(info)
-
-            self._keyboard = copy.copy(keyboard)
 
         # Processing mouse !
         mouse_events = bge.logic.mouse.events

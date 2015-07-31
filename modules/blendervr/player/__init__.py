@@ -206,7 +206,7 @@ class Main:
                 raise
 
             if hasattr(self, '_keyboardAndMouse') and\
-                         not self._keyboardAndMouse.checkMethod(False):
+                         not self._keyboardAndMouse.checkMethod(True):
                 del(self._keyboardAndMouse)
 
             self._splash.setMessage("Waiting for all slaves !")
@@ -279,7 +279,8 @@ class Main:
 
         try:
             self._processor.run()
-            self._keyboardAndMouse.run()
+            if hasattr(self, '_keyboardAndMouse'):
+                self._keyboardAndMouse.run()
         except SystemExit:
             pass
         except:
