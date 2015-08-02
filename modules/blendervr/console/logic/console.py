@@ -41,7 +41,7 @@ import os
 from .. import exceptions
 from ...tools import protocol
 import copy
-#import select
+from collections import OrderedDict
 import sys
 import subprocess
 
@@ -101,7 +101,8 @@ class Logic:
             self._anchor = starter['anchor']
             self._screenSets = starter['configs']
             self._blender_exe = starter['blender']
-            possibleScreenSets = list(self._screenSets.keys())
+            # pass an OrderedDict to possibleScreeSets to keep config order in console menu
+            possibleScreenSets = list(OrderedDict(sorted(self._screenSets.items())).keys())
 
             self._common_processors = self._configuration['processors']
 
