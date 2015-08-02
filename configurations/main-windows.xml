@@ -4,8 +4,8 @@
 
   <!-- MODIFY ACCORDING TO YOUR OWN PATH -->
   <starter blender='D:/My/BlenderVRBuild/blender/blender.exe'>
-    <config name='split'>console half left, console half right</config>
     <config name='console'>console</config>
+    <config name='split'>console half left, console half right</config>
   </starter>
 
   <users>

@@ -4,8 +4,9 @@
 
   <starter>
   <!-- <starter blender='path to blender executable'> -->
-    <config name='split'>console half left, console half right</config>
-    <config name='console'>console</config>
+    <!-- configs are displayed in alphabetical order in console-->
+    <config name='1 console'>console</config>
+    <config name='2 split'>console half left, console half right</config>
   </starter>
 
   <users>
