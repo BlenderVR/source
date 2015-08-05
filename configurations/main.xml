@@ -10,7 +10,13 @@
   </starter>
 
   <users>
+    <!-- if not defined, default eye_separation is 0.06 (meter) -->
+    <behavior eye_separation='0.06'>
+      <!-- if not defined, default position is 0.0, 0.0, 0.0 -->
+      <default_position>0.0, 0.0, 0.0</default_position>
+    </behavior>
     <user name="user A"/>
+    <!-- <user name="user B"/> -->
   </users>
 
   <computers>
