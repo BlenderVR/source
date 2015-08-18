@@ -116,7 +116,9 @@ class OSC(bc_base.Base):
 
     def getObject(self, obj):
         """
-        Instantiate/Access OSC_Object attached to a KX_GameObject, return OSC_Object
+        Instantiate/Access OSC_Object attached to a KX_GameObject, return OSC_Object.
+        Return None if the maximum number of instantiated sound objects has been reached
+        (defined in configuration file).
 
         :param obj: KX_GameObject in the scene
         :type obj: KX_GameObject
@@ -124,6 +126,10 @@ class OSC(bc_base.Base):
         id_obj = id(obj)
         if id_obj in self._objects:
             return self._objects[id_obj]
+        max_audio_objects = int(self._global._commands['max_audio_objects']['value'])
+        if len(self._objects) == max_audio_objects: # if self._objects dictionary already contains as much osc objects as defined in the Sound Rendering Engine
+            self.logger.error('Reached maximum number of audio object ({0}). Release some (using <osc_object>.release(True)) or increase max_audio_objects in configuration file'.format(max_audio_objects))
+            return None
         self._objects[id_obj] = object.Object(self, obj)
         return self._objects[id_obj]
 
