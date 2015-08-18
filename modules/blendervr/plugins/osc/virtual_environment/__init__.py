@@ -50,12 +50,16 @@ class OSC(bc_base.Base):
         self._global = base.Base(self, 'global', None)
 
         self._global._commands['configuration'] = { 'type'  : 'string' }
+        self._global._commands['max_audio_objects'] = { 'type'  : 'int' }
         self._global._commands['reset']         = { 'type'  : 'none' }
 
         if 'configuration' in configuration:
             self._global._commands['configuration']['value'] = configuration['configuration']
 
-        self._global._commands_order = ['reset', 'configuration', 'volume', 'start', 'mute']
+        if 'max_audio_objects' in configuration:
+            self._global._commands['max_audio_objects']['value'] = configuration['max_audio_objects']
+
+        self._global._commands_order = ['max_audio_objects', 'reset', 'configuration', 'volume', 'start', 'mute']
 
         self._global.define_commands()
 

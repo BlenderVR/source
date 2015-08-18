@@ -84,7 +84,7 @@
       <button device="GTK" host="localhost" processor_method="buttons"/>
     </vrpn>
 
-    <osc host='localhost' port='3819' configuration='Laptop SPAT'>
+    <osc host='localhost' port='3819' configuration='Laptop SPAT' max_audio_objects='20'>
       <user listener='Binaural 1' viewer='user A' />
       <!-- <user listener='Binaural 2' viewer='user B' /> -->
       <user listener='Ambisonic' />

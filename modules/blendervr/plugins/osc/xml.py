@@ -44,7 +44,7 @@ class XML(xml.XML):
 
     def __init__(self, parent, name, attrs):
         super(XML, self).__init__(parent, name, attrs)
-        self._attribute_list += ['host', 'port', 'configuration']
+        self._attribute_list += ['host', 'port', 'configuration', 'max_audio_objects']
         self._class_list += ['users']
         #self._class_list     += ['room']
         if 'host' in attrs:
@@ -59,6 +59,10 @@ class XML(xml.XML):
             self._configuration = attrs['configuration']
         else:
             self._configuration = None
+        if 'max_audio_objects' in attrs:
+            self._max_audio_objects = attrs['max_audio_objects']
+        else:
+            self._max_audio_objects = 7
 
         self._users = None
 
