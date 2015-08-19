@@ -55,8 +55,9 @@ class Object(base.Base):
         self._commands['sound'] = {'type': 'string'}
         self._commands['position'] = {'type': 'matrix'}
         self._commands['loop'] = {'type': 'state'}
-        self._commands_order = ['sound', 'loop', 'volume', 'start',
-                                'position', 'mute']
+        self._commands['release'] = {'type': 'state'}
+        self._commands_order = ['release', 'sound', 'loop', 'volume',
+                                'start', 'position', 'mute']
         self.define_commands()
 
     def run(self):
@@ -70,6 +71,8 @@ class Object(base.Base):
         object_position[1][3] = self._object.worldPosition[1]
         object_position[2][3] = self._object.worldPosition[2]
         self.position(camera_position.inverted() * object_position)
+
+        self.checkIfObjectHasBeenReleased()
         super(Object, self).run()
 
     def getName(self):
@@ -77,3 +80,33 @@ class Object(base.Base):
 
     def getObject(self):
         return self._object
+
+    def checkIfObjectHasBeenReleased(self):
+        """
+        Check if OSC object has been released. Delete OSC object and
+        its associated userObject links from stored dictionaries.
+        Mecanism to limit (reuse) the number of objects instantiated
+        in the OSC client (e.g. sound objects in Max/MSP).
+
+        Args: None
+
+        Returns: Bool, True if object has been released
+        """
+
+        attribut = self._commands['release']
+        if attribut['update'] and attribut['value']==1:
+
+            try: ## del osc object_user from _userObject dict
+                for key, item in self._parent._users.items(): # for all osc users
+                    id_usr = item.getID_1()
+                    if id_usr in self._parent._userObject: # if a userObject link exists for this osc user
+                        usr_obj = self._parent._userObject[id_usr] # get osc user
+                        id_obj  = self._OSC_ID_1 # get osc object
+                        if id_obj in usr_obj.keys(): # if an objectUser link exists between osc object and osc user
+                            del(usr_obj[id_obj]) # delete said link
+
+            except:
+                self.logger.log_traceback(False)
+
+            ## del osc object from _objects dict
+            del(self.getParent()._objects[id(self._object)])
