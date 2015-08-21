@@ -41,7 +41,6 @@ from .base import Base
 from .buffer import Buffer
 import bge
 
-
 class User(Base):
 
     SYNCHRONIZER_COMMAND_USER_POSITION = b'u'
@@ -68,9 +67,23 @@ class User(Base):
                                     'userSynchronization-' + self._name)
 
     def getID(self):
+        """
+        get user Identifier
+
+        Args: None
+
+        Returns: Int
+        """
         return self._id
 
     def getName(self):
+        """
+        get user name (as defined in configuration file)
+
+        Args: None
+
+        Returns: String
+        """
         return self._name
 
     def getPosition(self):
@@ -84,6 +97,21 @@ class User(Base):
         return self._position
 
     def getVehiclePosition(self, internal=False):
+        """
+        returns 4x4 camera-to-vehicle transform in the virtual environment.
+        ****** Note ******
+        in Blender, worldTransform matrix is short for object-to-world transform matrix
+        (given an object-space point, it will transform it to a world-space point).
+        This method returns the inverse of what one could call vehicle.cameraTransform in Blender
+        (given a camera-space point, it will transform it to a vehicle-space point).
+        The vehicle transform is always expressed with respect to the camera. At BlenderVR
+        scene startup, the vehicle is created at camera pos/ori (transform) and its own pos/ori
+        matrix (here self._vehicle_position) is set to Id (4x4).
+
+        Args: (Optional) internal:
+
+        Returns: 4x4 mathutils.Matrix (rotation and location).
+        """
         if isinstance(self._parent, User) and not internal:
             return self._vehicle_position * self._parent.getVehiclePosition()
         if isinstance(self._parent, bge.types.KX_GameObject) and not internal:
@@ -93,15 +121,43 @@ class User(Base):
         return self._vehicle_position
 
     def getEyeSeparation(self):
+        """
+        get user eye separation (as defined in configuration file)
+
+        Args: None
+
+        Returns: Float
+        """
         return self._eye_separation
 
     def setPosition(self, position):
+        """
+        set User position in the virtual environment.
+
+        Args: 4x4 mathutils.Matrix (rotation and location).
+
+        Returns: None
+        """
         self._position = position
 
     def setVehiclePosition(self, position):
+        """
+        set User's vehicle position in the virtual environment.
+
+        Args: 4x4 mathutils.Matrix (rotation and location).
+
+        Returns: None
+        """
         self._vehicle_position = position
 
     def resetVehiclePosition(self):
+        """
+        reset vehicle position in the virtual environment.
+
+        Args: None
+
+        Returns: None
+        """
         self._vehicle_position = mathutils.Matrix()
 
     def setParent(self, parent):
