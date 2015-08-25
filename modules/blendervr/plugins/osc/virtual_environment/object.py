@@ -61,18 +61,8 @@ class Object(base.Base):
         self.define_commands()
 
     def run(self):
-        camera = bge.logic.getCurrentScene().active_camera
-        camera_position = camera.worldOrientation.to_4x4()
-        camera_position[0][3] = camera.worldPosition[0]
-        camera_position[1][3] = camera.worldPosition[1]
-        camera_position[2][3] = camera.worldPosition[2]
-        object_position = self._object.worldOrientation.to_4x4()
-        object_position[0][3] = self._object.worldPosition[0]
-        object_position[1][3] = self._object.worldPosition[1]
-        object_position[2][3] = self._object.worldPosition[2]
-        self.position(camera_position.inverted() * object_position)
-
-        self.checkIfObjectHasBeenReleased()
+        self._updateObjectPosition()
+        self._checkIfObjectHasBeenReleased()
         super(Object, self).run()
 
     def getName(self):
@@ -81,7 +71,24 @@ class Object(base.Base):
     def getObject(self):
         return self._object
 
-    def checkIfObjectHasBeenReleased(self):
+    def _updateObjectPosition(self):
+        """
+        Compute camera (viewpoint) to object transform and send
+        it to osc server
+        """
+        # get camera-to-world transform
+        camera = bge.logic.getCurrentScene().active_camera
+        camera_position = camera.worldOrientation.to_4x4()
+        camera_position.translation = camera.worldPosition
+
+        # get object-to-world transform
+        object_position = self._object.worldOrientation.to_4x4()
+        object_position.translation = self._object.worldPosition
+
+        # send osc object position rel. to camera
+        self.position(camera_position.inverted() * object_position)
+
+    def _checkIfObjectHasBeenReleased(self):
         """
         Check if OSC object has been released. Delete OSC object and
         its associated userObject links from stored dictionaries.
