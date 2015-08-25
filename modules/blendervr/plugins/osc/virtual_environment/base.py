@@ -171,13 +171,13 @@ class Base(base.Base):
 
             attribut['update'] = True
 
-            # DPQ modified - To forbid slave to handle OSC init messages (e.g. users name, configuration, etc.)
+            # Avoid slaves handling OSC init messages (e.g. users name, configuration, etc.)
             # the 'position' still has to be initialized for correct sound rendering
+            # TODO: need to check if this mechanism does not prevent user update
+            # in networked mode with an oculus on remote host
             if not self.BlenderVR.isMaster():
                 if attribut['cmd'] != 'position':
                     attribut['update'] = False
-            # !!!  check if it does not prevent user update in networked
-            # mode with an oculus on remote host
 
             if 'value' not in attribut:
                 if attribut['type'] == 'none':
