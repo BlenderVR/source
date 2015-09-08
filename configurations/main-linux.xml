@@ -77,7 +77,7 @@
     <!-- Example of OSC setup -->
     <osc host='localhost' port='3819' configuration='Laptop SPAT' max_audio_objects='20'>
       <user listener='Binaural 2' viewer='user A' />
-      <user listener='Binaural 1' viewer='user B' />
+      <!-- <user listener='Binaural 1' viewer='user B' /> -->
       <user listener='Ambisonic' />
       <user listener='Stereo' />
       <room warmth='32' />
