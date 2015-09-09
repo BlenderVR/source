@@ -1806,7 +1806,7 @@ class Hmd():
 
     @staticmethod
     def get_perspective(fov, near, far, right_handed):
-        return ovrMatrix4f_Projection(fov, near, far, '\x01' if right_handed else '\x00')
+        return ovrMatrix4f_Projection(fov, near, far, right_handed)
 
     @staticmethod
     def get_orthographic(perspective, scale, distance, eye_x_offset):
