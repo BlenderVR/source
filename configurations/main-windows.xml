@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <blendervr>
-  <!-- Documentation can be found on BlenderVR web site: http://blendervr.limsi.fr/doku.php?id=doc:config -->
+  <!-- Documentation can be found on BlenderVR web site: http://blendervr.limsi.fr -->
+  <!-- http://blender-vr-manual.readthedocs.org/components/configuration-file.html -->
 
   <!-- MODIFY ACCORDING TO YOUR OWN PATH -->
-  <starter blender='D:/My/BlenderVRBuild/blender/blender.exe'>
+  <starter blender='C:/BlenderVR/blender/blender.exe'>
     <config name='console'>console</config>
     <config name='split'>console half left, console half right</config>
   </starter>
@@ -24,7 +25,7 @@
         <environment>SystemRoot=C:\\Windows</environment>
       </daemon>
       <!-- MODIFY ACCORDING TO YOUR OWN PATH -->
-      <blenderplayer executable='D:/My/BlenderVRBuild/blender/blenderplayer.exe'/>
+      <blenderplayer executable='C:/BlenderVR/blender/blenderplayer.exe'/>
     </system>
     <computer name='Any' hostname='*' />
   </computers>
