@@ -68,6 +68,8 @@ class Slave(Light, item_object.Slave):
         item_object.Slave.__init__(self, parent, item)
 
     def _processCommand(self, command, buff):
+        item_object.Slave._processCommand(self, command, buff)
+
         if command == self.COLOR:
             self._item.color = buff.vector_3()
 
