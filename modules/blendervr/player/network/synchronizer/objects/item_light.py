@@ -37,21 +37,37 @@
 ##
 
 #import copy
-#import mathutils
+import mathutils
 from . import item_object
 
 
 class Light:
-    pass
+    COLOR = b'c'
 
 
 class Master(Light, item_object.Master):
     def __init__(self, parent, item):
         Light.__init__(self)
         item_object.Master.__init__(self, parent, item)
+        self._previousColor = mathutils.Vector()
+
+    def getSynchronizerBuffer(self):
+        buff = item_object.Master.getSynchronizerBuffer(self)
+
+        if self._previousColor != self._item.color:
+            self_previousColor = self._item.color
+            buff.command(self.COLOR)
+            buff.vector_3(self_previousColor)
+
+        return buff
 
 
 class Slave(Light, item_object.Slave):
     def __init__(self, parent, item):
         Light.__init__(self)
         item_object.Slave.__init__(self, parent, item)
+
+    def _processCommand(self, command, buff):
+        if command == self.COLOR:
+            self._item.color = buff.vector_3()
+
