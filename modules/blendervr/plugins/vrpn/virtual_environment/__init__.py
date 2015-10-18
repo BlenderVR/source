@@ -54,8 +54,8 @@ class VRPN(base.Base):
             from . import analog
             from . import button
             from . import text
-        except ImportError:
-            self.logger.info('No VRPN python module available')
+        except ImportError as e:
+            self.logger.info('No VRPN python module available, reason:',e)
             self._available = False
             return
 
