@@ -75,7 +75,7 @@ class Splash(base.Base):
         self._ecg_values = ECG_VALUES
         self._message = ''
         self._ecg_values_size = len(self._ecg_values)
-        self._repeat = 10
+        self._repeat = 8
         self._total_size = self._ecg_values_size * self._repeat
         self._extinction = 3.0
 
@@ -85,24 +85,32 @@ class Splash(base.Base):
         if self._official_splash:
             return
 
-        logo_path = os.path.join(utils_path, 'bc.ppm')
+        logo_path = os.path.join(utils_path, 'bvr-logo.ppm')
         logofile = open(logo_path, 'r')
         magic = logofile.readline().strip()
-        if magic != 'P3':
-            self.logger.warning('Cannot load BlenderVR Logo !')
+        if magic != 'P3': # check for plain ppm format
+            self.logger.warning('Cannot load BlenderVR Logo (wrong .ppm format)')
             return
-        comment = logofile.readline()
+        comment = logofile.readline() # remove comment line (Gimp generated)
         assert comment    # avoid unused warning
-        logoformat = logofile.readline().strip().split(' ')
+        if not comment[0] == '#': # if generated file doesn't have this comment line (varies between e.g. Gimp and MagickImage)
+            logoformat = comment
+        else:
+            logoformat = logofile.readline().strip().split(' ')
         highest = float(logofile.readline())
         texture_buffer = []
         while 1:
             line = logofile.readline().strip()
             try:
-                value = float(line)
+                value = [int(255 * (float(x) / highest)) for x in line.split(' ')]
             except ValueError:
                 break
-            texture_buffer.append(int(255 * (value / highest)))
+            texture_buffer.append(value)
+
+        if type(texture_buffer[0]) is list:
+            # from list of list to list (in line of values (per lines) scenario)
+            texture_buffer = [item for sublist in texture_buffer for item in sublist]
+
         texture_buffer = Buffer(GL_BYTE, len(texture_buffer), texture_buffer)
 
         glEnable(GL_TEXTURE_2D)
@@ -214,11 +222,11 @@ class Splash(base.Base):
 
                 glDisable(GL_TEXTURE_2D)
             else:
-                glColor4f(1.0, 0.3, 0.3, 1.0)
+                glColor4f(0.8, 0.25, 0.0, 1.0)
                 self._draw_text("BlenderVR", 3)
 
         # BLF drawing routine
-        glColor4f(0.3, 0.3, 1.0, 1.0)
+        glColor4f(0.6, 0.6, 0.6, 1.0)
         self._draw_text(self._message, 1)
 
         line_width = 10.0
@@ -235,14 +243,14 @@ class Splash(base.Base):
                 attenuation = (index - start) / window
 
                 glLineWidth(4.0 * attenuation)
-                glColor4f(0.0, 3.0 * attenuation, 0.0, 1.0)
+                glColor4f(0.7 * attenuation, 0.7 * attenuation, 0.7 * attenuation, 1.0)
                 glBegin(GL_LINES)
                 self._draw_ecg(index, width, shift)
                 self._draw_ecg(index + 1, width, shift)
                 glEnd()
 
-        glColor4f(0.0, 1.0, 0.0, 1.0)
-        glPointSize(10.0)
+        glColor4f(0.7, 0.7, 0.7, 1.0)
+        glPointSize(7.0)
         glBegin(GL_POINTS)
         self._draw_ecg(index, width, shift)
         glEnd()
