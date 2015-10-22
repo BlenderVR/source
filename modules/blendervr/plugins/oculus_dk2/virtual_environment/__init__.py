@@ -47,7 +47,10 @@ class OculusDK2(base.Base):
         self._user = None
         self._hmd = None
         self._description = None
-        self._matrix = None
+        self._modelview_matrix = [None, None]
+        self._projection_matrix = [None, None]
+        self._near = -100.0
+        self._far = -100.0
 
         self.checkLibraryPath()
 
@@ -56,7 +59,7 @@ class OculusDK2(base.Base):
             assert(Hmd)
 
         except ImportError:
-            self.logger.info('Oculus DK2 plugin error: no \"oculusvr\" module available. Make sure you have the projec submodules. Please refer to the BlenderVR documentation')
+            self.logger.info('Oculus DK2 plugin error: no \"oculusvr\" module available. Make sure you have the project submodules. Please refer to the BlenderVR documentation')
             self._available = False
             return
 
@@ -84,30 +87,16 @@ class OculusDK2(base.Base):
         super(OculusDK2, self).start()
         from mathutils import Matrix
 
+        self.logger.debug("START PLUGIN")
+
         try:
-            self._matrix = Matrix.Identity(4)
             self._startOculus()
+
         except Exception:
             self._available = False
 
     def run(self):
         super(OculusDK2, self).run()
-
-        try:
-            self._updateMatrix()
-            info = {'matrix' : self._matrix}
-            self._user.run(info)
-
-        except Exception as err:
-            self.logger.log_traceback(err)
-
-    def _updateMatrix(self):
-        try:
-            matrix = self._getMatrix()
-            if matrix:
-                self._matrix = matrix
-        except Exception as err:
-            self.logger.log_traceback(err)
 
     def checkMethods(self):
         if not self._available:
@@ -139,6 +128,8 @@ class OculusDK2(base.Base):
             sys.path.append(oculus_path)
 
     def _startOculus(self):
+        from time import sleep
+        import oculusvr as ovr
         from oculusvr import (
                 Hmd,
                 cast,
@@ -152,44 +143,78 @@ class OculusDK2(base.Base):
         except SystemError as err:
             self.logger.error("Oculus initialization failed, check the physical connections and run again")
 
-        if Hmd.detect() == 1:
-            self._hmd = Hmd()
-            self._description = cast(self._hmd.hmd, POINTER(ovrHmdDesc)).contents
-            self._frame = 0
-            self._eyes_offset = [ ovrVector3f(), ovrVector3f() ]
-            self._eyes_offset[0] = 0.0, 0.0, 0.0
-            self._eyes_offset[1] = 0.0, 0.0, 0.0
+        """
+        self._hmd = Hmd()
+        self._description = cast(self._hmd.hmd, POINTER(ovrHmdDesc)).contents
+        self._frame = 0
+        self._eyes_offset = [ ovrVector3f(), ovrVector3f() ]
+        self._eyes_offset[0] = 0.0, 0.0, 0.0
+        self._eyes_offset[1] = 0.0, 0.0, 0.0
 
+        self._hmd.configure_tracking()
+        self.logger.info(self._description.ProductName)
+        """
+
+        try:
+            debug = not Hmd.detect()
+
+            if debug:
+                self.logger.error("Oculus not connected")
+
+            self._hmd = Hmd(debug=debug)
+
+            desc = self._hmd.hmd.contents
+            self._frame = -1
+
+            sleep(0.1)
             self._hmd.configure_tracking()
-            self.logger.info(self._description.ProductName)
 
-        else:
-            self.logger.error("Oculus not connected")
-            raise Exception
-
-    def _getMatrix(self):
-        from oculusvr import Hmd
-        from mathutils import (
-                Quaternion,
-                Matrix,
+            self._fovPorts = (
+                desc.DefaultEyeFov[0],
+                desc.DefaultEyeFov[1],
                 )
 
-        if self._hmd and Hmd.detect() == 1:
-            self._frame += 1
+            #self._eyeTextures = [ ovrGLTexture(), ovrGLTexture() ]
+            self._eyeOffsets = [ ovrVector3f(), ovrVector3f() ]
+            self._width = [-1, -1]
+            self._height = [-1, -1]
 
-            poses = self._hmd.get_eye_poses(self._frame, self._eyes_offset)
+            rc = ovr.ovrRenderAPIConfig()
+            header = rc.Header
+            header.API = ovr.ovrRenderAPI_OpenGL
+            header.BackBufferSize = desc.Resolution
+            header.Multisample = 1
 
-            # oculus may be returning the matrix for both eyes
-            # but we are using a single eye without offset
+            for i in range(8):
+                rc.PlatformData[i] = 0
 
-            rotation_raw = poses[0].Orientation.toList()
-            position_raw = poses[0].Position.toList()
+            self._eyeRenderDescs = self._hmd.configure_rendering(rc, self._fovPorts)
 
-            rotation = Quaternion(rotation_raw).to_matrix().to_4x4()
-            position = Matrix.Translation(position_raw)
+            for eye in range(2):
+                size = self._hmd.get_fov_texture_size(eye, self._fovPorts[eye])
+                self._width[eye], self._height[eye] = size.w, size.h
+                #eyeTexture = self._eyeTextures[eye]
+                #eyeTexture.API = ovr.ovrRenderAPI_OpenGL
+                #header = eyeTexture.Texture.Header
+                #header.TextureSize = size
+                #vp = header.RenderViewport
+                #vp.Size = size
+                #vp.Pos.x = 0
+                #vp.Pos.y = 0
 
-            matrix = position * rotation
-            matrix.invert()
+                self._eyeOffsets[eye] = self._eyeRenderDescs[eye].HmdToEyeViewOffset
 
-            return matrix
-        return None
+
+            # store the data globally, to access it in screen
+            from bge import logic
+            global_dict = logic.globalDict
+
+            global_dict['hmd'] = self._hmd
+            global_dict['frame'] = self._frame
+            global_dict['eyeOffsets'] = self._eyeOffsets
+            global_dict['fovPorts'] = self._fovPorts
+
+        except Exception as err:
+            self.logger.error("Error initializing Oculus", str(err))
+        else:
+            self.logger.info("Oculus properly initialized")

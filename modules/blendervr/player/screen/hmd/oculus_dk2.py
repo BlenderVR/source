@@ -37,6 +37,8 @@
 ##
 
 import mathutils
+from mathutils import Matrix, Quaternion
+
 import bge
 from . import base
 from ... import exceptions
@@ -52,6 +54,25 @@ class Device(base.Device):
     def __init__(self, parent, configuration):
         super(Device, self).__init__(parent, configuration)
         self._plugin = None
+        self._modelview_matrix = [Matrix.Identity(4), Matrix.Identity(4)]
+        self._projection_matrix = [Matrix.Identity(4), Matrix.Identity(4)]
+        self._near = -1
+        self._far = -1
+
+        self.checkLibraryPath()
+
+        try:
+            from oculusvr import Hmd
+            assert(Hmd)
+
+        except ImportError:
+            self.logger.info('Oculus DK2 plugin error: no \"oculusvr\" module available. Make sure you have the project submodules. Please refer to the BlenderVR documentation')
+            return
+
+        except Exception as err:
+            self.logger.error(err)
+            self._available = False
+            return
 
     def start(self):
         super(Device, self).start()
@@ -86,3 +107,104 @@ class Device(base.Device):
 
         except Exception as err:
             self.logger.error(err)
+
+    def _updateMatrixForBuffer(self, bufferName, camera, depth):
+
+        scale = self.BlenderVR.scale
+        user = self._buffers[bufferName]['user']
+
+        if bufferName == 'left':
+            near = camera.near * scale
+            far = camera.far * scale
+
+            self._updateProjectionMatrix(near, far)
+            self._updateModelViewMatrix(user.getPosition() * user.getVehiclePosition(), camera.modelview_matrix)
+
+            self._setModelViewMatrix(self._modelview_matrix[0])
+            self._setProjectionMatrix(self._projection_matrix[0])
+        else:
+            self._setModelViewMatrix(self._modelview_matrix[1])
+            self._setProjectionMatrix(self._projection_matrix[1])
+
+
+    def _updateModelViewMatrix(self, user_matrix, camera_matrix):
+        from oculusvr import Hmd
+        from bge import logic
+
+        global_dict = logic.globalDict
+        hmd = global_dict.get('hmd')
+
+        if hmd and Hmd.detect() == 1:
+            global_dict['frame'] += 1
+
+            frame = global_dict['frame']
+            fov_ports = global_dict['fovPorts']
+            eye_offsets = global_dict['eyeOffsets']
+
+            poses = hmd.get_eye_poses(frame, eye_offsets)
+            hmd.begin_frame(frame)
+
+            orientation = [None, None]
+            position = [None, None]
+
+            for eye in range(2):
+                orientation_raw = poses[eye].Orientation.toList()
+                position_raw = poses[eye].Position.toList()
+
+                orientation = Quaternion(orientation_raw).to_matrix().to_4x4()
+                position = Matrix.Translation(position_raw)
+
+                matrix = position * orientation
+                matrix.invert()
+
+                self._modelview_matrix[eye] = self._convertMatrixTo4x4(user_matrix * matrix * camera_matrix)
+
+    def _convertMatrixTo4x4(self, value):
+        matrix = Matrix()
+
+        matrix[0] = value[0:4]
+        matrix[1] = value[4:8]
+        matrix[2] = value[8:12]
+        matrix[3] = value[12:16]
+
+        return matrix.transposed()
+
+
+    def _updateProjectionMatrix(self, near, far):
+
+        if not self._cameraClippingChanged(near, far):
+            return
+
+        from bge import logic
+        import oculusvr as ovr
+
+        global_dict = logic.globalDict
+        fov_ports = global_dict['fovPorts']
+
+        self._projection_matrix[0] = self._convertMatrixTo4x4(ovr.Hmd.get_perspective(fov_ports[0], near, far, True).toList())
+        self._projection_matrix[1] = self._convertMatrixTo4x4(ovr.Hmd.get_perspective(fov_ports[1], near, far, True).toList())
+
+    def _cameraClippingChanged(self, near, far):
+        """
+        check if near of far values changed
+        """
+        if near == self._near and far == self._far:
+            return False
+
+        self._near = near
+        self._far = far
+
+        return True
+
+    def checkLibraryPath(self):
+        """if library exists append it to sys.path"""
+        import sys
+        import os
+        from .... import tools
+
+        libs_path = tools.getLibsPath()
+        oculus_path = os.path.join(libs_path, "python-ovrsdk")
+
+        if oculus_path not in sys.path:
+            sys.path.append(oculus_path)
+
