@@ -161,7 +161,10 @@ class OculusDK2(base.Base):
             if debug:
                 self.logger.error("Oculus not connected")
 
-            self._hmd = Hmd(debug=debug)
+            try:
+                self._hmd = Hmd()
+            except:
+                self._hmd = Hmd(debug=True)
 
             desc = self._hmd.hmd.contents
             self._frame = -1
