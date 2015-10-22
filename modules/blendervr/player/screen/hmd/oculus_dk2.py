@@ -157,7 +157,7 @@ class Device(base.Device):
                 matrix = position * orientation
                 matrix.invert()
 
-                self._modelview_matrix[eye] = self._convertMatrixTo4x4(user_matrix * matrix * camera_matrix)
+                self._modelview_matrix[eye] = user_matrix * matrix * camera_matrix
 
     def _convertMatrixTo4x4(self, value):
         matrix = Matrix()
