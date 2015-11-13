@@ -59,10 +59,10 @@ class Creator:
         self._output_blender_file = self._input_blender_file.split('.')
         self._output_blender_file.insert(-1, 'vr')
         self._output_blender_file = '.'.join(self._output_blender_file)
-        if not sys.platform.startswith('win'):
-            self._output_blender_file = os.path.join(
-                        os.path.dirname(self._output_blender_file),
-                        '.' + os.path.basename(self._output_blender_file))
+        self._output_blender_file = os.path.join(
+                    os.path.dirname(self._output_blender_file),
+                    '.' + os.path.basename(self._output_blender_file))
+
         self._output_blender_file = self._output_blender_file.replace('\\', '/')
 
     def process(self):
