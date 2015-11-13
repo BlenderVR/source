@@ -76,7 +76,7 @@ def getProcessor():
         _logger.warning('Invalid path for processor: ', module_path)
         return Processor
 
-    module_name = os.path.splitext(os.path.basename(processor_file))[0]
+    module_name = os.path.splitext(os.path.basename(processor_file))[0].replace('\\', '/')
     try:
         import imp
         (file, file_name, data) = imp.find_module(module_name, [module_path])

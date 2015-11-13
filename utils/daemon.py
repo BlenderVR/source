@@ -154,8 +154,8 @@ class Daemon:
             if argument:
                 try:
                     import compileall
-                    compileall.compile_dir(os.path.join(BlenderVR_modules,
-                                                'blendervr'), quiet=True)
+                    compileall.compile_dir("/".join((BlenderVR_modules,
+                                                'blendervr')), quiet=True)
                 except:
                     pass
                 self._start_blender_player()
@@ -307,7 +307,7 @@ def main():
 
     # Find the installation root, and make blender package available.
     BlenderVR_root = os.path.dirname(os.path.dirname(__file__))
-    BlenderVR_modules = os.path.join(BlenderVR_root, 'modules')
+    BlenderVR_modules = "/".join((BlenderVR_root, 'modules'))
     sys.path.append(BlenderVR_modules)
 
     Daemon(BlenderVR_modules).main()

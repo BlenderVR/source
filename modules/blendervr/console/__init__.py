@@ -65,7 +65,7 @@ def unstripAnchor(anchor, path):
     if path is None:
         return None
     if path[1] and anchor is not None:
-        return os.path.join(anchor, path[0])
+        return "/".join((anchor, path[0]))
     return path[0]
 
 

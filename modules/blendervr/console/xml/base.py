@@ -226,7 +226,7 @@ class XML(xml.sax.handler.ContentHandler, Base):
             locations = os.environ.get("PATH").split(os.pathsep)
             candidates = []
             for location in locations:
-                candidate = os.path.join(location, filename)
+                candidate = "/".join((location, filename))
                 if self.is_exe(candidate):
                     return candidate
         return None

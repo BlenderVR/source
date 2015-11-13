@@ -133,7 +133,7 @@ class OculusDK2(base.Base):
         from .... import tools
 
         libs_path = tools.getLibsPath()
-        oculus_path = os.path.join(libs_path, "python-ovrsdk")
+        oculus_path = "/".join((libs_path, "python-ovrsdk"))
 
         if oculus_path not in sys.path:
             sys.path.append(oculus_path)

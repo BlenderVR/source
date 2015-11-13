@@ -63,6 +63,7 @@ class Creator:
             self._output_blender_file = os.path.join(
                         os.path.dirname(self._output_blender_file),
                         '.' + os.path.basename(self._output_blender_file))
+        self._output_blender_file = self._output_blender_file.replace('\\', '/')
 
     def process(self):
         if is_creating_loader():
@@ -127,7 +128,7 @@ class Creator:
     def _getScreenShader(self):
         import os
         folderpath = os.path.dirname(os.path.abspath(__file__))
-        filepath = os.path.join(folderpath, 'oculus_dk2.glsl')
+        filepath = "/".join((folderpath, 'oculus_dk2.glsl'))
         f = open(filepath, 'r')
         data = f.read()
         f.close()

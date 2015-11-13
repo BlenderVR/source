@@ -50,16 +50,18 @@ class FileName:
                             (not hasattr(self, '_origin_file_name')):
             relpath = os.path.relpath(self._file_name, anchor)
             if not relpath.startswith('..'):
-                self._origin_file_name = self._file_name
-                self._file_name = relpath
+                self._origin_file_name = self._file_name.replace('\\', '/')
+                self._file_name = relpath.replace('\\', '/')
 
     def unstrip(self, anchor):
         if not self._file_name:
             return None
+
         if hasattr(self, '_origin_file_name'):
             if anchor:
-                return os.path.join(anchor, self._file_name)
+                return os.path.join(anchor, self._file_name).replace('\\', '/')
             return self._origin_file_name
+
         if anchor:
             raise Exception('Invalid apply of anchor')
         return self._file_name

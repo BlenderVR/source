@@ -265,8 +265,8 @@ class Logic:
     def compile_BC(self):
         try:
             import compileall
-            compileall.compile_dir(os.path.join(BlenderVR_root, 'modules',
-                                                'blendervr'), quiet=True)
+            compileall.compile_dir("/".join((BlenderVR_root, 'modules',
+                                                'blendervr')), quiet=True)
         except:
             self.logger.log_traceback(False)
 
@@ -314,9 +314,9 @@ class Logic:
                     if self.profile.getValue(['files', 'processor']) != \
                                                         processor_file_name:
                         if not os.path.isfile(processor_file_name):
-                            processor_file_name = os.path.join(BlenderVR_root,
+                            processor_file_name = "/".join((BlenderVR_root,
                                                 'modules', 'blendervr',
-                                                'processor', 'default.py')
+                                                'processor', 'default.py'))
                         self.profile.setValue(['files', 'processor'],
                                                 processor_file_name)
                         self._force_processor_file(processor_file_name)

@@ -61,4 +61,4 @@ def getLibsPath():
     """The path for the external libs"""
     import os
     root_path = getRootPath()
-    return os.path.join(root_path, "libs")
+    return "/".join((root_path, "libs"))

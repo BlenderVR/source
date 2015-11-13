@@ -51,8 +51,8 @@ class GUI(common_GUI):
              'display toggle': self._profile_index + ['log', 'toggle']})
 
         from ...tools import gui, getModulePath
-        self._screen_ui = gui.load(os.path.join(getModulePath(), 'designer',
-                                                'screen.ui'), self._window)
+        self._screen_ui = gui.load("/".join((getModulePath(), 'designer',
+                                                'screen.ui')), self._window)
         self._screen_ui.std_out.clicked.connect(self.cb_toggle_stdout_state)
         self._screen_ui.std_err.clicked.connect(self.cb_toggle_stderr_state)
 

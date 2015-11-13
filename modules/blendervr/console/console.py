@@ -51,8 +51,8 @@ class Console(logic.Logic, gui.GUI):
 
         self._processor = None
 
-        self._update_loader_script = os.path.join(BlenderVR_root, 'utils',
-                                                    'update_loader.py')
+        self._update_loader_script = "/".join((BlenderVR_root, 'utils',
+                                                    'update_loader.py'))
 
         from . import profile
         self._profile = profile.Profile(profile_file)

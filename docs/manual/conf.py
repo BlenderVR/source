@@ -83,7 +83,7 @@ else:
         exec(code, namespace, namespace)
         return namespace
 
-    mod_path = os.path.join(os.path.dirname(__file__), "quicky_index_gen.py")
+    mod_path = "/".join((os.path.dirname(__file__), "quicky_index_gen.py"))
     namespace = exec_file(mod_path)
     del mod_path
 
