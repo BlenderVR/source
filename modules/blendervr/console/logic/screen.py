@@ -165,7 +165,8 @@ class Logic:
                     self.logger.error('Its environment variables:',
                                       self._daemon['environments'])
                 self._process = subprocess.Popen(command,
-                         env=self._daemon['environments'],
+                         # FIXME, env prevents windows from calling linux clients
+                         #env=self._daemon['environments'],
                          stdin=daemon_in,
                          stdout=daemon_out,
                          stderr=daemon_out,
