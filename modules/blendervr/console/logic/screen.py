@@ -61,6 +61,8 @@ class Logic:
     def start(self):
         if not self.daemon_is_running():
             self._startDaemon()
+        else:
+            self.restartDaemon()
 
     def quit(self):
         self._stop = True
