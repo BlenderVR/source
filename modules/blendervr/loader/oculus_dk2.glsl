@@ -5,7 +5,7 @@ const vec4 kappa = vec4(1.0,1.7,0.7,15.0);
 uniform float screen_width;
 uniform float screen_height;
 
-const float scaleFactor = 0.6;
+const float scaleFactor = 0.85;
 
 const vec2 leftCenter = vec2(0.25, 0.5);
 const vec2 rightCenter = vec2(0.75, 0.5);
