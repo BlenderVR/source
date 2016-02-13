@@ -125,8 +125,8 @@ elif is_console():
 
             self._widget = QtGui.QWidget()
             from ..tools import gui, getModulePath
-            self._ui = gui.load(os.path.join(getModulePath(), 'designer',
-                                            'landmark.ui'), self._widget)
+            self._ui = gui.load("/".join((getModulePath(), 'designer',
+                                            'landmark.ui')), self._widget)
             self._ui.save.clicked.connect(self.cb_save)
             self._ui.select.clicked.connect(self.cb_select)
             self._ui.remove.clicked.connect(self.cb_remove)

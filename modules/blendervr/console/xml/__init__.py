@@ -80,7 +80,7 @@ class Configure(xml.sax.handler.ContentHandler, xml.sax.handler.EntityResolver, 
     def _lookForConfigurationFile(self, filename):
         if filename is not None:
             for path in self._config_paths:
-                complete_filename = os.path.join(path, filename)
+                complete_filename = os.path.join(path, filename).replace('\\', '/')
                 try:
                     file = open(complete_filename)
                 except:

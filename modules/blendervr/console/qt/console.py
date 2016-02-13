@@ -58,8 +58,8 @@ class GUI(common_GUI):
 
         # Set up the user interface from Designer.
         from ...tools import gui, getModulePath
-        self._console_ui = gui.load(os.path.join(getModulePath(), 'designer',
-                                            'console.ui'), self._window)
+        self._console_ui = gui.load("/".join((getModulePath(), 'designer',
+                                            'console.ui')), self._window)
 
         self._window.destroyed.connect(self.cb_close)
         self._console_ui.menuQuit.triggered.connect(self.cb_close)

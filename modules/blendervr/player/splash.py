@@ -69,8 +69,8 @@ ECG_VALUES = [2.2115759e+00, 1.9184524e+00, 1.6262298e+00, 1.3363817e+00,
 class Splash(base.Base):
     def __init__(self, parent):
         super(Splash, self).__init__(parent)
-        utils_path = os.path.join(BlenderVR_root, 'utils')
-        font_path = os.path.join(utils_path, 'font.ttf')
+        utils_path = "/".join((BlenderVR_root, 'utils'))
+        font_path = "/".join((utils_path, 'font.ttf'))
         self._font_id = blf.load(font_path)
         self._ecg_values = ECG_VALUES
         self._message = ''
@@ -85,7 +85,7 @@ class Splash(base.Base):
         if self._official_splash:
             return
 
-        logo_path = os.path.join(utils_path, 'bvr-logo.ppm')
+        logo_path = "/".join((utils_path, 'bvr-logo.ppm'))
         logofile = open(logo_path, 'r')
         magic = logofile.readline().strip()
         if magic != 'P3': # check for plain ppm format

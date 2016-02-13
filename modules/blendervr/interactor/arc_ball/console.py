@@ -128,7 +128,7 @@ elif is_console():
 
             from ..wavefront_obj import Reader
             from ...tools import getModulePath
-            self._suzanne = Reader(os.path.join(getModulePath(), 'suzanne.obj'))
+            self._suzanne = Reader("/".join((getModulePath(), 'suzanne.obj')))
 
             # Under MACOS X, QtCore.Qt.MouseButton.LeftButton is not defined !
             # So we use 1 as button

@@ -285,8 +285,8 @@ elif is_console():
 
             self._widget = QtGui.QWidget()
             from ..tools import gui, getModulePath
-            self._ui = gui.load(os.path.join(getModulePath(), 'designer',
-                            'head_controlled_navigation.ui'), self._widget)
+            self._ui = gui.load("/".join((getModulePath(), 'designer',
+                            'head_controlled_navigation.ui')), self._widget)
             self._ui.navigation.clicked.connect(self.cb_navigation)
             self._ui.calibration.clicked.connect(self.cb_calibration)
             self._ui.home.clicked.connect(self.cb_home)

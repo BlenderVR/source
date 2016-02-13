@@ -110,7 +110,7 @@ class log(base.mono):
         if self._clear_previous is None:
             self._clear_previous = True
         if self._path is None:
-            self._path = os.path.join(os.path.expanduser('~'), '.log', 'blender')
+            self._path = "/".join((os.path.expanduser('~'), '.log', 'blender'))
 
 
 class login(base.mono):

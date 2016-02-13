@@ -94,8 +94,8 @@ class Logic:
                          dev_type: screen_conf[dev_type],
                          'keep_focus': screen_conf['keep_focus']}
 
-        self._log_file = os.path.join(system['log']['path'],
-                                'BlenderVR_' + self.getName() + '.log')
+        self._log_file = "/".join((system['log']['path'],
+                                'BlenderVR_' + self.getName() + '.log'))
         if system['log']['clear_previous']:
             self._log_to_clear = self._log_file
         else:
@@ -127,8 +127,8 @@ class Logic:
         if login['remote_command']:
             self._daemon['command'] += shlex.split(login['remote_command'])
         self._daemon['command'].append(login['python'])
-        self._daemon['command'].append(os.path.join(system['root'],
-                                                    'utils', 'daemon.py'))
+        self._daemon['command'].append("/".join((system['root'],
+                                                    'utils', 'daemon.py')))
         self._daemon['command'].append(self._net_console)
         self._daemon['command'].append(self.getName())
 
@@ -167,7 +167,8 @@ class Logic:
                     self.logger.error('Its environment variables:',
                                       self._daemon['environments'])
                 self._process = subprocess.Popen(command,
-                         env=self._daemon['environments'],
+                         # FIXME, env prevents windows from calling linux clients
+                         #env=self._daemon['environments'],
                          stdin=daemon_in,
                          stdout=daemon_out,
                          stderr=daemon_out,

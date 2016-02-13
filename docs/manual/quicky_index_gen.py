@@ -25,8 +25,8 @@ def from_chapters():
 
     master_doc = "contents_quicky"
 
-    fn_src = os.path.join(CURRENT_DIR, "contents.rst")
-    fn_dst = os.path.join(CURRENT_DIR, "contents_quicky.rst")
+    fn_src = "/".join((CURRENT_DIR, "contents.rst"))
+    fn_dst = "/".join((CURRENT_DIR, "contents_quicky.rst"))
 
     f = open(fn_src, 'r')
     data = f.read()
@@ -65,7 +65,7 @@ def from_chapters():
     # now exclude all dirs not in chapters
     exclude_patterns.append("contents.rst")
     for fn in os.listdir(CURRENT_DIR):
-        if os.path.isdir(os.path.join(CURRENT_DIR, fn)):
+        if os.path.isdir("/".join((CURRENT_DIR, fn))):
             if fn not in quicky_chapters:
                 # print("  exclude:", fn)
                 exclude_patterns.append(fn)

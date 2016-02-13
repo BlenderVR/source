@@ -148,8 +148,8 @@ elif is_console():
             try:
                 from . import profile
                 self._profile = profile.Profile(
-                            os.path.join(BlenderVR_profilePath, 'processor',
-                            self._getProfileName()))
+                            "/".join((BlenderVR_profilePath, 'processor',
+                            self._getProfileName())))
             except:
                 self._profile = None
 

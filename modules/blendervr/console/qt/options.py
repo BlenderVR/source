@@ -53,8 +53,8 @@ class GUI(base.Base, common_GUI):
                              'display toggle': ['options', 'toggle']})
 
         from ...tools import gui, getModulePath
-        self._options_ui = gui.load(os.path.join(getModulePath(),
-                                    'designer', 'options.ui'), self._window)
+        self._options_ui = gui.load("/".join((getModulePath(),
+                                    'designer', 'options.ui')), self._window)
 
         self._window.setWindowTitle('BlenderVR options')
 
