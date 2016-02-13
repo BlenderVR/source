@@ -118,7 +118,8 @@ class Device(base.Device):
             far = camera.far * scale
 
             self._updateProjectionMatrix(near, far)
-            self._updateModelViewMatrix(user.getPosition() * user.getVehiclePosition(), camera.modelview_matrix)
+            # self._updateModelViewMatrix(user.getPosition() * user.getVehiclePosition(), camera.modelview_matrix)
+            self._updateModelViewMatrix(user.getVehiclePosition(), camera.modelview_matrix)
 
             self._setModelViewMatrix(self._modelview_matrix[0])
             self._setProjectionMatrix(self._projection_matrix[0])
@@ -157,7 +158,17 @@ class Device(base.Device):
                 matrix = position * orientation
                 matrix.invert()
 
-                self._modelview_matrix[eye] = user_matrix * matrix * camera_matrix
+                # self._modelview_matrix[eye] = user_matrix * matrix * camera_matrix
+                self._modelview_matrix[eye] =  matrix * user_matrix * camera_matrix
+
+                # update user position to be used e.g. in processor files (arbitrary: take modelview matrix of eye 0)
+                if eye == 0:
+                    try:
+                        bufferName = 'left'
+                        user = self._buffers[bufferName]['user']
+                        user.setPosition(matrix)
+                    except Exception as err:
+                        self.logger.log_traceback(err)
 
     def _convertMatrixTo4x4(self, value):
         matrix = Matrix()
@@ -179,10 +190,12 @@ class Device(base.Device):
         import oculusvr as ovr
 
         global_dict = logic.globalDict
-        fov_ports = global_dict['fovPorts']
 
-        self._projection_matrix[0] = self._convertMatrixTo4x4(ovr.Hmd.get_perspective(fov_ports[0], near, far, True).toList())
-        self._projection_matrix[1] = self._convertMatrixTo4x4(ovr.Hmd.get_perspective(fov_ports[1], near, far, True).toList())
+        fov_ports = global_dict.get('fovPorts')
+
+        if fov_ports:
+            self._projection_matrix[0] = self._convertMatrixTo4x4(ovr.Hmd.get_perspective(fov_ports[0], near, far, True).toList())
+            self._projection_matrix[1] = self._convertMatrixTo4x4(ovr.Hmd.get_perspective(fov_ports[1], near, far, True).toList())
 
     def _cameraClippingChanged(self, near, far):
         """

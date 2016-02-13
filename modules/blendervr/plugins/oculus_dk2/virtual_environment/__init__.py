@@ -87,7 +87,7 @@ class OculusDK2(base.Base):
         super(OculusDK2, self).start()
         from mathutils import Matrix
 
-        self.logger.debug("START PLUGIN")
+        self.logger.debug("Start Oculus DK2 plugin")
 
         try:
             self._startOculus()
