@@ -48,6 +48,8 @@ class Object:
     ORIENTATION = b'o'
     SCALE = b's'
     VISIBILITY = b'v'
+    COLOR3 = b'd'
+    COLOR4 = b'c'
 
     def default(self):
         pass
@@ -61,6 +63,7 @@ class Master(Object, item_base.Master):
         self._previousOrientation = mathutils.Matrix()
         self._previousScale = mathutils.Vector()
         self._previousVisibility = True
+        self._previousColor = mathutils.Vector((0.8,0.8,0.8,1.0))
 
 
     def getSynchronizerBuffer(self):
@@ -86,6 +89,15 @@ class Master(Object, item_base.Master):
             buff.command(self.VISIBILITY)
             buff.boolean(self._previousVisibility)
 
+        if self._previousColor != self._item.color:
+            self._previousColor = self._item.color.copy()
+            if len(self._item.color) == 4:
+                buff.command(self.COLOR4)
+                buff.vector_4(self._previousColor)
+            if len(self._item.color) == 3:
+                buff.command(self.COLOR3)
+                buff.vector_3(self._previousColor)
+
         return buff
 
 
@@ -108,6 +120,13 @@ class Slave(Object, item_base.Slave):
         if command == self.VISIBILITY:
             self._item.setVisible(buff.boolean())
 
+        if command == self.COLOR3:
+            self.logger.debug(self._item.color)
+            self._item.color = buff.vector_3()
+
+        if command == self.COLOR4:
+            self.logger.debug(self._item.color)
+            self._item.color = buff.vector_4()
 
     def processSynchronizerBuffer(self, buff):
         while len(buff) > 0:
