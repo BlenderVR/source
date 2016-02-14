@@ -121,11 +121,9 @@ class Slave(Object, item_base.Slave):
             self._item.setVisible(buff.boolean())
 
         if command == self.COLOR3:
-            self.logger.debug(self._item.color)
             self._item.color = buff.vector_3()
 
         if command == self.COLOR4:
-            self.logger.debug(self._item.color)
             self._item.color = buff.vector_4()
 
     def processSynchronizerBuffer(self, buff):
