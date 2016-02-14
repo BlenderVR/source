@@ -226,12 +226,18 @@ class GUI(common_GUI):
             self._console_ui.current_screen_set.setText(currentScreenSet)
 
     def cb_set_screen_set(self):
-        all_screen_sets = self._possibleScreenSets
-        current = all_screen_sets[
-                        self._console_ui.select_screen_set.currentIndex()]
-        self.profile.setValue(['screen', 'set'], current)
-        self._console_ui.current_screen_set.setText(current)
-        self.set_screen_set()
+        if hasattr(self, '_first_time_cb_set_screen_set'):
+            # to avoid resetting screen set to default (first in list) at console opening,
+            # thus remembering selected screenset at last console close, related to the line in __init__:
+            # --> self._console_ui.select_screen_set.currentIndexChanged.connect(self.cb_set_screen_set)
+            all_screen_sets = self._possibleScreenSets
+            current = all_screen_sets[
+                            self._console_ui.select_screen_set.currentIndex()]
+            self.profile.setValue(['screen', 'set'], current)
+            self._console_ui.current_screen_set.setText(current)
+            self.set_screen_set()
+        else:
+            self._first_time_cb_set_screen_set = True
 
     def cb_set_blender_file(self):
         previous_file = self.profile.getValue(['files', 'blender'])
