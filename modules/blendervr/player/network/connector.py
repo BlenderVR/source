@@ -297,7 +297,13 @@ class Slave(Connector):
     def quit(self, reason):
         if hasattr(self, '_socket'):
             try:
-                self._socket.shutdown(socket.SHUT_RDWR)
+                try:
+                    self._socket.shutdown(socket.SHUT_RDWR)
+                except OSError as err:
+                    if not err.errno == 57:
+                        self.logger.log_traceback(False)
+                    else: # OSError: [Errno 57] Socket is not connected
+                        self.logger.debug('Shutdown socket failed: socket is not connected')
                 self._socket.close()
                 del(self._socket)
             except:
