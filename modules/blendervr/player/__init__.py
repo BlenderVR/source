@@ -287,7 +287,8 @@ class Main:
             self.stopDueToError()
 
     def _run_slave(self):
-        self._scene.suspend()
+        # self._scene.suspend()
+        pass
 
     def _run_default(self):
         try:
@@ -449,8 +450,8 @@ class Main:
         """Internal method to pause and resume the scene"""
         if self._connector.isReady() and not self.isPaused():
             # On doit demarrer la scene !
-            if self.isMaster():
-                self._scene.resume()
+            # if self.isMaster():
+            self._scene.resume()
             self._splash.stop()
         else:  # No network for the moment or pause !
             # We must stop the scene.
