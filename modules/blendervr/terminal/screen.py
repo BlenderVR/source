@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# file: blendervr/console/console.py
+# file: blendervr/console/screen.py
 
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
@@ -36,76 +36,59 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
-import sys
-import os
-from .logic import console as logic
-from .qt import console as gui
+from . import base
+from ..console.logic import screen as logic
 
 
-class Console(logic.Logic, gui.GUI):
-    def __init__(self, profile_file):
 
-        self._is_terminal_mode = False
+class Screen(base.Base, logic.Logic):
+
+    def __init__(self, screens, name, net_console):
+        self._opened = True
+        base.Base.__init__(self, screens)
+        self._main_logger = self.getParent().logger
+        self._name = name
 
         self._blender_file = None
         self._loader_file = None
-        self._processor_files = None
-
-        self._processor = None
-
-        self._update_loader_script = "/".join((BlenderVR_root, 'utils',
-                                                    'update_loader.py'))
-
-        from . import profile
-        self._profile = profile.Profile(profile_file)
+        self._processor_files = []
 
         from ..tools import logger
-        self._logger = logger.getLogger('BlenderVR')
+        self._logger = logger.getLogger(self.getName())
 
-        logic.Logic.__init__(self)
-        gui.GUI.__init__(self)
-
-        from . import screens
-        self._screens = screens.Screens(self)
-
-        from ..plugins import getPlugins
-        self._plugins = getPlugins(self, self._logger)
+        logic.Logic.__init__(self, net_console)
+        self.main_logger.debug('Creation of screen "' + self.getName() + '"')
 
     def __del__(self):
-        pass
+        self.main_logger.debug('Deletion of screen "' + self.getName() + '"')
+        logic.Logic.__del__(self)
 
     def start(self):
         logic.Logic.start(self)
-        gui.GUI.start(self)
-        self._screens.start()
-        self.load_configuration_file()
-        for plugin in self._plugins:
-            plugin.start()
-        self.profile.lock(False)
 
     def quit(self):
-        self.profile.lock(True)
-        for plugin in self._plugins:
-            plugin.quit()
         logic.Logic.quit(self)
-        gui.GUI.quit(self)
-        self._screens.quit()
-        del(self._screens)
-        gui.quit()
-        sys.exit()
 
-    @property
-    def profile(self):
-        return self._profile
+    def getName(self):
+        return self._name
+
+    def _write_to_window(self, message):
+        if message[:7] == 'stderr>':
+            print(message[7:])
+        elif message[:7] == 'stdout>':
+            print(message[7:])
+        elif message.startswith("INFO>"):
+            self.logger.info(message[5:])
+        elif message.startswith('DEBUG>'):
+            self.logger.debug(message[6:])
 
     @property
     def logger(self):
-        return self._logger
+        return self._main_logger
 
     @property
-    def plugins(self):
-        return self._plugins
+    def main_logger(self):
+        return self._main_logger
 
-    @property
-    def is_terminal_mode(self):
-        return self._is_terminal_mode
+    def is_log_window_opened(self):
+        return self._opened

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<!--
+    Here's an example of a launch xml file. Here you will define the components of the render, and you will start it
+    with the command: ./BLENDERVR_SOURCE/blendervr start-xml -start CURRENT_DIR/profile_spider.xml     -->
+<blendervr-launch>
+<configuration-file file="/users/mperez5/scratch/blenderVR_old/configurations/main-local.xml"/>
+
+<!--
+    If no arguments are given, this is the screen that will open when this profile_file is used. Note that with
+    -screen you can choose another screen set. For example... if there's another screen set  called 'CAVE'
+    you can open hhe application with the command:
+    ./BLENDERVR_SOURCE/blendervr start-xml -start CURRENT_DIR/profile_spider.xml -screen CAVE       -->
+<default-screen screen="local"/>
+
+<blender file="/gpfs/runtime/opt/blender/2.75-VR/blendervr/samples/advanced/chess/chess.blend"/>
+<processor file="/gpfs/runtime/opt/blender/2.75-VR/blendervr/samples/advanced/chess/chess.processor.py"/>
+
+</blendervr-launch> 

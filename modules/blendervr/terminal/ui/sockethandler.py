@@ -36,76 +36,27 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
-import sys
-import os
-from .logic import console as logic
-from .qt import console as gui
+import threading
+import select
 
 
-class Console(logic.Logic, gui.GUI):
-    def __init__(self, profile_file):
-
-        self._is_terminal_mode = False
-
-        self._blender_file = None
-        self._loader_file = None
-        self._processor_files = None
-
-        self._processor = None
-
-        self._update_loader_script = "/".join((BlenderVR_root, 'utils',
-                                                    'update_loader.py'))
-
-        from . import profile
-        self._profile = profile.Profile(profile_file)
-
-        from ..tools import logger
-        self._logger = logger.getLogger('BlenderVR')
-
-        logic.Logic.__init__(self)
-        gui.GUI.__init__(self)
-
-        from . import screens
-        self._screens = screens.Screens(self)
-
-        from ..plugins import getPlugins
-        self._plugins = getPlugins(self, self._logger)
-
-    def __del__(self):
+#Socket Handler. It will call the callback everytime there's something to be read from the port specified.
+class SocketThread(threading.Thread):
+    def __init__(self, server, callback):
+        threading.Thread.__init__(self)
+        self.setDaemon(True)
+        self.input = server
+        self.function_to_call = callback
         pass
 
-    def start(self):
-        logic.Logic.start(self)
-        gui.GUI.start(self)
-        self._screens.start()
-        self.load_configuration_file()
-        for plugin in self._plugins:
-            plugin.start()
-        self.profile.lock(False)
+    def run(self):
+        running = True
+        while running:
+            try:
+                inputready, outputready, exceptready = select.select([self.input],[],[],None)
+                if inputready is not None:
+                    for s in inputready:
+                            self.function_to_call(s)
+            except Exception as e:
+                pass
 
-    def quit(self):
-        self.profile.lock(True)
-        for plugin in self._plugins:
-            plugin.quit()
-        logic.Logic.quit(self)
-        gui.GUI.quit(self)
-        self._screens.quit()
-        del(self._screens)
-        gui.quit()
-        sys.exit()
-
-    @property
-    def profile(self):
-        return self._profile
-
-    @property
-    def logger(self):
-        return self._logger
-
-    @property
-    def plugins(self):
-        return self._plugins
-
-    @property
-    def is_terminal_mode(self):
-        return self._is_terminal_mode

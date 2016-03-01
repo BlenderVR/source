@@ -44,11 +44,11 @@ class Logic:
     def start(self):
         pass
 
-    def quit(self):
-        self.set_screens({}, None, None, None, None)
+    def quit(self, mode = False):
+        self.set_screens({}, None, None, None, None, mode)
 
     def set_screens(self, configurations, net_console, master_name,
-                                                        port, complements):
+                                                        port, complements, is_terminal_mode = False):
         to_remove = []
         for name in list(self._screens.keys()):
             if name not in configurations:
@@ -58,10 +58,13 @@ class Logic:
                 obj = None
 
         if len(configurations) == 0:
-            self.update_gui()
+            if not is_terminal_mode:
+                self.update_gui()
             return
-
-        from .. import screen
+        if not is_terminal_mode:
+            from .. import screen
+        else:
+            from ...terminal import screen
 
         for name, configuration in configurations.items():
             if name not in self._screens:
@@ -82,10 +85,13 @@ class Logic:
                 obj.setHierarchy(slave_informations)
         obj = None
 
-        self.update_gui()
+        if not is_terminal_mode:
+            self.update_gui()
 
         for name, obj in self._screens.items():
             obj.start()
+
+
 
     def getMaster(self):
         return self._screens[self._master_name]
@@ -94,6 +100,9 @@ class Logic:
         if screen_name in self._screens:
             return self._screens[screen_name]
         return None
+
+    def getScreens(self):
+        return self._screens.items()
 
     def getScreensNumber(self):
         return len(self._screens)

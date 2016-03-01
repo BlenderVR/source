@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# file: blendervr/console/console.py
+# file: blendervr/console/__init__.py
 
 ## Copyright (C) LIMSI-CNRS (2014)
 ##
@@ -37,75 +37,35 @@
 ##
 
 import sys
-import os
-from .logic import console as logic
-from .qt import console as gui
+from .. import *
 
 
-class Console(logic.Logic, gui.GUI):
-    def __init__(self, profile_file):
-
-        self._is_terminal_mode = False
-
-        self._blender_file = None
-        self._loader_file = None
-        self._processor_files = None
-
-        self._processor = None
-
-        self._update_loader_script = "/".join((BlenderVR_root, 'utils',
-                                                    'update_loader.py'))
-
-        from . import profile
-        self._profile = profile.Profile(profile_file)
-
-        from ..tools import logger
-        self._logger = logger.getLogger('BlenderVR')
-
-        logic.Logic.__init__(self)
-        gui.GUI.__init__(self)
-
-        from . import screens
-        self._screens = screens.Screens(self)
-
-        from ..plugins import getPlugins
-        self._plugins = getPlugins(self, self._logger)
-
-    def __del__(self):
-        pass
-
-    def start(self):
-        logic.Logic.start(self)
-        gui.GUI.start(self)
-        self._screens.start()
-        self.load_configuration_file()
-        for plugin in self._plugins:
-            plugin.start()
-        self.profile.lock(False)
-
-    def quit(self):
-        self.profile.lock(True)
-        for plugin in self._plugins:
-            plugin.quit()
-        logic.Logic.quit(self)
-        gui.GUI.quit(self)
-        self._screens.quit()
-        del(self._screens)
-        gui.quit()
+def main():
+    if not is_console():
+        import bge
+        bge.logic.endGame()
         sys.exit()
 
-    @property
-    def profile(self):
-        return self._profile
+import os
 
-    @property
-    def logger(self):
-        return self._logger
 
-    @property
-    def plugins(self):
-        return self._plugins
+def stripAnchor(anchor, path):
+    if path is None:
+        return None
+    if anchor is not None:
+        relpath = os.path.relpath(path, anchor)
+        if not relpath.startswith('..'):
+            return (relpath, True)
+    return (path, False)
 
-    @property
-    def is_terminal_mode(self):
-        return self._is_terminal_mode
+
+def unstripAnchor(anchor, path):
+    if path is None:
+        return None
+    if path[1] and anchor is not None:
+        return os.path.join(anchor, path[0])
+    return path[0]
+
+
+if os.environ.get('READTHEDOCS', False) != 'True':
+    main()

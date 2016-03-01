@@ -25,6 +25,7 @@
 ## with loading,  using,  modifying and/or developing or reproducing the
 ## software by the user in light of its specific status of free software,
 ## that may mean  that it is complicated to manipulate,  and  that  also
+## that may mean  that it is complicated to manipulate,  and  that  also
 ## therefore means  that it is reserved for developers  and  experienced
 ## professionals having in-depth computer knowledge. Users are therefore
 ## encouraged to load and test the software's suitability as regards their
@@ -95,20 +96,21 @@ class Logic:
             config = xml.Configure(self, configuration_paths,
                                          configuration_file)
             self._configuration = config.getConfiguration()
-
             starter = self._configuration['starter']
             self._net_console = starter['hostname'] + ':' + str(self._port)
             self._anchor = starter['anchor']
             self._screenSets = starter['configs']
             self._blender_exe = starter['blender']
             # pass an OrderedDict to possibleScreeSets to keep config order in console menu
+
             possibleScreenSets = list(OrderedDict(sorted(self._screenSets.items())).keys())
 
             self._common_processors = self._configuration['processors']
 
             if self._possibleScreenSets != possibleScreenSets:
                 self._possibleScreenSets = possibleScreenSets
-                self.display_screen_sets(self._possibleScreenSets)
+                if not self._is_terminal_mode:
+                    self.display_screen_sets(self._possibleScreenSets)
             self.set_screen_set()
 
         except SystemExit:
@@ -125,7 +127,8 @@ class Logic:
             configuration_screens = self._configuration['screens']
             configuration_computers = self._configuration['computers']
 
-            from ..  import screen
+            if not self._is_terminal_mode:
+                from ..  import screen
 
             screenSet = self._screenSets[current]
             masterScreen = screenSet[0]
@@ -161,11 +164,12 @@ class Logic:
                            'processors': self._configuration['processors'],
                            'screens_computer_map': screens_computer_map}
 
+
             self._screens.set_screens(configurations,
                                       self._net_console,
                                       masterScreen,
                                       self._configuration['port'],
-                                      complements)
+                                      complements, self._is_terminal_mode)
             self._update_status()
             self.update_user_files(True)
 
@@ -181,7 +185,10 @@ class Logic:
             state = 'running'
         else:
             state = None
-        self._display_status(state, states)
+
+        if not self._is_terminal_mode:
+            self._display_status(state, states)
+
         if self._previous_state != state:
             if self._processor:
                 if state == 'running':
@@ -189,7 +196,9 @@ class Logic:
                 if state == 'stopped':
                     self._processor.stop()
             self._previous_state = state
-            self.update_processor()
+
+            if not self._is_terminal_mode:
+                self.update_processor()
 
     def _connect_client(self, *args):
         conn, addr = self._server.accept()
@@ -209,6 +218,8 @@ class Logic:
 
         processor_files = [self.profile.getValue(['files', 'processor'])] + \
                           self._common_processors
+
+
         if self._processor_files != processor_files:
             if self._processor:
                 self._processor.quit()
@@ -290,6 +301,7 @@ class Logic:
                 del(self._kill_timer)
             except:
                 pass
+
             self._screens.stop_simulation()
 
     def sendToVirtualEnvironment(self, command, argument):
