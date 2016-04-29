@@ -39,10 +39,12 @@
 from .. import base
 
 
-class Base(base.Base):
+class PlayerBase(base.Base):
     def __init__(self, parent):
         base.Base.__init__(self, parent)
 
     @property
     def BlenderVR(self):
         return self.getMainRunningModule()
+
+Base = PlayerBase

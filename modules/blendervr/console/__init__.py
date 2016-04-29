@@ -37,7 +37,10 @@
 ##
 
 import sys
+import os
+
 from .. import *
+from . import logic
 
 
 def main():
@@ -46,10 +49,25 @@ def main():
         bge.logic.endGame()
         sys.exit()
 
-import os
-
 
 def stripAnchor(anchor, path):
+    """Compute file path to have a relative path to parent dir anchor.
+
+    If path is not a subpath of anchor, it is returned unchanged
+    with a bool False flag. 
+    If path is a subpath of anchor, it is returned relative to anchor
+    with a bool flag True.
+
+    If path is None, simply return None.
+    If anchor is None, return path and bool flag False indicating inchanged.
+
+    :param anchor: root part of path to remove.
+    :type anchor: string
+    :param path: complete path to strip anchor root path.
+    :type path: string
+    :rtype: (string, bool)
+    :return: relative path from anchor, indicator of modification
+    """
     if path is None:
         return None
     if anchor is not None:
@@ -58,10 +76,25 @@ def stripAnchor(anchor, path):
             return (relpath, True)
     return (path, False)
 
-from . import logic
-
 
 def unstripAnchor(anchor, path):
+    """Re-insert removed anchor root at begin of path.
+
+    Warning: Here path is not a simple string as in stripAnchor() call,
+    its the result of this call: (string, bool).
+
+    If path is None, simply return None.
+    If path has not been modified (path[1] is False), then simply
+    return the path strting as is.
+    Else prepend anchor to the path string.
+
+    :param anchor: root part of path to re-insert.
+    :type anchor: string
+    :param path: alue returned from stripAnchor call()
+    :type path: (string, bool)
+    :rtype: string
+    :return: absolute path including anchor
+    """
     if path is None:
         return None
     if path[1] and anchor is not None:
@@ -69,5 +102,13 @@ def unstripAnchor(anchor, path):
     return path[0]
 
 
-if os.environ.get('READTHEDOCS', False) != 'True':
+# Environment variable set by documentation processing, used to avoid
+# execution of blendervr when we are just importing for generating
+# documentation.
+# Package bvr is a Blender tool, its presence in modules indicate that
+# we are not in the blenderplayer context but in an interactive Blender
+# session using the BlenderVR bvr tool.
+# In these two cases, we DONT start the BlenderVR machinery.
+if os.environ.get('READTHEDOCS', False) != 'True' and (
+        'bvr' not in sys.modules or 'BVR_LOADER_CREATION' in os.environ):
     main()

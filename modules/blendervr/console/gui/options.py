@@ -37,7 +37,7 @@
 ##
 
 
-class GUI:
+class ConsoleOptionsGUI:
     def __init__(self):
         self.profile.setDefault({'debug': {'daemon': False,
                                            'processor': True,
@@ -55,3 +55,5 @@ class GUI:
 
     def is_options_window_opened(self):
         return False
+
+GUI = ConsoleOptionsGUI

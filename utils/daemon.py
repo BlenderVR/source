@@ -36,13 +36,119 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
-"""
+"""\
 Daemon
 ******
 
-This script runs in the clients and is responsible for spawning the
-Blender Player.
+This script runs in the clients rendering nodes and is responsible for spawning the
+Blender Player with correct parameters, and sending feedback to the Console.
+
+The daemon is started with command-line arguments. 
+**First argument** is the network address ``host:port`` reference to contact the console.
+**Second argument** is the *name* of the screen managed by that daemon.
+An optional **third argument** can be ``debug`` to request activation of debugging
+code in the daemon.
+
+
+Messages
+========
+
+
+Management
+----------
+
+When started the daemon connect to the Console via its contact reference given on
+command line arguments. Its first sent message is an  identification of itself with 
+a command ``daemon`` giving the screen name as argument::
+
+  daemon:"name"
+
+If the daemon is the result of a fork, it send back to the Console a ``forked`` message
+without parameter::
+
+  forked:""
+
+To stop the daemon, just send it a ``kill daemon`` message without parameter::
+
+  kill daemon:""
+
+
+Playing
+-------
+
+The daemon can receive a ``blender_player`` command specifying in arguments 
+the parameters needed to start the blenderplayer process::
+
+  blender_player:{'executable': "path to blenderplayer binary",
+                  'option': "options to pass to executable"
+                  'environments': { 'ENVIRONMENT_NAMES': 'ENVIRONMENT_VALUES' } }
+
+If some log file has to be cleared before running the player, then the
+daemon can receive a message with ``log_to_clear`` command specifying this 
+file as argument::
+
+  log_to_clear:"path to log file to remove"
+
+Once the player context has been specified, you can indicate what file
+must be played using command loader_file::
+
+  loader_file:"file name of path to file"
+
+To start the player, the daemon receive a ``state`` command with a bool arguments::
+
+  state:True
+
+To stop the player, Console can send a simple ``state`` command with a bool arguments::
+
+    state:False
+
+Once having a running player, the daemon send back a ``started`` command indication to the
+Console, without argument::
+
+  started:""
+
+To explicitly stop the player, the daemon can receive a ``kill`` command, without
+argument::
+
+  kill:""
+
+When the blender player has been started, the daemon send back a ``started`` command
+without argument to the Console::
+
+  started:""
+
+When the blender player has been stopped, the daemon send back a ``stopped`` command
+without argument to the Console::
+
+  stopped:""
+
+
+Information / Feedback
+----------------------
+
+Before starting the player, the daemon send back a ``command`` command
+to the Console, specifying what local command and with what parameters will be
+started::
+
+  command:{'command': "command to start via subprocess",
+           'environment': { 'ENVIRONMENT_NAMES': 'ENVIRONMENT_VALUES' },
+           'path': "path to played file directory" }
+
+In case of error, the daemon send back an ``stderr`` command with some informational
+string as argument to the Console. 
+It also send back this way any informations printed on the daemon's stderr stream::
+
+  stderr:"error informations / printed informations"
+
+In the same spirit, the daemon send back to the Console ``stdout`` commands with
+string as argument for any printed line on daemon's stdout stream::
+
+  stdout:"printed informations"
+
 """
+
+# Inspired from daemonize module https://pypi.python.org/pypi/daemonize/
+# But usable on Linux, Windows, MasOS… cannot use daemonize as is.
 
 import sys
 import threading
@@ -54,12 +160,16 @@ import subprocess
 import threading
 
 
+#: debug argument present as third parameter of daemon process on command line.
 debug = False
+
+#: Indicate that we have been double-forked to be a Unix daemon.
 forked = False
 
 
 class Daemon:
-    """Background management of the Blender Player and related stuff.
+    """\
+    Background management of the Blender Player and related stuff.
 
 
     """
@@ -91,8 +201,8 @@ class Daemon:
         #         version = '.'.join(map(str, sys.version_info[:2]))
         #         raise Exception('pywin32 not installed for Python ' + version)
 
-        if forked:
-            self._client.send('forked')
+        if forked:  # Global set in module main() code.
+            self._client.send_command('forked')
 
         self._loader_file = None
         self._loader_path = None
@@ -109,7 +219,7 @@ class Daemon:
         for message in messages:
             elements.append(str(message))
         for message in (' '.join(elements)).split('\n'):
-            self._client.send('log', message.rstrip(' \n\r'))
+            self._client.send_command('log', message.rstrip(' \n\r'))
 
     def __del__(self):
         self._stop_blender_player()
@@ -136,6 +246,7 @@ class Daemon:
         :param command: Command to execute in the client machine
         :type command: str
         :param argument: Value depends on the command
+        :type argument: any jsonifiable content
         """
         BlenderVR_modules = self._BlenderVR_modules
         if command == 'blender_player':
@@ -188,7 +299,7 @@ class Daemon:
                 self._process.wait()
             self._process = None
             try:
-                self._client.send('stopped')
+                self._client.send_command('stopped')
             except:
                 pass
 
@@ -207,7 +318,7 @@ class Daemon:
                     command[index] = '"' + argument + '"'
 
             try:
-                self._client.send('command', {'command': command,
+                self._client.send_command('command', {'command': command,
                                               'environment': self._environment,
                                               'path': self._loader_path})
                 self._process = subprocess.Popen(command,
@@ -220,13 +331,13 @@ class Daemon:
                              #TODO: use os.name == 'posix'
                              close_fds=('posix' in sys.builtin_module_names))
             except Exception as error:
-                self._client.send('stderr', 'Cannot start blenderplayer: '
+                self._client.send_command('stderr', 'Cannot start blenderplayer: '
                                                     + str(error))
             threading.Thread(target=Daemon._stream_waiter,
                                         args=(self, 'stdout')).start()
             threading.Thread(target=Daemon._stream_waiter,
                                         args=(self, 'stderr')).start()
-            self._client.send('started')
+            self._client.send_command('started')
 
     def _exit(self, *args):
         self._stop_blender_player()
@@ -236,11 +347,11 @@ class Daemon:
         stream = getattr(self._process, stream_name)
         while True:
             lines = stream.readline()
-            if not lines:
+            if not lines:   # Break on end of stream (closed).
                 break
             lines = lines.rstrip(' \r\n')
             for line in lines.split('\n'):
-                self._client.send(stream_name, line)
+                self._client.send_command(stream_name, line)
         if stream_name == 'stdout':
             self._stop_blender_player()
 
@@ -288,6 +399,7 @@ def main():
             # as it might be different than /dev/null.
             devnull = os.devnull
 
+        # Close inherited file descriptors.
         import resource
         for fd in range(resource.getrlimit(resource.RLIMIT_NOFILE)[0]):
             try:
@@ -295,15 +407,14 @@ def main():
             except OSError:
                 pass
 
-        os.open(devnull, os.O_RDWR)
-        #TODO: LPOINTAL: usage of duplicating (twice) stdin and bad dup() ?
-        # Maybe second call should be os.dup(1).
-        # And, what is done with values ? Maybe should use dup2() which
-        # close the old file and to specify if the new is inheritable
-        # or not (for dup(), its non-inheritable in Unix, inheritable on
-        # windows.
-        os.dup(0)
-        os.dup(0)
+        # Redirect stdin/stdout/stderr to /dev/null stream.
+        # Note: updated with daemonize patch commited on 6 May 2014
+        devnull_fd = os.open(devnull, os.O_RDWR)
+        os.dup2(devnull_fd, 0)
+        os.dup2(devnull_fd, 1)
+        os.dup2(devnull_fd, 2)
+        # Note: sys.stdout and sys.stderr are redirected by daemon to the
+        # Console via TCP communications.
 
     # Find the installation root, and make blender package available.
     BlenderVR_root = os.path.dirname(os.path.dirname(__file__))

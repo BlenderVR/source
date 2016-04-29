@@ -36,23 +36,23 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
-"""
-Handle all the errors, warnings and debug info
+"""\
+Handle all the errors, warnings and debug info of BlenderVR.
 """
 
 import logging
 import sys
 import pprint
+from types import MethodType
 
 verbosities = ['debug', 'info', 'warning', 'error', 'critical']
 
 
-class Logger(logging.getLoggerClass()):
+class BlenderVRLogger(logging.getLoggerClass()):
 
     def __init__(self, name):
-        super(Logger, self).__init__(name)
+        super(BlenderVRLogger, self).__init__(name)
 
-        from types import MethodType
         for verbosity in verbosities:
             setattr(self, verbosity, MethodType(self._process, verbosity))
 
@@ -60,7 +60,7 @@ class Logger(logging.getLoggerClass()):
         return verbosities
 
     def setLevel(self, verbosity):
-        super(Logger, self).setLevel(self._getVerbosity(verbosity))
+        super(BlenderVRLogger, self).setLevel(self._getVerbosity(verbosity))
 
     def log_traceback(self, error):
         if error:
@@ -136,8 +136,10 @@ class Logger(logging.getLoggerClass()):
         self.addHandler(handler)
         return handler
 
+# Keep for compatibility.
+Logger = BlenderVRLogger
 
-class Console:
+class ConsoleLogger:
     def __init__(self, msg='Console logger: '):
         self._mapping = {'DEBUG': sys.stdout,
                          'INFO': sys.stdout,
@@ -147,7 +149,6 @@ class Console:
         self._logging_prefix = msg
 
     def write(self, *messages):
-        elements = []
         elements = []
         for message in messages:
             elements.append(str(message))
@@ -160,9 +161,12 @@ class Console:
                     dest = self._mapping[message_type]
                     dest.write(self._logging_prefix + message + '\n')
                     dest.flush()
+# Keep for compatibility.
+Console = ConsoleLogger
 
-if not isinstance(logging.getLoggerClass(), Logger):
-    logging.setLoggerClass(Logger)
+
+if not isinstance(logging.getLoggerClass(), BlenderVRLogger):
+    logging.setLoggerClass(BlenderVRLogger)
 
 
 def getLogger(name):
@@ -171,3 +175,10 @@ def getLogger(name):
 
 # def getGUIHandler(login_window):
 #     return handler
+
+
+# Enable out logging debug.
+import os.path
+logging.basicConfig(filename=os.path.join(os.path.expanduser('~'), 'bvr_logs_blendervr.txt'),
+                    filemode="w",   # Ensure overwrite the log file.
+                    level=logging.DEBUG)

@@ -39,7 +39,7 @@
 from .. import base
 
 
-class Logger(base.Base):
+class ConsoleLogger(base.Base):
 
     def __init__(self, parent, config_index):
         base.Base.__init__(self, parent)
@@ -99,3 +99,5 @@ class Logger(base.Base):
 
     def clear(self):
         pass
+
+Logger = ConsoleLogger

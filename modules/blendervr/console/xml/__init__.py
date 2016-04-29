@@ -46,7 +46,7 @@ class Configure(xml.sax.handler.ContentHandler, xml.sax.handler.EntityResolver, 
         xml.sax.handler.EntityResolver.__init__(self)
         Base.__init__(self, parent)
 
-        self._xml_reader         = self
+        self._xml_reader = self
         if type(config_paths) is str:
             self._config_paths = config_paths.split(os.pathsep)
         else:
@@ -62,10 +62,10 @@ class Configure(xml.sax.handler.ContentHandler, xml.sax.handler.EntityResolver, 
         configuration_file = self._lookForConfigurationFile(config_file)
         if configuration_file is None:
             from .. import exceptions
-            raise exceptions.Main('Invalid configuration file !')
+            raise exceptions.MainError('Invalid configuration file !')
         self._parser.parse(configuration_file)
 
-    def resolveEntity(self,publicID,systemID):
+    def resolveEntity(self, publicID, systemID):
         evaluated = self._root._evaluateInput(systemID)
         filename  = self._lookForConfigurationFile(evaluated)
         if filename is None:
@@ -74,7 +74,7 @@ class Configure(xml.sax.handler.ContentHandler, xml.sax.handler.EntityResolver, 
             else:
                 name = systemID
             from .. import exceptions
-            raise exceptions.Main('Cannot load ' + name + ' configuration file')
+            raise exceptions.MainError('Cannot load ' + name + ' configuration file')
         return filename
 
     def _lookForConfigurationFile(self, filename):

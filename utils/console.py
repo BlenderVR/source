@@ -40,21 +40,24 @@
 BlenderVR Console
 ******************
 
-BlenderVR console mode
+BlenderVR console mode.
+Started by blendervr script, whith provide parameters for
+our main() function.
 """
 
 import sys
 import os
-import __main__
+import builtins
+import pickle
+import pprint
 
 
-def main():
-    import builtins
+def main(environments, profile_file):
     builtins.BlenderVR_QT = BlenderVR_QT
 
     sys.path.append("/".join((BlenderVR_root, 'modules')))
 
-    if __main__.environments.d_version:
+    if environments.d_version:
         try:
             import blendervr
             print('Current version:', blendervr.version)
@@ -62,27 +65,25 @@ def main():
             pass
         sys.exit()
 
-    if __main__.environments.dis_console:
+    if environments.dis_console:
         try:
-            import pickle
-            with open(__main__.profile_file, 'rb') as node:
+            with open(profile_file, 'rb') as node:
                 consoleuration = pickle.load(node)
-            import pprint
             print("Consoleuration:")
             pprint.pprint(consoleuration)
         except:
-            print('Invalid profile file:', __main__.profile_file)
+            print('Invalid profile file:', profile_file)
         sys.exit()
 
-    if __main__.environments.del_console:
+    if environments.del_console:
         try:
-            os.remove(__main__.profile_file)
+            os.remove(profile_file)
         except:
             pass
         sys.exit()
 
     import blendervr.console.console
-    console = blendervr.console.console.Console(__main__.profile_file)
+    console = blendervr.console.console.ConsoleConsole(profile_file)
     console.start()
     console.main()
     console.quit()
@@ -100,7 +101,4 @@ except:
         print('No graphic library available : quitting !')
         sys.exit()
 
-
-if __name__ == "__main__":
-    main()
 

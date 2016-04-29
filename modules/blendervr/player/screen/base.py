@@ -79,10 +79,10 @@ class Base(base.Base):
         bgl.glGetBooleanv(bgl.GL_STEREO, stereo_mode)
         if ((not 'left' in self._buffers) or (not 'right' in self._buffers)) \
                 and (stereo_mode == 1):
-            raise exceptions.VirtualEnvironment('Stereo window but buffer '
+            raise exceptions.VirtualEnvironmentError('Stereo window but buffer '
                                                 'is missing !')
         if (not 'middle' in self._buffers) and (stereo_mode == 0):
-            raise exceptions.VirtualEnvironment('Monoscopic window but '
+            raise exceptions.VirtualEnvironmentError('Monoscopic window but '
                                             '"middle" buffer is missing !')
 
     def getBufferUser(self, bufferName):
@@ -163,19 +163,19 @@ class Base(base.Base):
         # First, check corners validity !
         XVector = corners['topRightCorner'] - corners['topLeftCorner']
         if XVector.length < (corners['topRightCorner'][0] / 100000):
-            raise exceptions.VirtualEnvironment("top right and left corners"
+            raise exceptions.VirtualEnvironmentError("top right and left corners"
                                                 " are same points !")
             return
 
         YVector = corners['topRightCorner'] - corners['bottomRightCorner']
         if YVector.length < (corners['topRightCorner'][0] / 100000):
-            raise exceptions.VirtualEnvironment("top and bottom right corners"
+            raise exceptions.VirtualEnvironmentError("top and bottom right corners"
                                                 " are same points !")
             return
 
         ZVector = XVector.cross(YVector)
         if ZVector.length < (corners['topRightCorner'][0] / 100000):
-            raise exceptions.VirtualEnvironment("Three corners are not "
+            raise exceptions.VirtualEnvironmentError("Three corners are not "
                                                 "perpendicular !")
             return
         corners['bottomLeftCorner'] = corners['topLeftCorner'] - YVector

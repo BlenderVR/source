@@ -34,7 +34,7 @@
 ##
 
 
-class Base:
+class MainBase:
     """Main struct for the blender vr environment"""
     def __init__(self, parent):
         """
@@ -43,7 +43,7 @@ class Base:
         """
         self._parent = parent
 
-        if isinstance(self._parent, Base):
+        if isinstance(self._parent, MainBase):
             self._main_running_module = self._parent._main_running_module
         else:
             self._main_running_module = self._parent
@@ -68,7 +68,7 @@ class Base:
 
     def getParent(self):
         """
-        Returns the module that inherits the Base class
+        Returns the module that inherits the MainBase class
 
         :rtype: module or class
         """
@@ -79,3 +79,5 @@ class Base:
         :rtype: module
         """
         return self._main_running_module
+
+Base = MainBase

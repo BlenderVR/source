@@ -40,6 +40,8 @@
 Main module of the BlenderVR application
 """
 
+import sys
+import os
 
 # Beware: you must alswo change BlenderVR console executable to change the
 # profile pickle file to load
@@ -67,6 +69,14 @@ def is_creating_loader():
     """
     try:
         import bpy
+        # With integration of BlenderVR as a Blender tool, we can have
+        # bpy importable (ie. is_creating_loader() True) but being in the
+        # console with the bvr package tool…
+        # Use an environment variable given to Blender to detect that
+        # we are using it to patch the scene xxx.blend and generate the
+        # corresponding .xxx.blend file.
+        if 'bvr' in os.modules and 'BVR_LOADER_CREATION' not in os.environ:
+            return False
         return True
     except:
         return False
@@ -82,6 +92,8 @@ def is_console():
 
 
 def run():
+    """Run VR rendering environment from bound bge.logic.BlenderVR object.
+    """
     if is_virtual_environment():
         import bge
         bge.logic.BlenderVR.run()
@@ -90,6 +102,8 @@ def run():
 
 
 def main():
+    """In case of virtual environment rendering, bind machinery inside bge.logic.BlenderVR.
+    """
     if is_virtual_environment():
         try:
             import bge
@@ -98,8 +112,16 @@ def main():
         except:
             pass
 
-import os
 # Environment variable set by documentation processing, used to avoid
-#
-if os.environ.get('READTHEDOCS', False) != 'True':
+# execution of blendervr when we are just importing for generating
+# documentation.
+# Package bvr is a Blender tool, its presence in modules indicate that
+# we are not in the blenderplayer context but in an interactive Blender
+# session using the BlenderVR bvr tool.
+# In these two cases, we DONT start the BlenderVR machinery.
+
+
+if os.environ.get('READTHEDOCS', 'False') != 'True' and (
+        'bvr' not in sys.modules or 'BVR_LOADER_CREATION' in os.environ):
     main()
+

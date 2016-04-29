@@ -37,7 +37,7 @@
 ##
 
 
-class GUI:
+class ConsoleScreensGUI:
     def __init__(self):
         pass
 
@@ -52,3 +52,5 @@ class GUI:
 
     def update_gui(self):
         pass
+
+GUI = ConsoleScreensGUI

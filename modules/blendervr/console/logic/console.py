@@ -36,17 +36,38 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
+"""\
+Main management of BlenderVR Console with singleton object.
+
+Profile paths:
+    config
+        file
+        path
+    screen
+        set
+        
+        
+"""
 import socket
 import os
-from .. import exceptions
-from ...tools import protocol
 import copy
 from collections import OrderedDict
 import sys
 import subprocess
 
+from blendervr.console import exceptions
+from blendervr.tools import protocol
+from blendervr.tools.connector import TcpServerConMgr
 
-class Logic:
+
+class ConsoleLogic:
+    """Logical control part of BlenderVR Console.
+
+    This class is intended to be used as a mixin class with
+    some inheritance from blendervr.base.MainBase class.
+
+    It uses some inherited methods/attributes of this superclass.
+    """
     def __init__(self):
         self._possibleScreenSets = None
         self._anchor = None
@@ -54,16 +75,27 @@ class Logic:
         self._common_processors = []
 
     def start(self):
+        # Note: In case of blender bvr tool, we directly manage socket reading,
+        # so we transmit socket object to addListenTo(), else we are dealing
+        # with Qt based console, and we transmit the corresponding fileno.
+        # Also use BVR_LOADER_CREATION env var to detect use as a loader.
+
+        # Open our console centralization socket as a TCP/IP server.
         self._server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._port = 31415
         while True:
             try:
                 self._server.bind(('', self._port))
+                self.logger.info("Console bound to TCP port %d", self._port)
                 break
             except socket.error:
                 self._port += 1
-        self._server.listen(10)
-        self._server_listen_tag = self.addListenTo(self._server.fileno(),
+        self._server.listen(10)     # Allow up to 10 input connections.
+        if 'bvr' in sys.modules and 'BVR_LOADER_CREATION' not in os.environ:
+            self._server_listen_tag = self.addListenTo(self._server,
+                                                   self._connect_client)
+        else:
+            self._server_listen_tag = self.addListenTo(self._server.fileno(),
                                                    self._connect_client)
         from ... import version
         self.logger.info('BlenderVR version:', version)
@@ -72,10 +104,17 @@ class Logic:
         pass
 
     def load_configuration_file(self):
+        """Load the configuration file specified in profile.
+
+        It use profile values from ['config', 'file'] and ['config', 'path'].
+
+        :return: an indicator that a valid file has been loaded.
+        :rtype: bool
+        """
         try:
             configuration_file = self.profile.getValue(['config', 'file'])
             if configuration_file is None:
-                return
+                return False
             configuration_paths = copy.copy(self.profile.getValue(['config',
                                                                    'path']))
 
@@ -94,6 +133,7 @@ class Logic:
             from .. import xml
             config = xml.Configure(self, configuration_paths,
                                          configuration_file)
+            self.logger.info("Configuration loaded: %d", configuration_file)
             self._configuration = config.getConfiguration()
 
             starter = self._configuration['starter']
@@ -110,13 +150,15 @@ class Logic:
                 self._possibleScreenSets = possibleScreenSets
                 self.display_screen_sets(self._possibleScreenSets)
             self.set_screen_set()
-
+            return True
         except SystemExit:
             raise
-        except exceptions.Main as error:
+        except exceptions.MainConsoleError as error:
             self.logger.error(str(error))
+            return False
         except:
             self.logger.log_traceback(False)
+            return False
 
     def set_screen_set(self):
         current = self.profile.getValue(['screen', 'set'])
@@ -125,7 +167,8 @@ class Logic:
             configuration_screens = self._configuration['screens']
             configuration_computers = self._configuration['computers']
 
-            from ..  import screen
+# TODO: Check if needed (unused…)
+#            from ..  import screen
 
             screenSet = self._screenSets[current]
             masterScreen = screenSet[0]
@@ -192,10 +235,15 @@ class Logic:
             self.update_processor()
 
     def _connect_client(self, *args):
-        conn, addr = self._server.accept()
+        """\
+        Connexion handler when a daemon call back to establish a communication.
 
-        from ...tools.connector import Server
-        client = Server(conn)
+        Identify the remote daemon and associate it with corresponding
+        Screen in the Console process.
+        """
+        # Accept the connection and build management object.
+        conn, addr = self._server.accept()
+        client = TcpServerConMgr(conn)
 
         module, screen_name = client.getClientInformation()
 
@@ -203,6 +251,7 @@ class Logic:
         if screen:
             screen.setNetworkClient(module, client, addr)
         return True
+        # TODO: what about returning False ?
 
     def update_user_files(self, force=False):
         blender_file = self.profile.getValue(['files', 'blender'])
@@ -229,8 +278,14 @@ class Logic:
                                                             blender_file]
             if self.profile.getValue(['debug', 'executables']):
                 self.logger.debug('Get loader script name:', ' '.join(command))
+            # In use with the console being a bvr tool, we set an environment variable 
+            # to inform launched blender that it is  creating a VR loader. 
+            # This avoid automagic detection using tentative to import bpy.
+            procenv = copy.deepcopy(os.environ)     # Dont touch our onwn env.
+            procenv['BVR_LOADER_CREATION'] = "creating"
             process = subprocess.Popen(command, stdin=subprocess.PIPE,
-                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                            env=procenv)
             process.wait()
             for line in process.stdout:
                 loader_file = line.decode('UTF-8').rstrip()
@@ -352,3 +407,4 @@ class Logic:
                 self.logger.debug(line.decode('UTF-8').rstrip())
 
 
+Logic = ConsoleLogic

@@ -39,7 +39,7 @@
 from .. import base
 
 
-class Base(base.Base):
+class ConsoleBase(base.Base):
     def __init__(self, parent):
         base.Base.__init__(self, parent)
         self._main_running_module_profile = self._main_running_module._profile
@@ -54,3 +54,5 @@ class Base(base.Base):
 
     def getConsole(self):
         return self.getMainRunningModule()
+
+Base = ConsoleBase

@@ -42,7 +42,7 @@ from .logic import console as logic
 from .qt import console as gui
 
 
-class Console(logic.Logic, gui.GUI):
+class ConsoleConsole(logic.Logic, gui.GUI):
     def __init__(self, profile_file):
 
         self._blender_file = None
@@ -103,3 +103,5 @@ class Console(logic.Logic, gui.GUI):
     @property
     def plugins(self):
         return self._plugins
+
+Console = ConsoleConsole

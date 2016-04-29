@@ -77,8 +77,8 @@ class Sender(Base):
             try:
                 self._users.append(self.BlenderVR.getUserByName(
                                                     configuration['users']))
-            except exceptions.User:
-                raise exceptions.Processor_Invalid_Device(
+            except exceptions.UserError:
+                raise exceptions.Processor_Invalid_DeviceError(
                                     'user not found for processor "'
                                     + configuration['processor_method']
                                     + '": ' + configuration['users'])

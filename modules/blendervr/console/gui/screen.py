@@ -37,7 +37,7 @@
 ##
 
 
-class GUI:
+class ConsoleScreenGUI:
     def __init__(self):
         self._profile_index = ['screens', self.getName()]
         self._log_to_file_index = self._profile_index + ['log', 'file']
@@ -68,3 +68,5 @@ class GUI:
 
     def _write_to_window(self, message):
         pass
+
+GUI = ConsoleScreenGUI

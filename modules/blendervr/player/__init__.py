@@ -56,7 +56,7 @@ if not is_virtual_environment():
 import bge
 LEFT_EYE = bge.render.LEFT_EYE
 
-class Main:
+class PlayerMain:
 
     MESSAGE_PAUSE = b'p'
     MESSAGE_PROCESSOR = b'r'
@@ -335,7 +335,7 @@ class Main:
         the user does not exists"""
         if userName in self._users:
             return self._users[userName]
-        raise exceptions.User('User "' + userName + '" not found')
+        raise exceptions.UserError('User "' + userName + '" not found')
 
     def getScreenUsers(self):
         return self._screen.getUsers()
@@ -512,3 +512,5 @@ class Main:
             else:
                 if not path in sys.path:
                     sys.path.append(path)
+
+Main = PlayerMain

@@ -41,7 +41,7 @@ from .logic import screen as logic
 from .qt import screen as gui
 
 
-class Screen(base.Base, logic.Logic, gui.GUI):
+class ConsoleScreen(base.Base, logic.Logic, gui.GUI):
 
     def __init__(self, screens, name, net_console):
         base.Base.__init__(self, screens)
@@ -82,3 +82,5 @@ class Screen(base.Base, logic.Logic, gui.GUI):
     @property
     def main_logger(self):
         return self._main_logger
+
+Screen = ConsoleScreen

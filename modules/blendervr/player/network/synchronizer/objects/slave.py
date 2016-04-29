@@ -81,7 +81,7 @@ class Slave(Synchronizer):
                                                     self.getItem(children))
                 continue
 
-            raise exceptions.Synchronizer("buffer from master reading error:"
+            raise exceptions.SynchronizerError("buffer from master reading error:"
                                           " not start of item ("
                                           + str(command) + ") !")
         return

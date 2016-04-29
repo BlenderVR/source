@@ -38,51 +38,58 @@
 
 from ..exceptions import *
 
-
-# TODO: rename exceptions as <prefix>XXXError
-class Common(Exception):
+class CommonError(Exception):
     def __init__(self, reason):
         self._reason = reason
 
     def __str__(self):
         return self._reason
+Common = CommonError
 
 
-class Main(Common):
+class MainError(CommonError):
     def __init__(self, reason):
-        super(Main, self).__init__(reason)
+        super(MainError, self).__init__(reason)
+Main = MainError
 
 
-class Synchronizer(Common):
+class SynchronizerError(CommonError):
     def __init__(self, reason):
-        super(Synchronizer, self).__init__(reason)
+        super(SynchronizerError, self).__init__(reason)
+Synchronizer= SynchronizerError
 
 
-class Controller(Common):
+class ControllerError(CommonError):
     def __init__(self, reason):
-        super(Controller, self).__init__(reason)
+        super(ControllerError, self).__init__(reason)
+Controller = ControllerError
 
 
-class User(Common):
+class UserError(CommonError):
     def __init__(self, reason):
-        super(User, self).__init__(reason)
+        super(UserError, self).__init__(reason)
+User = UserError
 
 
-class VirtualEnvironment(Common):
+class VirtualEnvironmentError(CommonError):
     def __init__(self, reason):
-        super(VirtualEnvironment, self).__init__(reason)
+        super(VirtualEnvironmentError, self).__init__(reason)
+VirtualEnvironment = VirtualEnvironmentError
 
 
-class Processor(Common):
+class ProcessorError(CommonError):
     def __init__(self, reason):
-        super(Processor, self).__init__(reason)
+        super(ProcessorError, self).__init__(reason)
+Processor = ProcessorError
 
 
-class Processor_Invalid_Device(Common):
+class Processor_Invalid_DeviceError(CommonError):
     def __init__(self, reason):
-        super(Processor_Invalid_Device, self).__init__(reason)
+        super(Processor_Invalid_DeviceError, self).__init__(reason)
+Processor_Invalid_Device = Processor_Invalid_DeviceError
 
 
-class Processor_Invalid_Device_Method(Processor_Invalid_Device):
+class Processor_Invalid_Device_MethodError(Processor_Invalid_DeviceError):
     def __init__(self, reason):
         super(Processor_Invalid_Device_Method, self).__init__(reason)
+Processor_Invalid_Device_Method = Processor_Invalid_Device_MethodError

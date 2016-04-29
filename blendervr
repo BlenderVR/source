@@ -58,6 +58,7 @@ import sys
 import os
 import builtins
 
+
 if sys.platform.startswith("win"):
     path = os.path.join(os.environ['APPDATA'])
 elif sys.platform == 'darwin':
@@ -110,7 +111,7 @@ root = None
 
 # Is BlenderVR_root given on command line ?
 if environments.BlenderVR_root is not None:
-    root= environments.BlenderVR_root
+    root = environments.BlenderVR_root
 
 # Is root available in profile file ?
 if not isValidRoot(root):
@@ -144,7 +145,7 @@ try:
     (fileobj, file_name, data) = imp.find_module('console',
                                         [os.path.join(root, 'utils')])
     module = imp.load_module('console', fileobj, file_name, data)
-    module.main()
+    module.main(environments, profile_file)
 except SystemExit:
     pass
 except:

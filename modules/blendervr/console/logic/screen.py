@@ -36,19 +36,29 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
+"""\
+Management of a screen with its related daemon.
+
+For daemon supported messages (commands and feedback), see documentation 
+in blendervr.utils.daemon.py.
+
+The screen manage startin/stopping the daemon and the calls to activate
+its functionnalities (mainly start/stop blenderplayer…).
+"""
+
 import os
 import subprocess
 import sys
-#import socket
 import copy
 import shlex
 
 
-class Logic:
+class ConsoleScreenLogic:
     def __init__(self, net_console):
         self._net_console = net_console
         self._process = None
 
+        #TODO: Replace self._clients[] by two attributes.
         self._clients = {'daemon': None,
                          'blender_player': None}
 
@@ -59,6 +69,9 @@ class Logic:
         pass
 
     def start(self):
+        """\
+        Start the daemon to manage the screen.
+        """
         if not self.daemon_is_running():
             self._startDaemon()
         else:
@@ -66,17 +79,77 @@ class Logic:
 
     def quit(self):
         self._stop = True
-        if self._clients['daemon']:
-            self._clients['daemon'].send('kill daemon')
-        self._close_network_client(self._clients['blender_player'])
-        self._close_network_client(self._clients['daemon'])
         self._stopDaemon()
 
     def restartDaemon(self):
-        if self._clients['daemon']:
-            self._clients['daemon'].send('kill daemon')
+        raise RuntimeError("! Who called it ???")
+        if self.daemon_is_running():
+            self._stopDaemon()
+        self._startDaemon()
 
     def setConfiguration(self, configuration, complements):
+        """\
+        Setup screen management configuration.
+
+        Use a large dictionnary to transmit configuration data.
+        
+        Here it is presented in a yaml-like syntax (string values
+        in quotes):
+        
+        screen:
+            device_type: "devtype"          <==== MUST VERIFY IF ITS A STRING
+            @devtype:
+                …
+            keep_focus: bool                <==== MUST VERIFY IF ITS A BOOL
+            display:
+                graphic_buffer: "nameof-gbuffer"    <==== MUST VERIFY ITS A STRING
+                viewport: "???" <==== WHAT KIND OF DATA?
+                environments:
+                    key: value
+                    …
+                options: "???" <===== WHAT KIND OF DATA
+            computer:
+                hostname: "name-of-the-host"
+                system:
+                    log:
+                        path: "path for logs"
+                        clear_previous: "filename or empty"
+                    anchor: "path to blender file directory"
+                    daemon:
+                        environments:
+                            key: value
+                            …
+                        transmit: bool
+                    blender_player:
+                        executable: "path to blenderplayer binary"
+                        environments:
+                            key: value
+                            …
+                    login:
+                        remote_command:
+                        python:
+                    
+        Il fill'in some internal configuration attributes:
+        _screen => {
+            'graphic_buffer': <= taken from screen->display->graphic_buffer
+            'viewport': <= taken from screen->display->viewport
+            'device_type': <= taken from screen->device_type
+            devtype: <= taken from screen->devtype
+            'keep_focus': <= taken from screen->keep_focus
+            }
+        _hostname <= taken from screen->computer->hostname
+        _log_file <= composed from screen->computer->system->log->path
+        _anchor <= taken from screen->computer->system->anchor
+        _blender_player => [
+            'executable': <= taken from screen->computer->system->blender_player->executable
+            'environments': {} <= duplicated from screen->computer->system->blender_player->environments and screen->display->environments
+            'options': <= taken from screen->display->options
+            }
+        _daemon => {
+            'command': [] <= list filled from several data (see setConfiguration() code).
+            'environments': {} <= duplicated from screen->computer->system->daemon->environments
+            }
+        """
         screen_conf = configuration['screen']
         computer_conf = configuration['computer']
         system = computer_conf['system']
@@ -108,6 +181,7 @@ class Logic:
         self._daemon = {'command': [],
                         'environments': {}}
 
+        # TODO: use dictionary update method with deep copies of environments.
         for name, value in system['daemon']['environments'].items():
             if system['daemon']['transmit']:
                 self._blender_player['environments'][name] = str(value)
@@ -134,12 +208,26 @@ class Logic:
 
         for index, argument in enumerate(self._daemon['command']):
             if ' ' in argument:
+                # TODO: check if can use shlex.quote()  in replacement.
+                # (what if a " is in the argument ?)
                 self._daemon['command'][index] = '"' + argument + '"'
 
     def getHostname(self):
         return self._hostname
 
     def setHierarchy(self, informations):
+        """\
+        Store nodes relations informations.
+
+        For the master node informations contain the 'port' number and
+        'nodes' list of screens names (all, including master).
+
+        For slave nodes informations contains the 'port' number and 'master'
+        host name.
+
+        :param informations: mapping infokey to info value.
+        :type informations: {'key':value}
+        """
         self._network = informations
 
     def is_master(self):
@@ -184,6 +272,16 @@ class Logic:
         self.logger.warning("Cannot start daemon for screen '" + self._name)
 
     def _stopDaemon(self):
+        """\
+        Stop the daemon and reset internal state.
+
+        On stopped, the daemon may be restarted.
+        """
+        if self.daemon_is_running():
+            self._clients['daemon'].send_command('kill daemon')
+        self._close_network_client(self._clients['blender_player'])
+        self._close_network_client(self._clients['daemon'])
+
         if self._process is not None:
             self._process.terminate()
             self._process.wait()
@@ -191,6 +289,11 @@ class Logic:
             self.logger.info("Daemon for screen '" + self._name + "' stopped !")
 
     def setNetworkClient(self, origin, client, addr):
+        # Note: In case of blender bvr tool, we directly manage socket reading,
+        # so we transmit socket object to addListenTo(), else we are dealing
+        # with Qt based console, and we transmit the socket fileno for Qt API.
+        # We added a test on BVR_LOADER_CREATION env var for use when adapting
+        # simulation files via Blender.
         if origin == 'daemon':
             if hasattr(self, '_check_daemon_timeout'):
                 del(self._check_daemon_timeout)
@@ -199,10 +302,16 @@ class Logic:
                 self.logger.error('Too many connexions of the daemon ...')
                 return
             self._clients['daemon'] = client
-            client.tag = self.getConsole().addListenTo(client.fileno(),
+            if 'bvr' in sys.modules and 'BVR_LOADER_CREATION' not in os.environ:
+                # Note: client is a blendervr.tools.connector.TcpServerConMgr,
+                # get its Socket object.
+                client.tag = self.getConsole().addListenTo(client.get_client(),
+                                                    self._recv_from_daemon)
+            else:
+                client.tag = self.getConsole().addListenTo(client.fileno(),
                                                     self._recv_from_daemon)
             for field in ['blender_player', 'log_to_clear']:
-                client.send(field, getattr(self, '_' + field))
+                client.send_command(field, getattr(self, '_' + field))
             self._send_loader_file()
             client.setCallback(self._message_from_daemon)
         elif origin == 'blender_player':
@@ -212,15 +321,24 @@ class Logic:
             self._set_current_state('building')
             self._clients['blender_player'] = client
 
-            client.tag = self.getConsole().addListenTo(client.fileno(),
+            if 'bvr' in sys.modules and 'BVR_LOADER_CREATION' not in os.environ:
+                # Note: client is a blendervr.tools.connector.TcpServerConMgr,
+                # get its Socket object.
+                client.tag = self.getConsole().addListenTo(client.get_client(),
+                                            self._recv_from_blender_player)
+            else:
+                client.tag = self.getConsole().addListenTo(client.fileno(),
                                             self._recv_from_blender_player)
             self._send_log_informations()
             self._send_log_to_file_information()
             for field in ['screen', 'complements', 'network', 'blender_file',
                                                         'processor_files']:
-                client.send(field, getattr(self, '_' + field))
-            client.send('base configuration ending')
+                client.send_command(field, getattr(self, '_' + field))
+            client.send_command('base configuration ending')
             client.setCallback(self._message_from_blender_player)
+        else:
+            print("*"*60 + "Unknwon origin " + origin)
+            raise RuntimeError("Unknwon origin " + origin)
 
     def _recv_from_daemon(self, *args):
         if self._clients['daemon'] is None:
@@ -307,19 +425,27 @@ class Logic:
     def _send_loader_file(self):
         if (self._clients['daemon'] is not None) \
                                     and (self._loader_file is not None):
-            self._clients['daemon'].send('loader_file', self._loader_file)
+            self._clients['daemon'].send_command('loader_file', self._loader_file)
 
 ###########################################################
     #  BlenderPlayer commands
 
-    def set_BlenderVR_state(self, state):
-        if state != (self._state != 'stopped'):
+    def set_BlenderVR_state(self, activate):
+        """\
+        Change BlenderVR node to activate/deactivate it.
+
+        Pass True to start BlenderVR, or False to stop it.
+
+        :param activate: activation of BlenderVR on the screen.
+        :type activate: bool
+        """
+        if activate != (self._state != 'stopped'):
             if self._clients['daemon']:
-                self._clients['daemon'].send('state', state)
+                self._clients['daemon'].send_command('state', activate)
 
     def send_to_blender_player(self, command, argument=''):
         if self._clients['blender_player']:
-            self._clients['blender_player'].send(command, argument)
+            self._clients['blender_player'].send_command(command, argument)
 
     def ask_blender_player_to_quit(self):
         self.send_to_blender_player('quit')
@@ -343,3 +469,5 @@ class Logic:
         self._state = state
         self.getConsole().updateStatus('Screen ' + self._name + ' ' + state)
         self.getConsole()._update_status()
+
+Logic = ConsoleScreenLogic

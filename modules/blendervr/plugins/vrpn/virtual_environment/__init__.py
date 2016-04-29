@@ -72,7 +72,7 @@ class VRPN(base.Base):
                     for element in configuration[key]:
                         try:
                             self._devices.append(className(self, element))
-                        except exceptions.Processor_Invalid_Device_Method \
+                        except exceptions.Processor_Invalid_Device_MethodError \
                                                                 as method:
                             if self._display_processors:
                                 self.logger.warning(method)

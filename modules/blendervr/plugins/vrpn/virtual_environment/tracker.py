@@ -86,16 +86,16 @@ class Tracker(device.Receiver):
         self._scale = configuration['scale']
 
         if 'sensors' not in configuration:
-            raise exceptions.Processor_Invalid_Device('VRPN tracker must '
+            raise exceptions.Processor_Invalid_DeviceError('VRPN tracker must '
                                                 'have at least one sensor')
         self._sensors = {}
         for element in configuration['sensors']:
             try:
                 sensor = _Sensor(self, element)
-            except exceptions.Processor_Invalid_Device_Method as method:
+            except exceptions.Processor_Invalid_Device_MethodError as method:
                 if self.getParent()._display_processors:
                     self.logger.warning(method)
-            except exceptions.Processor_Invalid_Device as other:
+            except exceptions.Processor_Invalid_DeviceError as other:
                 self.logger.warning(other)
             else:
                 self._sensors[sensor.getID()] = sensor

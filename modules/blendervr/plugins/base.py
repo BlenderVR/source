@@ -50,7 +50,7 @@ class Common:
 if is_virtual_environment():
     from ..player import base
 
-    class Base(Common, base.Base):
+    class PluginBase(Common, base.Base):
         def __init__(self, parent):
             Common.__init__(self)
             base.Base.__init__(self, parent)
@@ -81,11 +81,12 @@ if is_virtual_environment():
         @property
         def virtual_environment(self):
             return self._main
+    Base = PluginBase
 
 elif is_console():
     from ..console import base
 
-    class Base(Common, base.Base):
+    class PluginBase(Common, base.Base):
         def __init__(self, parent):
             Common.__init__(self)
             base.Base.__init__(self, parent)
@@ -98,3 +99,5 @@ elif is_console():
 
         def getXMLParserClass(self):
             return None
+    Base = PluginBase
+

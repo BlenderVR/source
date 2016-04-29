@@ -186,7 +186,7 @@ if is_virtual_environment():
                 self._local = _HCNav(self, None, method)
             else:
                 from ..player import exceptions
-                raise exceptions.Processor('Invalid method or processor !')
+                raise exceptions.ProcessorError('Invalid method or processor !')
 
         def setDefaultUser(self, user):
             self._default_user = user

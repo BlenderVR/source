@@ -37,5 +37,7 @@
 ##
 
 
-class Main(Exception):
+class MainConsoleError(Exception):
     pass
+
+Main = MainConsoleError

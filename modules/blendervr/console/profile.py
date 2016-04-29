@@ -41,7 +41,11 @@ import os
 import copy
 
 
-class Profile:
+class ConsoleProfile:
+    """Storage of configuration profile for a Console.
+
+
+    """
     def __init__(self, configuration_file):
         self._configuration_file = configuration_file
         self._lock = False
@@ -96,15 +100,16 @@ class Profile:
         if isinstance(index, str):
             return [index]
         return index
-        result = []
-        for sub_index in index:
-            normalized_name = ''
-            for char in str(sub_index):
-                if not char.isalnum():
-                    char = "_%x" % ord(char)
-                normalized_name += char
-            result.append(normalized_name)
-        return result
+        # TODO: Dead code ! remove…
+        #result = []
+        #for sub_index in index:
+            #normalized_name = ''
+            #for char in str(sub_index):
+                #if not char.isalnum():
+                    #char = "_%x" % ord(char)
+                #normalized_name += char
+            #result.append(normalized_name)
+        #return result
 
     def setValue(self, index, value, write=True):
         if self._lock:
@@ -160,3 +165,5 @@ class Profile:
         else:
             current = [value] + previous
         self.setValue(index, current, write)
+
+Profile = ConsoleProfile

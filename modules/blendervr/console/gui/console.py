@@ -37,7 +37,7 @@
 ##
 
 
-class GUI:
+class ConsoleGUI:
 
     def __init__(self):
         self.profile.setDefault({'config': {'file': '',
@@ -64,3 +64,4 @@ class GUI:
     def _update_status(self):
         pass
 
+GUI = ConsoleGUI

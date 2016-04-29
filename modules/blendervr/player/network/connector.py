@@ -35,7 +35,9 @@
 ## The fact that you are presently reading this means that you have had
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
-
+"""\
+Connection between BlenderVR players for efficient duplication of scene data.
+"""
 import struct
 import socket
 import select
@@ -72,7 +74,7 @@ class Connector(base.Base):
             self._address = None
             self._port = port
         self.BUFFER_SIZE = 4096
-
+        self.logger.debug("Connetor to %s:%d", self._address, self._port)
         self.isReady = lambda *args: False
 
     def selectSocket(self):
@@ -105,11 +107,12 @@ class Connector(base.Base):
                 sended_size += chunk_size
         except:
             self._loosedConnexion(socket)
+Connector = PlayerConnector
 
-class Master(Connector):
+class MasterConnector(PlayerConnector):
 
     def __init__(self, parent, config):
-        Connector.__init__(self, parent, config)
+        PlayerConnector.__init__(self, parent, config)
 
         self.isMaster = lambda *args: True
 
@@ -136,14 +139,14 @@ class Master(Connector):
             try:
                 screen_name = client_socket.recv(ID_SIZE).decode().rstrip()
             except socket.error:
-                raise exceptions.Controller("Protocol error: client don't "
+                raise exceptions.ControllerError("Protocol error: client don't "
                                         "send correct connection message !")
             self.logger.info('Main Connection of a client [' +
                                         str(screen_name) + ']:', address)
 
             for index, client in self._clients.items():
                 if client['name'] == screen_name:
-                    raise exceptions.Controller("Protocol error : client "
+                    raise exceptions.ControllerError("Protocol error : client "
                                                 "already defined !")
             self._clients[client_socket] = {'name': screen_name,
                                             'socket': client_socket,
@@ -229,12 +232,13 @@ class Master(Connector):
                                             select.select([], clients, [])
             for client in clients:
                 self.sendTo(client, data)
+# Keep for compatibility.
+Master = MasterConnector
 
-
-class Slave(Connector):
+class SlaveConnector(PlayerConnector):
 
     def __init__(self, parent, config):
-        Connector.__init__(self, parent, config)
+        PlayerConnector.__init__(self, parent, config)
         self.isMaster = lambda *args: False
 
         self._master = config['master']
@@ -263,7 +267,7 @@ class Slave(Connector):
         if self.selectSocket():
             ready = self._socket.recv(COMMAND_SIZE)
             if ready != EVERYBODY_HERE:
-                raise exceptions.Controller("Protocol error: server don't "
+                raise exceptions.ControllerError("Protocol error: server don't "
                                             "send Everybody is here !")
             self.isReady = lambda *args: True
 
@@ -318,3 +322,5 @@ class Slave(Connector):
 
     def _loosedConnexion(self, socket):
         self.BlenderVR.quit('Lost connexion to master')
+# Keep for compatibility
+Slave = SlaveConnector

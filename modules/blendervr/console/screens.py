@@ -39,9 +39,9 @@
 from . import base
 from .logic import screens as logic
 from .qt import screens as gui
+from . import screen
 
-
-class Screens(base.Base, logic.Logic, gui.GUI):
+class ConsoleScreens(base.Base, logic.Logic, gui.GUI):
     def __init__(self, parent):
         base.Base.__init__(self, parent)
 
@@ -55,3 +55,14 @@ class Screens(base.Base, logic.Logic, gui.GUI):
     def quit(self):
         logic.Logic.quit(self)
         gui.GUI.quit(self)
+
+    def build_screen(self, *args):
+        """\
+        Build a console screen corresponding to this GUI.
+        
+        This method is used by subclass as a factory to build Screen objects
+        corresponding to running GUI.
+        """
+        return screen.ConsoleScreen(*args)
+    
+Screens = ConsoleScreens

@@ -36,19 +36,43 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
+"""Protocole to encapsulate data into messages.
+
+We simply use a string containig command key followed by a JSON serialization 
+of command argument: "command: arguments_jsonified"
+"""
+
 import json
 
 
 def composeMessage(command, argument=''):
+    """\
+    Build message representationfrom command and optional arguments.
+
+    :param command: simple command word
+    :type command: string
+    :param argument: JSON serializable data (eventually compound structure)
+        Default to empty string.
+    :type argument: anything serializablen.
+    :rtype: string
+    :return: representation of the message 
+    """
     return command + ':' + json.dumps(argument)
 
 
 def decomposeMessage(message):
-    message = message.split(':')
-    command = message[0]
-    argument = ':'.join(message[1:])
+    """\
+    Retrieve command and arguments from serialized message.
+
+    :param message: message representation (serialized).
+    :type message: string
+    :rtype: (string, data)
+    :return: command and its associated argument
+    """
+    command, argument = message.split(':', 1)
     try:
         argument = json.loads(argument)
     except:
+        # TODO: log some error
         pass
     return (command, argument)
