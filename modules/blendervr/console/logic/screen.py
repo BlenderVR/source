@@ -79,10 +79,13 @@ class ConsoleScreenLogic:
 
     def quit(self):
         self._stop = True
+        if self.daemon_is_running():
+            self._clients['daemon'].send_command('kill daemon')
+        self._close_network_client(self._clients['blender_player'])
+        self._close_network_client(self._clients['daemon'])
         self._stopDaemon()
 
     def restartDaemon(self):
-        raise RuntimeError("! Who called it ???")
         if self.daemon_is_running():
             self._stopDaemon()
         self._startDaemon()
@@ -149,6 +152,8 @@ class ConsoleScreenLogic:
             'command': [] <= list filled from several data (see setConfiguration() code).
             'environments': {} <= duplicated from screen->computer->system->daemon->environments
             }
+
+        Note: _xxx attributes are used in some places with getattr.
         """
         screen_conf = configuration['screen']
         computer_conf = configuration['computer']
@@ -273,15 +278,10 @@ class ConsoleScreenLogic:
 
     def _stopDaemon(self):
         """\
-        Stop the daemon and reset internal state.
+        Stop the daemon process and reset internal state.
 
-        On stopped, the daemon may be restarted.
+        Once stopped, the daemon may be restarted.
         """
-        if self.daemon_is_running():
-            self._clients['daemon'].send_command('kill daemon')
-        self._close_network_client(self._clients['blender_player'])
-        self._close_network_client(self._clients['daemon'])
-
         if self._process is not None:
             self._process.terminate()
             self._process.wait()

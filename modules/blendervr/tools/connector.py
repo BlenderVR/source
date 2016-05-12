@@ -56,7 +56,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Set to true to print packets to (real) stdout (sys.__stdout__). Help debugging.
-SOCKET_DEBUG = True
+SOCKET_DEBUG = False
 
 
 class ConnectorCommon:

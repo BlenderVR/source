@@ -19,7 +19,7 @@ sys.path.append("/".join((BlenderVR_root, 'modules')))
 
 import blendervr.tools.logger
 logger = blendervr.tools.logger.getLogger('loader creation')
-logger.addLoginWindow(blendervr.tools.logger.Console(''), True)
+logger.addLoginWindow(blendervr.tools.logger.ConsoleLogger(''), True)
 
 
 try:

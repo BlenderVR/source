@@ -39,11 +39,11 @@
 from .. import *
 
 if is_virtual_environment():
-    from ..player import base
+    from blendervr.player import base
 elif is_console():
-    from ..console import base
+    from blendervr.console import base
 elif is_creating_loader():
-    from ..loader import base
+    from blendervr.loader import base
 
 
 class ProcessorCommon(base.Base):

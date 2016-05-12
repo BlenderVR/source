@@ -140,6 +140,20 @@ class BlenderVRLogger(logging.getLoggerClass()):
 Logger = BlenderVRLogger
 
 class ConsoleLogger:
+    """\
+    Write messages to standard streams.
+    
+    The stream stderr or stdout is selected upon message level.
+    
+    """
+    # Note: this is used as a stream for a logging.StreamHandler() object creation
+    # via login_window parameter in BlenderVRLogger.addLoginWindow(),
+    # called in blendervr.update_loader main code.
+
+    # TODO: Log level identification is based on the message representation, 
+    # bad idea as this can be modified by a log formatter.
+    # Rework this to a proper log handler (and not a StreamHandler hack on the
+    # stream).
     def __init__(self, msg='Console logger: '):
         self._mapping = {'DEBUG': sys.stdout,
                          'INFO': sys.stdout,
@@ -149,18 +163,18 @@ class ConsoleLogger:
         self._logging_prefix = msg
 
     def write(self, *messages):
-        elements = []
-        for message in messages:
-            elements.append(str(message))
-        for message in (' '.join(elements)).split('\n'):
+        # Get string representation of data to write.
+        wholemessage = " ".join([str(x) for x in messages])
+        # Split while message data by lines and write non-empty lines.
+        for message in wholemessage.split('\n'):
             message = message.rstrip(' \n\r')
-            if len(message) > 0:
+            if message:
                 message_type = message.split('>')
                 message_type = message_type[0]
-                if message_type in self._mapping:
-                    dest = self._mapping[message_type]
-                    dest.write(self._logging_prefix + message + '\n')
-                    dest.flush()
+                # Write to ad-hoc stream for message type, stdout if no corresponding stream.
+                dest = self._mapping.get(message_type, sys.stdout)
+                dest.write(self._logging_prefix + message + '\n')
+                dest.flush()
 # Keep for compatibility.
 Console = ConsoleLogger
 

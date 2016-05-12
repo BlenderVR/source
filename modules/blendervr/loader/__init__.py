@@ -52,6 +52,8 @@ def main():
 class Creator:
     def __init__(self, logger):
 
+        print("\n===\n",repr(sys.argv),"\n===\n",file=sys.__stdout__)
+        print("Creating loadeer:", is_creating_loader(),"\n===\n",file=sys.__stdout__)
         self._logger = logger
         self._logger.setLevel('debug')
 

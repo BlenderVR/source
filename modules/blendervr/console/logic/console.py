@@ -254,6 +254,9 @@ class ConsoleLogic:
         # TODO: what about returning False ?
 
     def update_user_files(self, force=False):
+        """\
+        Patch user xxxx.blend file, creating corresponding .xxxx.blend
+        """
         blender_file = self.profile.getValue(['files', 'blender'])
 
         processor_files = [self.profile.getValue(['files', 'processor'])] + \
@@ -263,7 +266,7 @@ class ConsoleLogic:
                 self._processor.quit()
                 del(self._processor)
             try:
-                from ...processor import _getProcessor
+                from blendervr.processor import _getProcessor
                 processor = _getProcessor(processor_files, self.logger,
                             self.profile.getValue(['debug', 'processor']))
                 self._processor = processor(self)
