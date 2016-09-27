@@ -193,7 +193,11 @@ class Logic:
     def setNetworkClient(self, origin, client, addr):
         if origin == 'daemon':
             if hasattr(self, '_check_daemon_timeout'):
-                del(self._check_daemon_timeout)
+                try:
+                    self._check_daemon_timeout.cancel()
+                except:
+                    del(self._check_daemon_timeout)
+
             self.logger.info("Daemon for screen '" + self._name + "' started")
             if self._clients['daemon'] is not None:
                 self.logger.error('Too many connexions of the daemon ...')
@@ -233,6 +237,7 @@ class Logic:
             return False
         if not self._clients['blender_player'].run():
             self._close_network_client(self._clients['blender_player'])
+
 
     def _message_from_daemon(self, command, argument):
         if command in ['stdout', 'stderr']:
@@ -293,6 +298,8 @@ class Logic:
     #  Misc
     def adapt_simulation_files_to_screen(self, loader_file, blender_file,
                                                             processor_files):
+
+
         self._loader_file = loader_file.unstrip(self._anchor)
         self._blender_file = blender_file.unstrip(self._anchor)
         self._processor_files = []

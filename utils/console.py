@@ -68,7 +68,7 @@ def main():
             with open(__main__.profile_file, 'rb') as node:
                 consoleuration = pickle.load(node)
             import pprint
-            print("Consoleuration:")
+            print("Current Configuration:")
             pprint.pprint(consoleuration)
         except:
             print('Invalid profile file:', __main__.profile_file)
@@ -81,25 +81,110 @@ def main():
             pass
         sys.exit()
 
-    import blendervr.console.console
-    console = blendervr.console.console.Console(__main__.profile_file)
-    console.start()
-    console.main()
-    console.quit()
-    del(console)
+    #Start launch mode
+    elif __main__.environments.launch:
+        #on-the-fly mode
+        if sys.platform.startswith("win"):
+            print("\tWindows doesn't currently supports BlenderVR in terminal mode")
+        else:
+            if __main__.environments.launch == "start":
+                import blendervr.terminal.terminal
+                console = blendervr.terminal.terminal.Terminal(__main__.profile_file, __main__.environments.config,
+                                                       __main__.environments.blender_file, __main__.environments.processor_file,
+                                                       __main__.environments.screen, True)
+                console.start()
+
+                if __main__.environments.log is not None:
+                    console.log_in_file(__main__.environments.log)
+
+                console.main()
+                console.quit()
+                del(console)
+            #xml mode
+            elif __main__.environments.launch == "start-xml":
+                import blendervr.terminal.terminal
+                data = get_data(__main__.environments.launch_xml)
+                console = blendervr.terminal.terminal.Terminal(__main__.profile_file, data['configuration'],data['blender'],
+                                                       data['processor'], data['screen'], True)
+
+                console.start()
+
+                if __main__.environments.log is not None:
+                    console.log_in_file(__main__.environments.log)
+
+                console.main()
+                console.quit()
+                del(console)
+
+    #Start console mode
+    elif __main__.environments.console_mode:
+        if sys.platform.startswith("win"):
+            print("\tWindows doesn't currently supports BlenderVR in terminal mode")
+        else:
+            import blendervr.terminal.terminal
+            console = blendervr.terminal.terminal.Terminal(__main__.profile_file)
+            console.start()
+            console.main()
+            console.quit()
+            del(console)
+
+    else:
+        #Start GUI mode
+        import blendervr.console.console
+        console = blendervr.console.console.Console(__main__.profile_file)
+        console.start()
+        console.main()
+        console.quit()
+        del(console)
 
 
-try:
-    import PyQt4
-    BlenderVR_QT = 'PyQt4'
-except:
-    try:
-        import PySide
-        BlenderVR_QT = 'PySide'
+if not __main__.environments.console_mode and not __main__.environments.launch:
+    try: 
+        import PyQt4
+        BlenderVR_QT = 'PyQt4'
     except:
-        print('No graphic library available : quitting !')
-        sys.exit()
+        try:
+            import PySide
+            BlenderVR_QT = 'PySide'
+        except:
+            print('No graphic library available : quitting !')
+            sys.exit()
+else:
+	BlenderVR_QT = None
 
+def get_data(xml_file):
+    try:
+        import xml.etree.ElementTree
+        tree = xml.etree.ElementTree.parse(xml_file)
+        root = tree.getroot()
+
+        config = root.find('configuration-file').attrib['file']
+        blender = root.find('blender').attrib['file']
+        processor = root.find('processor').attrib['file']
+        screen = root.find('default-screen').attrib['screen']
+
+        data = {'configuration' : config,
+                'blender' : blender,
+                'processor' : processor,
+                'screen' : screen,}
+
+        is_valid_data = True
+        for item in data:
+            if item is None:
+                is_valid_data = False
+
+        if is_valid_data:
+            return data
+
+        else:
+            print("Missing arguments in xml File")
+            print("Not Valid XML File")
+            return None
+
+    except Exception as e:
+        print(e)
+        print("Not Valid XML File")
+        return None
 
 if __name__ == "__main__":
     main()

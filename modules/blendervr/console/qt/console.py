@@ -36,6 +36,7 @@
 ## knowledge of the CeCILL license and that you accept its terms.
 ##
 
+
 from ...tools.gui.qt import QtGui, QtCore, Common
 from ..gui.console import GUI as common_GUI
 import os
@@ -152,6 +153,7 @@ class GUI(common_GUI):
                                 socket, QtCore.QSocketNotifier.Read, data)
         notifier.activated.connect(callback)
         return notifier
+
 
     def removeListenTo(self, tag):
         del(tag)

@@ -153,36 +153,11 @@ elif blendervr.is_creating_loader():
 
 elif blendervr.is_console():
 
-    from blendervr.tools.gui.qt import QtGui
 
     class Common(blendervr.processor.getProcessor()):
 
         def __init__(self, parent, ui_path=None, head_navigator=None):
             super(Common, self).__init__(parent)
 
-            # The common processor should be loaded at first !
-            self._window = QtGui.QDialog()
-            if ui_path:
-                self._ui = blendervr.tools.gui.load(ui_path, self._window)
-                try:
-                    self._ui.navigation.clicked.connect(self.cb_navigation)
-                    self._ui.calibration.clicked.connect(self.cb_calibration)
-                    self._ui.home.clicked.connect(self.cb_home)
-                except:
-                    pass
-
-            if head_navigator is not None:
-                from blendervr.interactor.head_controlled_navigation import (
-                                                                        HCNav)
-                self._navigator = HCNav(self)
-                self.registerInteractor(self._navigator)
-
-        def show(self):
-            self._window.show()
-
-        def hide(self):
-            self._window.hide()
-
         def quit(self):
-            self._window.close()
             super(Common, self).quit()

@@ -104,6 +104,35 @@ parser.add_argument("--delete-console", dest="del_console",
                     help="Delete current configuration of the console",
                     action="store_true", default=False)
 
+#Start in console mode. Gives you more control, but requires more user intervention.
+parser.add_argument("--start-in-console", dest="console_mode",
+                    help="Start BlenderVR in the terminal",
+                    action="store_true", default=False)
+
+
+#Start the blenderplayer with only one command (Pretty useful for the YURT and on-the-fly rendering)
+subparsers = parser.add_subparsers(dest='launch')
+start = subparsers.add_parser("start")
+start.add_argument("-configuration", dest='config', required=True, help="Configuration File", default=None)
+start.add_argument("-screen", dest='screen', required=True, help="Screen set name", default=None)
+start.add_argument("-blend", dest='blender_file', required=True, help="blender File location", default=None)
+start.add_argument("-processor", dest='processor_file', required=True, help="Processor file location", default=None)
+start.add_argument("-log", dest='log', help="Log to desired file", default=None)
+
+"""
+Start using an xml profile. Basically the same as the "Start the blenderplayer with only one command", but it lets you
+save the options for different applications in xml files making the command simpler and more easy for the users.
+
+Example, instead of writing start with 4 argument, you only write start-xml with one argument(the location of the xml file)
+and you don't have to worry about mispelling or pointing at the right files everytime, becuase it is already set up in the
+xml file. Convenient way to run standalone applications. See an example under source/samples/profile_spider.xml
+"""
+xml_ = subparsers.add_parser("start-xml")
+xml_.add_argument("-start", dest="launch_xml", help="Start from xml file", default=None, required=True)
+xml_.add_argument("-screen", dest="screen_o", help="Use other screen but the default", default=None)
+xml_.add_argument("-log", dest='log', help="Log to desired file", default=None)
+
+
 environments = parser.parse_args(sys.argv[1:])
 
 root = None
@@ -111,6 +140,10 @@ root = None
 # Is BlenderVR_root given on command line ?
 if environments.BlenderVR_root is not None:
     root= environments.BlenderVR_root
+
+# Use our container directory as root.
+if not isValidRoot(root):
+    root = os.path.dirname(os.path.realpath(__file__))
 
 # Is root available in profile file ?
 if not isValidRoot(root):
@@ -123,9 +156,6 @@ if not isValidRoot(root):
     except:
         pass
 
-# Use our container directory as root.
-if not isValidRoot(root):
-    root = os.path.dirname(os.path.realpath(__file__))
 
 # Without root, we cannot start.
 if not isValidRoot(root):
@@ -135,7 +165,7 @@ if not isValidRoot(root):
     sys.exit()
 
 # IMPORTANT !
-# Modify all scipts environment by inserting a new builtin name.
+# Modify all scripts environment by inserting a new builtin name.
 builtins.BlenderVR_root = root
 
 # Start main() function from utils/blendervr.py module.
