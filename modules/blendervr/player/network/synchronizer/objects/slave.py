@@ -37,7 +37,7 @@
 ##
 
 #import copy
-#import bge
+import bge
 from .... import exceptions
 from . import Synchronizer
 
@@ -51,7 +51,6 @@ class Slave(Synchronizer):
         self._synchronizer.addSynchronizedObject(0, self._root)
 
     def processSynchronizerBuffer(self, buff):
-
         while len(buff) > 0:
             command = buff.command()
 
@@ -77,6 +76,13 @@ class Slave(Synchronizer):
                 if not parent_item:
                     continue
                 children = parent_item.getItemByName(children_name, sg_parent)
+                 
+                #If the item_id already exists in synchronizer, that mean this item is a copy. create a new one with the id given
+                if self._synchronizer.isObjectInSynchronizer(id(children)):
+                    children_to_copy = parent_item.getItemByName(children_name, sg_parent)
+                    children = self.createCopy(children_to_copy)
+                    if children == None:
+                        children = children_to_copy 
                 self._synchronizer.addSynchronizedObject(children_id,
                                                     self.getItem(children))
                 continue
@@ -85,6 +91,13 @@ class Slave(Synchronizer):
                                           " not start of item ("
                                           + str(command) + ") !")
         return
+	
+    def createCopy(self, children_to_copy):
+        try:
+            object = bge.logic.getCurrentScene().addObject(str(children_to_copy), str(children_to_copy), 0)
+            return object
+        except:
+            return None
 
     def getObjectByMasterID(self, master_id):
         return self._synchronizer.getObjectByID(master_id)
