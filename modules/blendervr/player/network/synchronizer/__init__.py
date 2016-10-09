@@ -71,6 +71,13 @@ class Base(base.Base):
             return self._synchronizedObjects[object_id]
         return None
 
+    def isObjectInSynchronizer(self, object_id):
+        for obj in self._synchronizedObjects.values():
+            if hasattr(obj, 'getItemID'):
+                if obj.getItemID() == object_id:
+                    return True
+        return False
+
     def run(self):
         pass
 
